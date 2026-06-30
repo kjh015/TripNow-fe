@@ -81,7 +81,7 @@ const MainPageCard = ({ boardId, score, rank }) => {
         <div style={{ position: "relative", width: "100%" }}>
           {board.imagePaths && board.imagePaths.length > 0 ? (
             <img
-              src={`http://14.63.178.161${board.imagePaths[0]}`}
+              src={`${process.env.REACT_APP_IMAGE_BASE_URL}${board.imagePaths[0]}`}
               alt="Main visual"
               className="card-img-top"
               style={{

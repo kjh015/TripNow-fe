@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import SignApiClient from '../sign/service/SignApiClient';
 import { useEffect, useState } from 'react';
 import UserAuthentication from '../sign/service/UserAuthentication';
+import { formatDate } from '../utils/dateUtils';
 import { toast } from 'react-toastify';
 
 // 프로필 이미지 예시
@@ -65,10 +66,6 @@ const MyPage = () => {
     getMember();
   }, []);
 
-  const formatDate = (isoString) => {
-    if (!isoString) return "";
-    return isoString.substring(0, 16).replace("T", " ");
-  };
 
   return (
     <div style={{

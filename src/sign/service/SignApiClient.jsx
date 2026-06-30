@@ -1,7 +1,7 @@
-import { authFetch } from "../../AuthFetch";
+﻿import { authFetch } from "../../AuthFetch";
 
 class SignApiClient {
-    static SERVER_URL = "http://14.63.178.161:8000/api/sign";
+    static SERVER_URL = `${process.env.REACT_APP_API_BASE_URL}/api/sign`;
     static ADMIN = "/admin";
     static SIGN_UP = "/sign-up";
     static CHECK_DUP = "/check-duplicate"

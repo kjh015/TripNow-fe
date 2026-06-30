@@ -6,6 +6,8 @@ import CommonApiClient from './service/CommonApiClient';
 
 import { Badge } from "react-bootstrap";
 import { FaMapMarkedAlt } from "react-icons/fa";
+import { categoryColors, regionColors } from "../constants/colorMaps";
+import { formatDate } from "../utils/dateUtils";
 
 const CheckMyArt = () => {
     const [boards, setBoards] = useState([]);
@@ -17,15 +19,6 @@ const CheckMyArt = () => {
 
     const navigate = useNavigate();
     const isLoggedIn = !!localStorage.getItem('accessToken');
-
-    const categoryColors = {
-        축제: "danger", 공연: "primary", 행사: "success", 체험: "warning",
-        쇼핑: "info", 자연: "success", 역사: "secondary", 가족: "dark", 음식: "warning",
-    };
-    const regionColors = {
-        서울: "primary", 부산: "info", 제주: "success", 강원: "danger", 경기: "info", 기타: "warning",
-        대구: "secondary", 인천: "dark", 전남: "secondary"
-    };
 
 
 
@@ -53,10 +46,6 @@ const CheckMyArt = () => {
 
 
 
-    const formatDate = (isoString) => {
-        if (!isoString) return "";
-        return isoString.substring(0, 16).replace("T", " ");
-    };
 
     return (
         <div

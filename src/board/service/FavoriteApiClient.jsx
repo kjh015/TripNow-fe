@@ -1,7 +1,7 @@
-import { authFetch } from "../../AuthFetch";
+﻿import { authFetch } from "../../AuthFetch";
 
 class FavoriteApiClient {
-    static SERVER_URL = "http://14.63.178.161:8000/api/favorite";
+    static SERVER_URL = `${process.env.REACT_APP_API_BASE_URL}/api/favorite`;
     static POST_TOGGLE = "/toggle";
     static POST_EXISTS = "/exists";
 

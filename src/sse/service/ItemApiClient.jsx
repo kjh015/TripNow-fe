@@ -1,5 +1,5 @@
-class ItemApiClient {
-    static SERVER_URL = "http://localhost:8000/sse";
+﻿class ItemApiClient {
+    static SERVER_URL = `${process.env.REACT_APP_API_BASE_URL}/sse`;
     static POST_ITEM = "/item";
 
     static sendItem(item){

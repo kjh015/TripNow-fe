@@ -1,7 +1,7 @@
-import { authFetch } from "../../AuthFetch";
+﻿import { authFetch } from "../../AuthFetch";
 
 class FormatApiClient {
-    static SERVER_URL = "http://14.63.178.161:8000/api/format/admin";
+    static SERVER_URL = `${process.env.REACT_APP_API_BASE_URL}/api/format/admin`;
     static GET_LIST = "/list"
     static GET_VIEW = "/view"
     static POST_ADD = "/add";

@@ -5,26 +5,16 @@ import BoardApiClient from "../../service/BoardApiClient";
 import BoardSearch from "./BoardSearch";
 import { Tooltip, Card, Badge, OverlayTrigger, Carousel } from "react-bootstrap";
 import { FaMapMarkedAlt } from "react-icons/fa";
+import { categoryColors, regionColors } from "../../../constants/colorMaps";
+import { formatDate } from "../../../utils/dateUtils";
 
 const BoardList = () => {
   const [boards, setBoards] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(false);
-  // const [sort, setSort] = useState("popular");
-  // const [sortName, setSortName] = useState("인기 순");
-  // const [direction, setDirection] = useState("desc");
   const [docCount, setDocCount] = useState(0);
-  // const [page, setPage] = useState(0);
   const [alert, setAlert] = useState({ show: false, message: '', type: '' });
-  const categoryColors = {
-    축제: "danger", 공연: "primary", 행사: "success", 체험: "warning",
-    쇼핑: "info", 자연: "success", 역사: "secondary", 가족: "dark", 음식: "warning",
-  };
-  const regionColors = {
-    서울: "primary", 부산: "info", 제주: "success", 강원: "danger", 경기: "info", 기타: "warning",
-    대구: "secondary", 인천: "dark", 전남: "secondary"
-  };
   const SORT_NAME_MAP = {
     "popular-desc": "인기 순",
     "ratingAvg-desc": "높은 평점 순",
@@ -128,17 +118,6 @@ const BoardList = () => {
   };
 
 
-  const formatDate = (isoString) => {
-    if (!isoString) return "";
-    const date = new Date(isoString + "+09:00");
-    return (
-      date.getFullYear() + "-" +
-      String(date.getMonth() + 1).padStart(2, "0") + "-" +
-      String(date.getDate()).padStart(2, "0") + " " +
-      String(date.getHours()).padStart(2, "0") + ":" +
-      String(date.getMinutes()).padStart(2, "0")
-    );
-  };
 
   const handleSort = ({ sort, direction, name }) => {
     params.set("sort", sort);

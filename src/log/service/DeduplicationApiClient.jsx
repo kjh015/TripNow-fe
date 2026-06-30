@@ -1,7 +1,7 @@
-import { authFetch } from "../../AuthFetch";
+﻿import { authFetch } from "../../AuthFetch";
 
 class DeduplicationApiClient {
-    static SERVER_URL = "http://14.63.178.161:8000/api/deduplication/admin";
+    static SERVER_URL = `${process.env.REACT_APP_API_BASE_URL}/api/deduplication/admin`;
     static GET_LIST = "/list";
     static GET_VIEW = "/view";
     static POST_ADD = "/add";
