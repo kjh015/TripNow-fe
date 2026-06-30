@@ -1,10 +1,11 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
+﻿import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from 'react-router-dom';
 import RegionRadioComp from './RegionRadioComp';
 import BoardApiClient from '../../service/BoardApiClient';
 import { useState, useEffect } from 'react';
 import CategoryCard from './CategoryCard';
+import useAlert from '../../../hooks/useAlert';
 
 const BoardWritePage = () => {
     const navigate = useNavigate();
@@ -20,22 +21,13 @@ const BoardWritePage = () => {
 
     const [images, setImages] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
-    // Bootstrap Alert 상태 (처음에 show: false)
-    const [alert, setAlert] = useState({ show: false, message: '', type: '' });
-
-    // Alert 메시지 자동 닫힘 (0.5초)
-    useEffect(() => {
-        if (alert.show) {
-            const timer = setTimeout(() => setAlert(prev => ({ ...prev, show: false })), 500);
-            return () => clearTimeout(timer);
-        }
-    }, [alert.show]);
+    const { alert, showAlert } = useAlert(500);
 
     // 로그인 체크 및 닉네임 셋팅
     useEffect(() => {
         let nickname = localStorage.getItem("nickname");
         if (!nickname) {
-            setAlert({ show: true, message: "로그인이 필요합니다.", type: "danger" });
+            showAlert("로그인이 필요합니다.", "danger" );
             setTimeout(() => navigate(-1), 500); // 0.5초 후 뒤로가기
             return;
         }
@@ -92,7 +84,7 @@ const BoardWritePage = () => {
         e.preventDefault();
 
         if (!images || images.length === 0) {
-            setAlert({ show: true, message: "사진을 한 장 이상 첨부해 주세요!", type: "danger" });
+            showAlert("사진을 한 장 이상 첨부해 주세요!", "danger" );
             return;
         }
 
@@ -104,13 +96,13 @@ const BoardWritePage = () => {
         try {
             const response = await BoardApiClient.addBoard(formData);
             if (response.ok) {
-                setAlert({ show: true, message: "글 작성이 완료되었습니다.", type: "success" });
+                showAlert("글 작성이 완료되었습니다.", "success" );
                 setTimeout(() => navigate('/board/list'), 500); // 0.5초 후 이동, 잔상 없음
             } else {
-                setAlert({ show: true, message: "글 작성에 실패하였습니다.", type: "danger" });
+                showAlert("글 작성에 실패하였습니다.", "danger" );
             }
         } catch (err) {
-            setAlert({ show: true, message: "오류가 발생했습니다.", type: "danger" });
+            showAlert("오류가 발생했습니다.", "danger" );
             console.error(err);
         }
     };

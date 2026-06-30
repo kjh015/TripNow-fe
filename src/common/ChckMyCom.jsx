@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import CommonApiClient from "./service/CommonApiClient";
 import { useNavigate } from "react-router-dom";
-import { FaMapMarkedAlt } from "react-icons/fa";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const renderStarsStatic = (score = 0) => (
     <span>
@@ -41,31 +41,7 @@ const ChckMyCom = () => {
 
     // 1. 로딩 중일 때 비행기 애니메이션 노출
     if (loading) {
-        return (
-            <div className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: 140, marginTop: "100px" }}>
-                {/* 아이콘 + 스피너 */}
-                <div className="mb-3" style={{ position: "relative", width: 100, height: 100 }}>
-                    <FaMapMarkedAlt size={70} color="#6cb4f8" style={{ filter: "drop-shadow(0 4px 12px #aee7ff77)" }} />
-                    <div
-                        className="spinner-border"
-                        style={{
-                            position: "absolute",
-                            top: -10,
-                            left: -15,
-                            width: 100,
-                            height: 100,
-                            borderWidth: "6px",
-                            opacity: 0.5,
-                            color: "#6cb4f8"
-                        }}
-                        role="status"
-                    />
-                </div>
-                <div className="mt-2 fs-5 text-secondary">
-                    데이터를 불러오는 중...
-                </div>
-            </div>
-        );
+        return <div style={{ marginTop: "100px" }}><LoadingSpinner minHeight={140} /></div>;
     }
 
     // 2. 로딩이 끝나면, 댓글 목록 or "없음" 표시

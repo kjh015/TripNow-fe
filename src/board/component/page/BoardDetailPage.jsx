@@ -1,16 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+﻿import React, { useEffect, useRef, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { Tooltip, Card, Badge, OverlayTrigger, Carousel } from "react-bootstrap";
 
-import Navbar from "../../../common/Navbar";
 import BoardApiClient from "../../service/BoardApiClient";
 import { useSearchParams, Link, useNavigate, useLocation } from "react-router-dom";
 import CommentPage from "../../../comment/component/CommentPage";
 import FavoriteApiClient from "../../service/FavoriteApiClient";
 import UserAuthentication from "../../../sign/service/UserAuthentication";
 import { categoryColors, regionColors } from "../../../constants/colorMaps";
+import useAlert from "../../../hooks/useAlert";
 
 const BoardDetailPage = () => {
   const enterTime = useRef(Date.now());
@@ -26,7 +26,7 @@ const BoardDetailPage = () => {
   const [commentFlag, setCommentFlag] = useState(false);
 
   const [liked, setLiked] = useState(false);
-  const [alert, setAlert] = useState({ show: false, message: '', type: '' });
+  const { alert, showAlert } = useAlert(2500);
 
   const goToList = () => {
     if (location.state && location.state.from) {
@@ -58,7 +58,7 @@ const BoardDetailPage = () => {
                   region: board.region,
                   title: board.title
                 });
-                setAlert({ show: true, message: "찜 목록에 추가되었습니다.", type: "success" });
+                showAlert("찜 목록에 추가되었습니다.", "success");
               }
               else {
                 window.dataLayer = window.dataLayer || [];
@@ -69,18 +69,18 @@ const BoardDetailPage = () => {
                   region: board.region,
                   title: board.title
                 });
-                setAlert({ show: true, message: "찜 목록에서 삭제되었습니다.", type: "danger" });
+                showAlert("찜 목록에서 삭제되었습니다.", "danger");
 
               }
             }
             else {
-              setAlert({ show: true, message: "오류가 발생했습니다.", type: "danger" });
+              showAlert("오류가 발생했습니다.", "danger");
             }
           }
           )
         )
     } catch {
-      setAlert({ show: true, message: "오류가 발생했습니다.", type: "danger" });
+      showAlert("오류가 발생했습니다.", "danger");
     }
   }
 
@@ -97,7 +97,7 @@ const BoardDetailPage = () => {
             setLiked(data);
           }
           else {
-            setAlert({ show: true, message: "오류가 발생했습니다.", type: "danger" });
+            showAlert("오류가 발생했습니다.", "danger");
           }
         }
         )
@@ -110,7 +110,7 @@ const BoardDetailPage = () => {
         if (res.ok) {
           res.json().then(data => setBoard({ ...data, images: data.images || [] }));
         } else {
-          setAlert({ show: true, message: '게시글을 불러오지 못했습니다.', type: "danger" });
+          showAlert("게시글을 불러오지 못했습니다.", "danger");
         }
       }
     )
@@ -120,7 +120,7 @@ const BoardDetailPage = () => {
       navigate(`/board/edit?no=${board.id}`);
     }
     else {
-      setAlert({ show: true, message: '권한이 없습니다.', type: "danger" });
+      showAlert("권한이 없습니다.", "danger");
     }
   }
 
@@ -174,6 +174,14 @@ const BoardDetailPage = () => {
         }
         `}
       </style>
+      {alert.show && (
+        <div
+          className={`alert alert-${alert.type} alert-dismissible`}
+          style={{ position: "fixed", top: 80, right: 24, zIndex: 9999, minWidth: 260 }}
+        >
+          {alert.message}
+        </div>
+      )}
       <div
         style={{
           minHeight: "100vh",
