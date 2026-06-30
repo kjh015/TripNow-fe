@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import BoardApiClient from "../../service/BoardApiClient";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Badge } from "react-bootstrap";
@@ -229,7 +229,7 @@ const AdmnBoard = () => {
     // 카드 클릭 시 이동
     const navigate = useNavigate();
     const handleGoDetail = (board) => {
-        navigate(`/board/detail?no=${board.id}`);
+        navigate(`/post/detail?no=${board.id}`);
     };
     const handleMysqlPageChange = (newPage) => setMysqlPage(newPage);
     const handleEsPageChange = (newPage) => {

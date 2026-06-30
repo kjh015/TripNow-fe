@@ -1,12 +1,13 @@
-import { Offcanvas, Button } from 'react-bootstrap';
+﻿import { Offcanvas, Button } from 'react-bootstrap';
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import SignApiClient from "../sign/service/SignApiClient";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import 'bootstrap-icons/font/bootstrap-icons.css'; // 아이콘 사용을 위해 import
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import UserAuthentication from '../sign/service/UserAuthentication';
 import { toast } from 'react-toastify';
+import useAlert from '../hooks/useAlert';
 
 const GRADIENT = "linear-gradient(90deg, #5C6BC0 0%, #283593 100%)";
 const BLUR = "backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);";
@@ -14,7 +15,7 @@ const BLUR = "backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);"
 const Navbar = () => {
   const [curUser, setCurUser] = useState('');
   const [show, setShow] = useState(false);
-  const [alert, setAlert] = useState({ show: false, message: '', type: '' }); // type: 'success' | 'danger'
+  const { alert, showAlert } = useAlert(500);
   const navigate = useNavigate();
 
   const handleClose = () => setShow(false);
@@ -43,10 +44,10 @@ const Navbar = () => {
       res => {
         if (res.ok) {
           res.text().then(
-            data => setAlert({ show: true, message: data, type: "success" })
+            data => showAlert(data, "success")
           )
         } else {
-          setAlert({ show: true, message: "실패", type: "danger" });
+          showAlert("실패", "danger");
         }
       }
     )
@@ -54,7 +55,7 @@ const Navbar = () => {
 
   const goToLogin = () => {
     if (localStorage.getItem('accessToken') != null) {
-      setAlert({ show: true, message: "이미 로그인되어 있습니다.", type: "info" });
+      showAlert("이미 로그인되어 있습니다.", "info");
     }
     else {
       navigate("/sign/component/SignInPage");
@@ -63,7 +64,7 @@ const Navbar = () => {
 
   const goToSignup = () => {
     if (localStorage.getItem('accessToken') != null) {
-      setAlert({ show: true, message: "이미 로그인되어 있습니다.", type: "info" });
+      showAlert("이미 로그인되어 있습니다.", "info");
     }
     else {
       navigate("/sign/component/SignUpPage");
@@ -80,13 +81,7 @@ const Navbar = () => {
     document.body.classList.remove('offcanvas-backdrop', 'modal-open');
   }, [handleShow]);
 
-  // Alert 자동 사라짐
-  useEffect(() => {
-    if (alert.show) {
-      const timer = setTimeout(() => setAlert(prev => ({ ...prev, show: false })), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [alert.show]);
+
 
   return (
     <>
@@ -108,8 +103,6 @@ const Navbar = () => {
         )}
       </div>
       {/* ----- 네비바 시작 ----- */}
-      변경
-
       <nav
         className="navbar navbar-dark fixed-top shadow"
         style={{
@@ -209,7 +202,7 @@ const Navbar = () => {
               <div className="d-flex flex-column align-items-stretch gap-2">
                 {/* 아래 링크들 공통 스타일에 마우스오버 효과 추가 */}
                 <MenuLink
-                  to="/board/list"
+                  to="/post/list"
                   icon="bi-card-list"
                   label="여행지"
                   onClick={handleClose}

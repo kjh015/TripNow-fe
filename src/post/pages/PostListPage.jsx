@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+﻿import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import BoardApiClient from "../../service/BoardApiClient";
-import BoardSearch from "./BoardSearch";
-import { Tooltip, Card, OverlayTrigger, Carousel } from "react-bootstrap";
-import LoadingSpinner from "../../../components/LoadingSpinner";
-import PostListCard from "../../../post/components/PostListCard";
+import BoardApiClient from "../../board/service/BoardApiClient";
+import PostSearch from "../components/PostSearch";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import PostListCard from "../components/PostListCard";
+import useAlert from "../../hooks/useAlert";
 
-const BoardList = () => {
-  const [boards, setBoards] = useState([]);
+const PostListPage = () => {
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(false);
   const [docCount, setDocCount] = useState(0);
-  const [alert, setAlert] = useState({ show: false, message: '', type: '' });
+  const { alert, showAlert } = useAlert(500);
   const SORT_NAME_MAP = {
     "popular-desc": "인기 순",
     "ratingAvg-desc": "높은 평점 순",
@@ -48,9 +48,9 @@ const BoardList = () => {
 
   const goToWrite = () => {
     if (isLoggedIn) {
-      navigate("/board/write");
+      navigate("/post/write");
     } else {
-      setAlert({ show: true, message: "로그인 필요", type: "danger" });
+      showAlert("로그인 필요", "danger");
     }
   };
 
@@ -62,7 +62,7 @@ const BoardList = () => {
       const res = await BoardApiClient.getBoardList();
       if (res.ok) {
         const data = await res.json();
-        setBoards(data);
+        setPosts(data);
       } else {
         setError(new Error("서버 응답 에러"));
       }
@@ -83,7 +83,7 @@ const BoardList = () => {
       const res = await BoardApiClient.getBoardListBySearch({ category, region, keyword, sort, direction, page });
       if (res.ok) {
         const data = await res.json();
-        setBoards(data.result);
+        setPosts(data.result);
         setDocCount(data.docCount);
         setRetryCount(0); // 성공시 재시도 초기화
       } else {
@@ -122,12 +122,12 @@ const BoardList = () => {
     params.set("sort", sort);
     params.set("direction", direction);
     params.set("page", 0); // 정렬 바뀌면 1페이지로
-    navigate(`/board/list?${params.toString()}`);
+    navigate(`/post/list?${params.toString()}`);
   };
 
   const handlePage = (pageNum) => {
     params.set("page", pageNum);
-    navigate(`/board/list?${params.toString()}`);
+    navigate(`/post/list?${params.toString()}`);
   };
 
   // 전체 페이지 배경색 + 내용 카드로 감싸기
@@ -138,7 +138,7 @@ const BoardList = () => {
     >
       <div style={{ marginTop: "3rem", }} />
 
-      <BoardSearch selectedCategory={category} selectedRegion={region} />
+      <PostSearch selectedCategory={category} selectedRegion={region} />
       <div
         style={{
           height: "3.5px",
@@ -210,17 +210,17 @@ const BoardList = () => {
               <button className="btn btn-outline-danger mt-3" onClick={handleRetry}>다시 시도</button>
             )}
           </div>
-        ) : boards.length === 0 ? (
+        ) : posts.length === 0 ? (
           <div className="text-center text-secondary py-5 fs-5">
             게시글이 없습니다. 검색해주세요.
           </div>
         ) : (
           <div className="d-flex flex-column gap-4">
-            {boards.map((board) => (
+            {posts.map((post) => (
               <PostListCard
-                key={board.id}
-                post={board}
-                navigateTo={`/board/detail?no=${board.id}`}
+                key={post.id}
+                post={post}
+                navigateTo={`/post/detail?no=${post.id}`}
                 navigateState={{ from: location.search }}
               />
             ))}
@@ -261,10 +261,10 @@ const BoardList = () => {
       </div>
       <style>
         {`
-.board-list-card {
+.post-list-card {
   transition: box-shadow 0.18s, transform 0.16s, background 0.16s, border 0.13s;
 }
-.board-list-card:hover, .board-list-card:focus {
+.post-list-card:hover, .post-list-card:focus {
   box-shadow: 0 6px 24px 0 rgba(123,82,255,0.14), 0 1.5px 10px rgba(60,0,128,0.04);
   border-color: #a084ee;
   background: #faf8ff;
@@ -277,4 +277,4 @@ const BoardList = () => {
   );
 };
 
-export default BoardList;
+export default PostListPage;

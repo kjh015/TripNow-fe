@@ -4,21 +4,20 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { Tooltip, Card, Badge, OverlayTrigger, Carousel } from "react-bootstrap";
 
-import BoardApiClient from "../../service/BoardApiClient";
+import BoardApiClient from "../../board/service/BoardApiClient";
 import { useSearchParams, Link, useNavigate, useLocation } from "react-router-dom";
-import CommentPage from "../../../comment/component/CommentPage";
-import FavoriteApiClient from "../../service/FavoriteApiClient";
-import UserAuthentication from "../../../sign/service/UserAuthentication";
-import { categoryColors, regionColors } from "../../../constants/colorMaps";
-import useAlert from "../../../hooks/useAlert";
+import CommentPage from "../../comment/component/CommentPage";
+import FavoriteApiClient from "../../board/service/FavoriteApiClient";
+import { categoryColors, regionColors } from "../../constants/colorMaps";
+import useAlert from "../../hooks/useAlert";
 
-const BoardDetailPage = () => {
+const PostDetailPage = () => {
   const enterTime = useRef(Date.now());
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const no = searchParams.get('no');
   const navigate = useNavigate();
-  const [board, setBoard] = useState({
+  const [post, setPost] = useState({
     id: '', title: '', content: '', memberNickname: '',
     travelPlace: '', address: '', category: '', region: '', imagePaths: [],
     createdDate: '', modifiedDate: '', ratingAvg: '', viewCount: '', favoriteCount: '', commentCount: ''
@@ -30,9 +29,9 @@ const BoardDetailPage = () => {
 
   const goToList = () => {
     if (location.state && location.state.from) {
-      navigate(`/board/list${location.state.from}`);
+      navigate(`/post/list${location.state.from}`);
     } else {
-      navigate("/board/list");
+      navigate("/post/list");
     }
   };
 
@@ -54,9 +53,9 @@ const BoardDetailPage = () => {
                 window.dataLayer.push({
                   event: "travel_favorite_add",
                   boardId: no,
-                  category: board.category,
-                  region: board.region,
-                  title: board.title
+                  category: post.category,
+                  region: post.region,
+                  title: post.title
                 });
                 showAlert("찜 목록에 추가되었습니다.", "success");
               }
@@ -65,9 +64,9 @@ const BoardDetailPage = () => {
                 window.dataLayer.push({
                   event: "travel_favorite_remove",
                   boardId: no,
-                  category: board.category,
-                  region: board.region,
-                  title: board.title
+                  category: post.category,
+                  region: post.region,
+                  title: post.title
                 });
                 showAlert("찜 목록에서 삭제되었습니다.", "danger");
 
@@ -108,7 +107,7 @@ const BoardDetailPage = () => {
     BoardApiClient.getBoard(no).then(
       res => {
         if (res.ok) {
-          res.json().then(data => setBoard({ ...data, images: data.images || [] }));
+          res.json().then(data => setPost({ ...data, images: data.images || [] }));
         } else {
           showAlert("게시글을 불러오지 못했습니다.", "danger");
         }
@@ -116,8 +115,8 @@ const BoardDetailPage = () => {
     )
   }
   const goToEdit = () => {
-    if (localStorage.getItem('nickname') == board.memberNickname) {
-      navigate(`/board/edit?no=${board.id}`);
+    if (localStorage.getItem('nickname') == post.memberNickname) {
+      navigate(`/post/edit?no=${post.id}`);
     }
     else {
       showAlert("권한이 없습니다.", "danger");
@@ -138,23 +137,23 @@ const BoardDetailPage = () => {
         event: "travel_detail_exit",
         boardId: no, // 여행지ID
         staySeconds: stayDuration,
-        title: board.title
+        title: post.title
       });
     }
 
   }, [no, liked, commentFlag]);
   useEffect(() => {
-    if (board && board.category && board.region) { // board가 로딩된 이후에만
+    if (post && post.category && post.region) { // post가 로딩된 이후에만
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: "travel_detail_pageview",
         boardId: no,
-        category: board.category,
-        region: board.region,
-        title: board.title
+        category: post.category,
+        region: post.region,
+        title: post.title
       });
     }
-  }, [board, no]);
+  }, [post, no]);
   const nickname = localStorage.getItem("nickname")
   const isLoggedIn = !!localStorage.getItem('accessToken');
 
@@ -212,10 +211,10 @@ const BoardDetailPage = () => {
               }}>
               <Card.Body className="pb-2 pt-4 d-flex flex-column" style={{ flex: 1 }}>
                 {/* 이미지 Carousel */}
-                {board.imagePaths && board.imagePaths.length > 0 && (
+                {post.imagePaths && post.imagePaths.length > 0 && (
                   <Carousel
                     interval={null}
-                    indicators={board.imagePaths.length > 1}
+                    indicators={post.imagePaths.length > 1}
                     style={{
                       maxWidth: 800,
                       margin: "0 auto 24px auto",
@@ -224,7 +223,7 @@ const BoardDetailPage = () => {
                       boxShadow: "0 6px 18px #0001"
                     }}
                   >
-                    {board.imagePaths.map(filename => (
+                    {post.imagePaths.map(filename => (
                       <Carousel.Item key={filename}>
                         <img
                           src={`${process.env.REACT_APP_IMAGE_BASE_URL}${filename}`}
@@ -242,14 +241,14 @@ const BoardDetailPage = () => {
                   </Carousel>
                 )}
                 <div className="d-flex justify-content-between align-items-start mb-1">
-                  <h4 className="fw-bold mb-1">{board.title}</h4>
-                  <Badge bg={categoryColors[board.category] || "secondary"} style={{ fontSize: "1rem" }}>
-                    {board.category}
+                  <h4 className="fw-bold mb-1">{post.title}</h4>
+                  <Badge bg={categoryColors[post.category] || "secondary"} style={{ fontSize: "1rem" }}>
+                    {post.category}
                   </Badge>
                 </div>
                 <div className="mb-2 text-muted" style={{ fontSize: "0.96rem" }}>
                   {/* 조회수 */}
-                  조회수: <span className="fw-semibold">{board.viewCount}</span> | 작성자: <span className="fw-semibold">{board.memberNickname ? board.memberNickname : 0}</span> |
+                  조회수: <span className="fw-semibold">{post.viewCount}</span> | 작성자: <span className="fw-semibold">{post.memberNickname ? post.memberNickname : 0}</span> |
 
 
                 </div>
@@ -258,18 +257,18 @@ const BoardDetailPage = () => {
 
                 <hr className="my-2" />
                 <div className="mb-2">
-                  <span className="fw-semibold"><i className="bi bi-geo-alt-fill"></i> 여행지:</span> {board.travelPlace}
-                  <div className="text-muted" style={{ fontSize: "0.97rem" }}>{board.address}</div>
+                  <span className="fw-semibold"><i className="bi bi-geo-alt-fill"></i> 여행지:</span> {post.travelPlace}
+                  <div className="text-muted" style={{ fontSize: "0.97rem" }}>{post.address}</div>
                 </div>
                 <div className="mb-2 d-flex align-items-center justify-content-between">
                   <div>
                     <span className="fw-semibold"><i className="bi bi-map-fill"></i> 지역:</span>
-                    <Badge bg={regionColors[board.region] || "secondary"} className="ms-1">{board.region}</Badge>
+                    <Badge bg={regionColors[post.region] || "secondary"} className="ms-1">{post.region}</Badge>
                   </div>
-                  {(nickname === board.memberNickname) && (
+                  {(nickname === post.memberNickname) && (
                     <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-edit">수정하기</Tooltip>}>
                       <Link
-                        to={`/board/edit?no=${board.id}`}
+                        to={`/post/edit?no=${post.id}`}
                         className="btn btn-outline-primary btn-sm ms-2"
                         style={{ whiteSpace: "nowrap" }}
                       >
@@ -281,7 +280,7 @@ const BoardDetailPage = () => {
                 {/* 본문 */}
                 <Card className="mb-0" style={{ background: "#f7fafc", border: "none" }}>
                   <Card.Body className="py-2 px-3" style={{ minHeight: "50px", fontSize: "1.08rem", whiteSpace: "pre-line" }}>
-                    {board.content}
+                    {post.content}
                   </Card.Body>
                 </Card>
                 {/* 하트/공유 버튼 (맨 하단으로 내리기 위해 mt-auto) */}
@@ -295,7 +294,7 @@ const BoardDetailPage = () => {
                     aria-label={liked ? "찜 취소" : "찜하기"}
                   >
                     <i className={liked ? "bi bi-heart-fill" : "bi bi-heart"} />
-                    <span className="fw-semibold"> {board.favoriteCount ? board.favoriteCount : 0}</span>
+                    <span className="fw-semibold"> {post.favoriteCount ? post.favoriteCount : 0}</span>
                   </button>
 
 
@@ -322,9 +321,9 @@ const BoardDetailPage = () => {
                 display: "flex",
                 flexDirection: "column"
               }}>
-              {board.id &&
+              {post.id &&
                 <Card.Body className="d-flex flex-column py-4" style={{ flex: 1 }}>
-                  <CommentPage no={board.id} isLoggedIn={isLoggedIn} ratingAvg={board.ratingAvg} setCommentFlag={setCommentFlag} category={board.category} region={board.region} title={board.title} />
+                  <CommentPage no={post.id} isLoggedIn={isLoggedIn} ratingAvg={post.ratingAvg} setCommentFlag={setCommentFlag} category={post.category} region={post.region} title={post.title} />
                 </Card.Body>}
             </Card>
           </div>
@@ -358,6 +357,6 @@ const BoardDetailPage = () => {
   );
 };
 
-export default BoardDetailPage;
+export default PostDetailPage;
 
 

@@ -1,4 +1,4 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
+﻿import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import BoardApiClient from '../../../service/BoardApiClient';
 import { useEffect, useRef, useState } from 'react';
@@ -70,7 +70,7 @@ const MainPageCard2 = ({ boardId, score, rank }) => {
           cursor: "pointer",
           zIndex: 1, // 뱃지보다 낮게!
         }}
-        onClick={() => { navigate(`/board/detail/?no=${board.id}`); }}
+        onClick={() => { navigate(`/post/detail/?no=${board.id}`); }}
       >
         {/* 이미지 or 배경 */}
         <div style={{ width: "40%", height: "100%" }}>

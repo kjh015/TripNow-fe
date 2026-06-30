@@ -1,4 +1,4 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
+﻿import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { Link, useNavigate } from 'react-router-dom';
 import SignApiClient from '../sign/service/SignApiClient';
@@ -193,10 +193,10 @@ const MyPage = () => {
               </div>
               {/* 주요 기능 버튼 카드 */}
               <div className="d-flex justify-content-between mb-2 gap-3">
-                <Link to="/board/favorite-list" className="btn btn-outline-danger rounded-pill w-100">
+                <Link to="/post/favorite-list" className="btn btn-outline-danger rounded-pill w-100">
                   <i className="bi bi-heart-fill me-1" /> 찜 목록
                 </Link>
-                <Link to="/board/my-article" className="btn btn-outline-info rounded-pill w-100 text-dark">
+                <Link to="/post/my-article" className="btn btn-outline-info rounded-pill w-100 text-dark">
                   <i className="bi bi-geo-alt-fill me-1" /> 여행지 관리
                 </Link>
                 <Link to="/page/chckmycom" className="btn btn-light border rounded-pill w-100">

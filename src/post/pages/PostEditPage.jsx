@@ -1,18 +1,18 @@
 ﻿import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import RadioPage from './RegionRadioComp';
+import RadioPage from '../../board/component/page/RegionRadioComp';
 import { useEffect, useState } from 'react';
-import BoardApiClient from '../../service/BoardApiClient';
-import CategoryCard from './CategoryCard';
-import useAlert from '../../../hooks/useAlert';
+import BoardApiClient from '../../board/service/BoardApiClient';
+import CategoryCard from '../../board/component/page/CategoryCard';
+import useAlert from '../../hooks/useAlert';
 
 //글 수정파일
-const BoardEditPage = () => {
+const PostEditPage = () => {
     const [searchParams] = useSearchParams();
     const no = searchParams.get('no');
     const navigate = useNavigate();
-    const [board, setBoard] = useState({
+    const [post, setPost] = useState({
         no: '',
         title: '',
         content: '',
@@ -34,7 +34,7 @@ const BoardEditPage = () => {
             res => {
                 if (res.ok) {
                     res.json().then(data => {
-                        setBoard(data);
+                        setPost(data);
                         setExistingImages(data.imagePaths || []);
                         setNewImages([]);
                         setImagePreviews(data.imagePaths || []);
@@ -49,7 +49,7 @@ const BoardEditPage = () => {
             res => {
                 if (res.ok) {
                     showAlert("삭제 성공", "success" );
-                    setTimeout(() => navigate('/board/list'), 500); // 성공 메시지 보여주고 이동
+                    setTimeout(() => navigate('/post/list'), 500); // 성공 메시지 보여주고 이동
                 } else {
                     showAlert("삭제 실패", "danger" );
                 }
@@ -65,7 +65,7 @@ const BoardEditPage = () => {
             setTimeout(() => navigate(-1), 500);
             return;
         }
-        setBoard(prev => ({
+        setPost(prev => ({
             ...prev,
             memberNickname: nickname
         }));
@@ -73,21 +73,21 @@ const BoardEditPage = () => {
 
     const handleChange = (e) => {
         const { id, value } = e.target;
-        setBoard(prev => ({
+        setPost(prev => ({
             ...prev,
             [id]: value
         }));
     };
 
     const handleCategorySelect = (cat) => {
-        setBoard(prev => ({
+        setPost(prev => ({
             ...prev,
             category: cat
         }));
     };
 
     const handleRegionChange = (regionValue) => {
-        setBoard(prev => ({
+        setPost(prev => ({
             ...prev,
             region: regionValue
         }));
@@ -132,7 +132,7 @@ const BoardEditPage = () => {
             const response = await BoardApiClient.editBoard(formData);
             if (response.ok) {
                 showAlert("글 수정이 완료되었습니다.", "success" );
-                setTimeout(() => navigate('/board/list'), 500);
+                setTimeout(() => navigate('/post/list'), 500);
             } else {
                 showAlert("글 수정에 실패하였습니다.", "danger" );
             }
@@ -180,7 +180,7 @@ const BoardEditPage = () => {
                                 작성자:
                             </span>
                             <span className="fw-bold" style={{ fontSize: '1.08rem', minWidth: 80, display: 'inline-block' }}>
-                                {board.memberNickname || ""}
+                                {post.memberNickname || ""}
                             </span>
                         </div>
 
@@ -195,7 +195,7 @@ const BoardEditPage = () => {
                                     required
                                     maxLength={40}
                                     placeholder="제목을 입력하세요"
-                                    value={board.title}
+                                    value={post.title}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -210,7 +210,7 @@ const BoardEditPage = () => {
                                         id="travelPlace"
                                         required
                                         placeholder="예: 남산타워"
-                                        value={board.travelPlace}
+                                        value={post.travelPlace}
                                         onChange={handleChange}
                                     />
                                 </div>
@@ -222,7 +222,7 @@ const BoardEditPage = () => {
                                         id="address"
                                         required
                                         placeholder="예: 서울특별시 중구 남산공원길 105"
-                                        value={board.address}
+                                        value={post.address}
                                         onChange={handleChange}
                                     />
                                 </div>
@@ -234,7 +234,7 @@ const BoardEditPage = () => {
                                     <label className="form-label fw-semibold">카테고리</label>
                                     <div className="bg-light rounded-4 p-2 px-3 border">
                                         <CategoryCard
-                                            selectedCategory={board.category || ''}
+                                            selectedCategory={post.category || ''}
                                             setCategory={handleCategorySelect}
                                         />
                                     </div>
@@ -243,7 +243,7 @@ const BoardEditPage = () => {
                                 <div className="col-md-6">
                                     <label className="form-label fw-semibold">지역 선택</label>
                                     <div className="bg-light rounded-4 p-2 px-3 border">
-                                        <RadioPage selectedRegion={board.region} setRegion={handleRegionChange} />
+                                        <RadioPage selectedRegion={post.region} setRegion={handleRegionChange} />
                                     </div>
                                 </div>
                             </div>
@@ -322,7 +322,7 @@ const BoardEditPage = () => {
                                     required
                                     maxLength={2000}
                                     placeholder="여행지에 대한 후기를 자유롭게 작성해 주세요 :)"
-                                    value={board.content}
+                                    value={post.content}
                                     onChange={handleChange}
                                     style={{ minHeight: 140 }}
                                 ></textarea>
@@ -352,4 +352,4 @@ const BoardEditPage = () => {
     );
 };
 
-export default BoardEditPage;
+export default PostEditPage;

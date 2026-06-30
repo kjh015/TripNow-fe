@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import CommonApiClient from "./service/CommonApiClient";
 import { useNavigate } from "react-router-dom";
@@ -62,7 +62,7 @@ const ChckMyCom = () => {
                     {commentList.length === 0 && <p className="text-muted">댓글이 없습니다.</p>}
                     <div>
                         {commentList.map((c, idx) => (
-                            <div key={idx} className="mainpage-card-hover card mb-3 border-0 shadow-sm rounded-3 position-relative" onClick={() => navigate(`/board/detail/?no=${c.no}`)}>
+                            <div key={idx} className="mainpage-card-hover card mb-3 border-0 shadow-sm rounded-3 position-relative" onClick={() => navigate(`/post/detail/?no=${c.no}`)}>
                                 <div className="card-body" >
                                     <div className="d-flex align-items-center mb-2">
                                         <strong className="me-2">{c.nickname}</strong>

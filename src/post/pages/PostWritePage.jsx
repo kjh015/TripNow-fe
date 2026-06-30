@@ -1,15 +1,15 @@
 ﻿import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from 'react-router-dom';
-import RegionRadioComp from './RegionRadioComp';
-import BoardApiClient from '../../service/BoardApiClient';
+import RegionRadioComp from '../../board/component/page/RegionRadioComp';
+import BoardApiClient from '../../board/service/BoardApiClient';
 import { useState, useEffect } from 'react';
-import CategoryCard from './CategoryCard';
-import useAlert from '../../../hooks/useAlert';
+import CategoryCard from '../../board/component/page/CategoryCard';
+import useAlert from '../../hooks/useAlert';
 
-const BoardWritePage = () => {
+const PostWritePage = () => {
     const navigate = useNavigate();
-    const [board, setBoard] = useState({
+    const [post, setPost] = useState({
         title: '',
         content: '',
         memberNickname: '',
@@ -31,7 +31,7 @@ const BoardWritePage = () => {
             setTimeout(() => navigate(-1), 500); // 0.5초 후 뒤로가기
             return;
         }
-        setBoard(prev => ({
+        setPost(prev => ({
             ...prev,
             memberNickname: nickname
         }));
@@ -40,7 +40,7 @@ const BoardWritePage = () => {
     // 입력 값 변경
     const handleChange = (e) => {
         const { id, value } = e.target;
-        setBoard(prev => ({
+        setPost(prev => ({
             ...prev,
             [id]: value
         }));
@@ -48,7 +48,7 @@ const BoardWritePage = () => {
 
     // 카테고리 카드 선택
     const handleCategorySelect = (cat) => {
-        setBoard(prev => ({
+        setPost(prev => ({
             ...prev,
             category: cat
         }));
@@ -56,7 +56,7 @@ const BoardWritePage = () => {
 
     // 지역 라디오 변경
     const handleRegionChange = (regionValue) => {
-        setBoard(prev => ({
+        setPost(prev => ({
             ...prev,
             region: regionValue
         }));
@@ -97,7 +97,7 @@ const BoardWritePage = () => {
             const response = await BoardApiClient.addBoard(formData);
             if (response.ok) {
                 showAlert("글 작성이 완료되었습니다.", "success" );
-                setTimeout(() => navigate('/board/list'), 500); // 0.5초 후 이동, 잔상 없음
+                setTimeout(() => navigate('/post/list'), 500); // 0.5초 후 이동, 잔상 없음
             } else {
                 showAlert("글 작성에 실패하였습니다.", "danger" );
             }
@@ -149,7 +149,7 @@ const BoardWritePage = () => {
                                 required
                                 maxLength={40}
                                 placeholder="제목을 입력하세요"
-                                value={board.title}
+                                value={post.title}
                                 onChange={handleChange}
                             />
                         </div>
@@ -164,7 +164,7 @@ const BoardWritePage = () => {
                                     id="travelPlace"
                                     required
                                     placeholder="예: 남산타워"
-                                    value={board.travelPlace}
+                                    value={post.travelPlace}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -176,7 +176,7 @@ const BoardWritePage = () => {
                                     id="address"
                                     required
                                     placeholder="예: 서울특별시 중구 남산공원길 105"
-                                    value={board.address}
+                                    value={post.address}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -188,7 +188,7 @@ const BoardWritePage = () => {
                                 <label className="form-label fw-semibold">카테고리</label>
                                 <div className="bg-light rounded-4 p-2 px-3 border">
                                     <CategoryCard
-                                        selectedCategory={board.category}
+                                        selectedCategory={post.category}
                                         setCategory={handleCategorySelect}
                                     />
                                 </div>
@@ -197,7 +197,7 @@ const BoardWritePage = () => {
                                 <label className="form-label fw-semibold">지역 선택</label>
                                 <div className="bg-light rounded-4 p-2 px-3 border">
                                     <RegionRadioComp
-                                        selectedRegion={board.region}
+                                        selectedRegion={post.region}
                                         setRegion={handleRegionChange}
                                     />
                                 </div>
@@ -256,7 +256,7 @@ const BoardWritePage = () => {
                                 required
                                 maxLength={2000}
                                 placeholder="여행지에 대한 후기를 자유롭게 작성해 주세요 :)"
-                                value={board.content}
+                                value={post.content}
                                 onChange={handleChange}
                                 style={{ minHeight: 140 }}
                             ></textarea>
@@ -280,4 +280,4 @@ const BoardWritePage = () => {
     );
 };
 
-export default BoardWritePage;
+export default PostWritePage;

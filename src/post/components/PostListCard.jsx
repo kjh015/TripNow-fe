@@ -1,4 +1,4 @@
-import { Badge } from "react-bootstrap";
+﻿import { Badge } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { categoryColors, regionColors } from "../../constants/colorMaps";
 import { formatDate } from "../../utils/dateUtils";
@@ -7,13 +7,13 @@ const PostListCard = ({ post, navigateTo, navigateState }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    const to = navigateTo ?? `/board/detail?no=${post.id}`;
+    const to = navigateTo ?? `/post/detail?no=${post.id}`;
     navigate(to, navigateState ? { state: navigateState } : undefined);
   };
 
   return (
     <div
-      className="p-3 rounded-3 border board-list-card"
+      className="p-3 rounded-3 border post-list-card"
       style={{
         background: "#fff",
         minHeight: "88px",
