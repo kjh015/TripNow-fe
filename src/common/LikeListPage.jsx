@@ -26,7 +26,7 @@ const LikeListPage = () => {
 
     const goToWrite = () => {
         if (isLoggedIn) {
-            navigate("/board/write");
+            navigate("/post/write");
         } else {
             showAlert("로그인 필요", "danger" );
         }
@@ -99,10 +99,10 @@ const LikeListPage = () => {
             </div>
             <style>
                 {`
-.board-list-card {
+.post-list-card {
   transition: box-shadow 0.18s, transform 0.16s, background 0.16s, border 0.13s;
 }
-.board-list-card:hover, .board-list-card:focus {
+.post-list-card:hover, .post-list-card:focus {
   box-shadow: 0 6px 24px 0 rgba(123,82,255,0.14), 0 1.5px 10px rgba(60,0,128,0.04);
   border-color: #a084ee;
   background: #faf8ff;

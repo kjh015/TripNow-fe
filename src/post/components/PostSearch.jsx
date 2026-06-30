@@ -1,15 +1,15 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { Form, Button, Card, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-import RegionRadioComp from "./RegionRadioComp";
-import CategoryCard from "./CategoryCard";
-import BoardApiClient from "../../service/BoardApiClient";
+import RegionRadioComp from "../../board/component/page/RegionRadioComp";
+import CategoryCard from "../../board/component/page/CategoryCard";
+import BoardApiClient from "../../board/service/BoardApiClient";
 
-const BoardSearch = ({selectedCategory, selectedRegion}) => {
-    const [board, setBoard] = useState({
+const PostSearch = ({selectedCategory, selectedRegion}) => {
+    const [post, setPost] = useState({
         category: "",
         region: ""
     });
@@ -24,7 +24,7 @@ const BoardSearch = ({selectedCategory, selectedRegion}) => {
 
     // 자동완성 fetch
     useEffect(() => {
-        setBoard({category: selectedCategory, region: selectedRegion});
+        setPost({category: selectedCategory, region: selectedRegion});
         if (!keyword) {
             setSuggestions([]);
             setShowList(false);
@@ -68,26 +68,26 @@ const BoardSearch = ({selectedCategory, selectedRegion}) => {
     }, [showList]);
 
     const handleCategoryChange = (category) => {
-        setBoard(prev => ({ ...prev, category }));
+        setPost(prev => ({ ...prev, category }));
     };
 
     const handleRegionChange = (region) => {
-        setBoard(prev => ({ ...prev, region }));
+        setPost(prev => ({ ...prev, region }));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         const params = new URLSearchParams();
-        if (board.category) params.append("category", board.category);
-        if (board.region) params.append("region", board.region);
+        if (post.category) params.append("category", post.category);
+        if (post.region) params.append("region", post.region);
         if (keyword) params.append("keyword", keyword);
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({
             event: "travel_search_click",
-            category: board.category ? board.category : "없음",
-            region: board.region ? board.region : "없음"
+            category: post.category ? post.category : "없음",
+            region: post.region ? post.region : "없음"
         });
-        navigate(`/board/list?${params.toString()}`);
+        navigate(`/post/list?${params.toString()}`);
     };
 
     // 자동완성 선택
@@ -142,12 +142,12 @@ const BoardSearch = ({selectedCategory, selectedRegion}) => {
                 <Row className="g-3">
                     <Col md={6}>
                         <div className="bg-light rounded-4 p-2 px-3 border">
-                            <CategoryCard selectedCategory={board.category} setCategory={handleCategoryChange} />
+                            <CategoryCard selectedCategory={post.category} setCategory={handleCategoryChange} />
                         </div>
                     </Col>
                     <Col md={6}>
                         <div className="bg-light rounded-4 p-2 px-3 border">
-                            <RegionRadioComp selectedRegion={board.region} setRegion={handleRegionChange} />
+                            <RegionRadioComp selectedRegion={post.region} setRegion={handleRegionChange} />
                         </div>
                     </Col>
                 </Row>
@@ -238,4 +238,4 @@ const BoardSearch = ({selectedCategory, selectedRegion}) => {
     );
 };
 
-export default BoardSearch;
+export default PostSearch;
