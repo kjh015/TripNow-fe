@@ -1,18 +1,18 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
+﻿import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useState, useEffect } from 'react';
 import SignApiClient from '../service/SignApiClient';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getLoginIdFromToken, isAdmin } from '../../utils/tokenUtils';
+import useAlert from '../../hooks/useAlert';
 
 const SignInPage = () => {
     const [loginData, setLoginData] = useState({
         loginId: '',
         password: ''
     });
-    // alert 상태 추가
-    const [alert, setAlert] = useState({ show: false, message: '', type: '' }); // type: 'success' | 'danger'
+    const { alert, showAlert } = useAlert();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -42,19 +42,16 @@ const SignInPage = () => {
                     navigate("/");
                 } else {
                     const data = await resDetail.json();                   
-                    setAlert({ show: true, message: data.message, type: "danger" });
+                    showAlert(data.message, "danger" );
                 }
             } else {
                 const data = await res.json();
-                setAlert({ show: true, message: data.message, type: "danger" });
+                showAlert(data.message, "danger" );
             }
         } catch (error) {
-            setAlert({ show: true, message: "에러가 발생했습니다.", type: "danger" });
+            showAlert("에러가 발생했습니다.", "danger" );
         }
     };
-
-    useEffect(() => {
-    }, [alert.show]);
 
     useEffect(() => {
         document.body.classList.add('bg-body-tertiary');

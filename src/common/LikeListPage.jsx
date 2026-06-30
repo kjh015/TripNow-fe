@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+﻿import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import CommonApiClient from './service/CommonApiClient';
 
-import { Badge } from "react-bootstrap";
-import { FaMapMarkedAlt } from "react-icons/fa";
-import { categoryColors, regionColors } from "../constants/colorMaps";
-import { formatDate } from "../utils/dateUtils";
+import LoadingSpinner from "../components/LoadingSpinner";
+import useAlert from "../hooks/useAlert";
+import PostListCard from "../post/components/PostListCard";
 
 const LikeListPage = () => {
     const [boards, setBoards] = useState([]);
@@ -15,7 +14,7 @@ const LikeListPage = () => {
     const [error, setError] = useState(null);
 
     const nickname = localStorage.getItem("nickname");
-    const [alert, setAlert] = useState({ show: false, message: '', type: '' });
+    const { alert, showAlert } = useAlert();
     const navigate = useNavigate();
     const isLoggedIn = !!localStorage.getItem('accessToken');
 
@@ -29,7 +28,7 @@ const LikeListPage = () => {
         if (isLoggedIn) {
             navigate("/board/write");
         } else {
-            setAlert({ show: true, message: "로그인 필요", type: "danger" });
+            showAlert("로그인 필요", "danger" );
         }
     };
 
@@ -81,29 +80,7 @@ const LikeListPage = () => {
 
                 {/* 카드 리스트 */}
                 {loading ? (
-                    <div className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: 140 }}>
-                        {/* 아이콘 + 스피너 */}
-                        <div className="mb-3" style={{ position: "relative", width: 100, height: 100 }}>
-                            <FaMapMarkedAlt size={70} color="#6cb4f8" style={{ filter: "drop-shadow(0 4px 12px #aee7ff77)" }} />
-                            <div
-                                className="spinner-border"
-                                style={{
-                                    position: "absolute",
-                                    top: -10,
-                                    left: -15,
-                                    width: 100,
-                                    height: 100,
-                                    borderWidth: "6px",
-                                    opacity: 0.5,
-                                    color: "#6cb4f8"
-                                }}
-                                role="status"
-                            />
-                        </div>
-                        <div className="mt-2 fs-5 text-secondary">
-                            데이터를 불러오는 중...
-                        </div>
-                    </div>
+                    <LoadingSpinner minHeight={140} />
                 ) : error ? (
                     <div className="text-danger text-center py-5">
                         에러 발생: {error.message}
@@ -114,75 +91,8 @@ const LikeListPage = () => {
                     </div>
                 ) : (
                     <div className="d-flex flex-column gap-4">
-                        {boards.map((board, idx) => (
-                            <div
-                                key={board.id}
-                                className="p-3 rounded-3 border board-list-card"
-                                style={{
-                                    background: "#fff",
-                                    minHeight: "88px",
-                                    boxShadow: "0 2px 10px 0 rgba(0,0,0,0.04)",
-                                    position: "relative"
-                                }}
-                                onClick={() => navigate(`/board/detail?no=${board.id}`)}
-                                tabIndex={0}
-                                onKeyDown={e => {
-                                    if (e.key === "Enter" || e.key === " ") {
-                                        navigate(`/board/detail?no=${board.id}`);
-                                    }
-                                }}
-                            >
-                                {/* 제목 + 날짜 우측 상단 */}
-                                <div
-                                    className="d-flex justify-content-between align-items-start fw-bold"
-                                    style={{
-                                        fontSize: "1.12rem",
-                                        marginBottom: 6
-                                    }}
-                                >
-                                    <div
-                                        className="text-truncate"
-                                        style={{
-                                            maxWidth: "75%",
-                                            whiteSpace: "nowrap",
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis"
-                                        }}
-                                    >
-                                        <span
-                                            style={{
-                                                color: "#222",
-                                                fontWeight: "bold",
-                                                fontFamily: "'Montserrat', 'Gowun Dodum', sans-serif"
-                                            }}
-                                            title={board.title}
-                                        >
-                                            {board.title}
-                                        </span>
-                                    </div>
-                                    <span className="text-secondary ms-2" style={{ fontSize: "0.95rem", whiteSpace: "nowrap" }}>
-                                        {formatDate(board.modifiedDate)}
-                                    </span>
-                                </div>
-
-                                <div className="d-flex align-items-center flex-wrap gap-2 justify-content-between" style={{ fontSize: "0.97rem" }}>
-                                    <div>
-                                        <Badge bg={categoryColors[board.category]} className="me-1">{board.category}</Badge>
-                                        <Badge bg={regionColors[board.region]} className="me-2">{board.region}</Badge>
-                                        <span style={{ color: "#222" }}>by {board.memberNickname}</span>
-                                    </div>
-                                    <div className="d-flex align-items-center">
-                                        <span className="badge text-dark d-flex align-items-center" style={{ fontSize: "1rem", fontWeight: 500 }}>
-                                            <i className="bi bi-eye me-1" />
-                                            {board.viewCount}
-                                        </span>
-                                        <span className="badge" style={{ color: "#ffc107", fontSize: "1rem", fontWeight: 500 }}>
-                                            <i className="bi bi-star-fill me-1" />
-                                            {board.ratingAvg ? board.ratingAvg.toFixed(1) : 0}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
+                        {boards.map((board) => (
+                            <PostListCard key={board.id} post={board} />
                         ))}
                     </div>
                 )}

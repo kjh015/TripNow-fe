@@ -1,10 +1,11 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
+﻿import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import RadioPage from './RegionRadioComp';
 import { useEffect, useState } from 'react';
 import BoardApiClient from '../../service/BoardApiClient';
 import CategoryCard from './CategoryCard';
+import useAlert from '../../../hooks/useAlert';
 
 //글 수정파일
 const BoardEditPage = () => {
@@ -26,15 +27,7 @@ const BoardEditPage = () => {
     const [existingImages, setExistingImages] = useState([]);
     const [newImages, setNewImages] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
-    const [alert, setAlert] = useState({ show: false, message: '', type: '' });
-
-    // Alert 자동 사라짐
-    useEffect(() => {
-        if (alert.show) {
-            const timer = setTimeout(() => setAlert(prev => ({ ...prev, show: false })), 500);
-            return () => clearTimeout(timer);
-        }
-    }, [alert.show]);
+    const { alert, showAlert } = useAlert(500);
 
     const viewBoard = () => {
         BoardApiClient.getBoard(no).then(
@@ -55,10 +48,10 @@ const BoardEditPage = () => {
         BoardApiClient.removeBoard(no).then(
             res => {
                 if (res.ok) {
-                    setAlert({ show: true, message: "삭제 성공", type: "success" });
+                    showAlert("삭제 성공", "success" );
                     setTimeout(() => navigate('/board/list'), 500); // 성공 메시지 보여주고 이동
                 } else {
-                    setAlert({ show: true, message: "삭제 실패", type: "danger" });
+                    showAlert("삭제 실패", "danger" );
                 }
             }
         )
@@ -68,7 +61,7 @@ const BoardEditPage = () => {
         viewBoard();
         let nickname = localStorage.getItem("nickname");
         if (nickname == null) {
-            setAlert({ show: true, message: "로그인이 필요합니다.", type: "danger" });
+            showAlert("로그인이 필요합니다.", "danger" );
             setTimeout(() => navigate(-1), 500);
             return;
         }
@@ -138,13 +131,13 @@ const BoardEditPage = () => {
         try {
             const response = await BoardApiClient.editBoard(formData);
             if (response.ok) {
-                setAlert({ show: true, message: "글 수정이 완료되었습니다.", type: "success" });
+                showAlert("글 수정이 완료되었습니다.", "success" );
                 setTimeout(() => navigate('/board/list'), 500);
             } else {
-                setAlert({ show: true, message: "글 수정에 실패하였습니다.", type: "danger" });
+                showAlert("글 수정에 실패하였습니다.", "danger" );
             }
         } catch (err) {
-            setAlert({ show: true, message: "오류가 발생했습니다.", type: "danger" });
+            showAlert("오류가 발생했습니다.", "danger" );
             console.error(err);
         }
     };
