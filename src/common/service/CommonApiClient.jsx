@@ -1,7 +1,7 @@
-import { authFetch } from "../../AuthFetch";
+﻿import { authFetch } from "../../AuthFetch";
 
 class CommonApiClient {
-    static SERVER_URL = "http://14.63.178.161:8000/api/common";
+    static SERVER_URL = `${process.env.REACT_APP_API_BASE_URL}/api/common`;
     static POST_FAVORITE = "/my-favorite";
     static POST_COMMENT = "/my-comment";
     static POST_BOARD = "/my-board";

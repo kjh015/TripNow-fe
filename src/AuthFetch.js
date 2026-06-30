@@ -29,7 +29,7 @@ export async function authFetch(url, options = {}) {
 
     if (res.status === 401) {
         // accessToken 만료 → refresh 요청
-        const refreshRes = await fetch('http://14.63.178.161:8000/api/sign/refresh', {
+        const refreshRes = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'}/api/sign/refresh`, {
             method: 'POST',
             credentials: 'include', // 쿠키 필요
         });

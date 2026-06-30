@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import SignApiClient from '../service/SignApiClient';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import UserAuthentication from '../service/UserAuthentication';
+import { getLoginIdFromToken, isAdmin } from '../../utils/tokenUtils';
 
 const SignInPage = () => {
     const [loginData, setLoginData] = useState({
@@ -27,7 +27,7 @@ const SignInPage = () => {
             if (res.ok) {
                 const data = await res.json();
                 localStorage.setItem('accessToken', data.accessToken);
-                const resDetail = await SignApiClient.getMemberDetail({loginId: getLoginIdFromToken({token: data.accessToken})});                
+                const resDetail = await SignApiClient.getMemberDetail({loginId: getLoginIdFromToken(data.accessToken)});
                 if (resDetail.ok) {
                     const member = await resDetail.json();
                     localStorage.setItem('nickname', member.nickname);
@@ -36,7 +36,7 @@ const SignInPage = () => {
                         nickname: member.nickname,
                         gender: member.gender,
                         age: member.age,
-                        role: isAdmin({token: data.accessToken}) ? "admin" : "user"
+                        role: isAdmin(data.accessToken) ? "admin" : "user"
                     });
                     toast.success(`${member.nickname}님 환영합니다.`);   
                     navigate("/");
@@ -53,31 +53,6 @@ const SignInPage = () => {
         }
     };
 
-    const getLoginIdFromToken = ({token}) => {
-        if (!token) return null;
-        try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            return payload.sub || payload.loginId;
-        } catch (e) {
-            console.error("토큰 디코딩 실패:", e);
-            return null;
-        }
-    };
-
-    const isAdmin = ({token}) => {
-        if (!token) {
-            return false;
-        }
-        try {            
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            return payload.roles?.includes("ROLE_ADMIN");
-        } catch (e) {
-            console.error("토큰 디코딩 실패:", e);
-            return false;
-        }
-    }
-
-    // alert 자동 사라짐 (2초)
     useEffect(() => {
     }, [alert.show]);
 

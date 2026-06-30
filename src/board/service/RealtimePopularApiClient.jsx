@@ -1,5 +1,5 @@
-class RealtimePopularApiClient {
-    static SERVER_URL = "http://14.63.178.161:8000/realtime-popular";
+﻿class RealtimePopularApiClient {
+    static SERVER_URL = `${process.env.REACT_APP_API_BASE_URL}/realtime-popular`;
     static GET_SSE = "/sse";
 
     static dd() {

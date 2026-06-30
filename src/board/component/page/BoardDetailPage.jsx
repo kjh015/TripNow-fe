@@ -10,16 +10,7 @@ import { useSearchParams, Link, useNavigate, useLocation } from "react-router-do
 import CommentPage from "../../../comment/component/CommentPage";
 import FavoriteApiClient from "../../service/FavoriteApiClient";
 import UserAuthentication from "../../../sign/service/UserAuthentication";
-
-const categoryColors = {
-  축제: "danger", 공연: "primary", 행사: "success", 체험: "warning",
-  쇼핑: "info", 자연: "success", 역사: "secondary", 가족: "dark", 음식: "warning",
-};
-
-const regionColors = {
-  서울: "primary", 부산: "info", 제주: "success", 강원: "danger", 경기: "info", 기타: "warning",
-  대구: "secondary", 인천: "dark", 전남: "secondary"
-};
+import { categoryColors, regionColors } from "../../../constants/colorMaps";
 
 const BoardDetailPage = () => {
   const enterTime = useRef(Date.now());
@@ -228,7 +219,7 @@ const BoardDetailPage = () => {
                     {board.imagePaths.map(filename => (
                       <Carousel.Item key={filename}>
                         <img
-                          src={`http://14.63.178.161${filename}`}
+                          src={`${process.env.REACT_APP_IMAGE_BASE_URL}${filename}`}
                           alt="uploaded"
                           style={{
                             width: "100%",

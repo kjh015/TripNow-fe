@@ -270,7 +270,7 @@ const BoardEditPage = () => {
                                         {existingImages.map((src, idx) => (
                                             <div key={`exist-${idx}`} style={{ position: 'relative' }}>
                                                 <img
-                                                    src={src.startsWith('/images/') ? `http://14.63.178.161${src}` : src}
+                                                    src={src.startsWith('/images/') ? `${process.env.REACT_APP_IMAGE_BASE_URL}${src}` : src}
                                                     alt={`preview-exist-${idx}`}
                                                     style={{
                                                         width: 100,

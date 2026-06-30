@@ -1,7 +1,7 @@
-import { authFetch } from "../../AuthFetch";
+﻿import { authFetch } from "../../AuthFetch";
 
 class FilterApiClient {
-    static SERVER_URL = "http://14.63.178.161:8000/api/filter/admin";
+    static SERVER_URL = `${process.env.REACT_APP_API_BASE_URL}/api/filter/admin`;
     static GET_LIST = "/list"
     static GET_VIEW = "/view"
     static POST_ADD = "/add"

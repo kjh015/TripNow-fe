@@ -1,7 +1,7 @@
-import { authFetch } from "../../AuthFetch";
+﻿import { authFetch } from "../../AuthFetch";
 
 class MonitoringApiClient {
-    static SERVER_URL = "http://14.63.178.161:8000/api/monitoring/admin";
+    static SERVER_URL = `${process.env.REACT_APP_API_BASE_URL}/api/monitoring/admin`;
     static POST_TOP = "/top";
     static POST_VISIT = "/visit";
 

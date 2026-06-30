@@ -1,7 +1,7 @@
-import { authFetch } from "../../AuthFetch";
+﻿import { authFetch } from "../../AuthFetch";
 
 class LogDBApiClient {
-    static SERVER_URL = "http://14.63.178.161:8000/api/log-db/admin";
+    static SERVER_URL = `${process.env.REACT_APP_API_BASE_URL}/api/log-db/admin`;
     static GET_SUCCESS = "/success";
     static GET_FAIL = "/fail";
     static GET_PROCESS = "-process";
