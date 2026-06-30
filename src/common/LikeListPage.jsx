@@ -1,8 +1,8 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import CommonApiClient from './service/CommonApiClient';
+import { getMyFavorite } from '../api/commonApi';
 
 import LoadingSpinner from "../components/LoadingSpinner";
 import useAlert from "../hooks/useAlert";
@@ -18,8 +18,6 @@ const LikeListPage = () => {
     const navigate = useNavigate();
     const isLoggedIn = !!localStorage.getItem('accessToken');
 
-
-
     useEffect(() => {
         getFavoriteList();
     }, []);
@@ -28,67 +26,40 @@ const LikeListPage = () => {
         if (isLoggedIn) {
             navigate("/post/write");
         } else {
-            showAlert("로그인 필요", "danger" );
+            showAlert("로그인 필요", "danger");
         }
     };
 
-    // 전체 게시판 (테스트용)
     const getFavoriteList = async () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await CommonApiClient.getMyFavorite(nickname);
-            if (res.ok) {
-                const data = await res.json();
-                setBoards(data);
-
-            } else {
-                setError(new Error("서버 응답 에러"));
-            }
+            const { data } = await getMyFavorite(nickname);
+            setBoards(data);
         } catch (e) {
             setError(e);
         } finally {
             setLoading(false);
         }
-    }
-
-
-
+    };
 
     return (
-        <div
-            className="bg-light min-vh-100 py-4"
-            style={{ overflowX: "hidden" }}
-        >
-
-
+        <div className="bg-light min-vh-100 py-4" style={{ overflowX: "hidden" }}>
             <div className="container py-3" style={{ maxWidth: 850 }}>
-                {/* 헤더, 정렬, 글쓰기 */}
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h3 className="fw-bold mb-1"
-                            style={{
-                                color: "#6c45e0",
-                                fontFamily: "'Montserrat', 'Gowun Dodum', sans-serif",
-                                fontSize: "2rem"
-                            }}>
+                            style={{ color: "#6c45e0", fontFamily: "'Montserrat', 'Gowun Dodum', sans-serif", fontSize: "2rem" }}>
                             찜 목록
                         </h3>
-
                     </div>
                 </div>
-
-                {/* 카드 리스트 */}
                 {loading ? (
                     <LoadingSpinner minHeight={140} />
                 ) : error ? (
-                    <div className="text-danger text-center py-5">
-                        에러 발생: {error.message}
-                    </div>
+                    <div className="text-danger text-center py-5">에러 발생: {error.message}</div>
                 ) : boards.length === 0 ? (
-                    <div className="text-center text-secondary py-5 fs-5">
-                        게시글이 없습니다.
-                    </div>
+                    <div className="text-center text-secondary py-5 fs-5">게시글이 없습니다.</div>
                 ) : (
                     <div className="d-flex flex-column gap-4">
                         {boards.map((board) => (

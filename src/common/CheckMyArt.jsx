@@ -1,7 +1,7 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import CommonApiClient from './service/CommonApiClient';
+import { getMyBoard } from '../api/commonApi';
 
 import LoadingSpinner from "../components/LoadingSpinner";
 import useAlert from "../hooks/useAlert";
@@ -15,67 +15,40 @@ const CheckMyArt = () => {
     const nickname = localStorage.getItem("nickname");
     const { alert, showAlert } = useAlert();
 
-
-
     const getMyBoardList = async () => {
         setLoading(true);
         setError(null);
         try {
-            const res = await CommonApiClient.getMyBoard(nickname);
-            if (res.ok) {
-                const data = await res.json();
-                setBoards(data);
-            } else {
-                setError(new Error("서버 응답 에러"));
-            }
+            const { data } = await getMyBoard(nickname);
+            setBoards(data);
         } catch (e) {
             setError(e);
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     useEffect(() => {
         getMyBoardList();
     }, []);
 
-
-
-
     return (
-        <div
-            className="bg-light min-vh-100 py-4"
-            style={{ overflowX: "hidden" }}
-        >
-
-
+        <div className="bg-light min-vh-100 py-4" style={{ overflowX: "hidden" }}>
             <div className="container py-3" style={{ maxWidth: 850 }}>
-                {/* 헤더, 정렬, 글쓰기 */}
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h3 className="fw-bold mb-1"
-                            style={{
-                                color: "#6c45e0",
-                                fontFamily: "'Montserrat', 'Gowun Dodum', sans-serif",
-                                fontSize: "2rem"
-                            }}>
+                            style={{ color: "#6c45e0", fontFamily: "'Montserrat', 'Gowun Dodum', sans-serif", fontSize: "2rem" }}>
                             나의 여행지 목록
                         </h3>
-
                     </div>
                 </div>
-
-                {/* 카드 리스트 */}
                 {loading ? (
                     <LoadingSpinner minHeight={140} />
                 ) : error ? (
-                    <div className="text-danger text-center py-5">
-                        에러 발생: {error.message}
-                    </div>
+                    <div className="text-danger text-center py-5">에러 발생: {error.message}</div>
                 ) : boards.length === 0 ? (
-                    <div className="text-center text-secondary py-5 fs-5">
-                        게시글이 없습니다.
-                    </div>
+                    <div className="text-center text-secondary py-5 fs-5">게시글이 없습니다.</div>
                 ) : (
                     <div className="d-flex flex-column gap-4">
                         {boards.map((board) => (

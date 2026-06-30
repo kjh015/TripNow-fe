@@ -24,7 +24,6 @@ import 체험 from '../../imgs/카테고리별/체험.jpg'
 
 
 
-import BoardApiClient from '../../../service/BoardApiClient';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 

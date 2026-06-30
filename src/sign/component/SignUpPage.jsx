@@ -2,16 +2,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import SignApiClient from '../service/SignApiClient';
+import { checkDuplicate, signUp } from '../../api/signApi';
 import { useNavigate } from 'react-router-dom';
-
-// 임시로 사용할 fetch 예시
-async function checkDuplicate(type, value) {
-    if (!value) return false;
-    const res = await fetch(`/api/check-duplicate?type=${type}&value=${encodeURIComponent(value)}`);
-    const data = await res.json();
-    return data.exists;
-}
 
 const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+~\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -66,16 +58,13 @@ const SignUpPage = () => {
         ["loginId", "email", "nickname"].forEach(field => {
             if (!formData[field]) return;
             if (debounce[field]) clearTimeout(debounce[field]);
-            debounce[field] = setTimeout(() => {
-                // fetch 이후 JSON 파싱, exists값만 setDups에 반영
-                SignApiClient.checkDuplicate({ type: field, value: formData[field] })
-                    .then(res => res.json())
-                    .then(data => {
-                        setDups(prev => ({ ...prev, [field]: !!data.exists }));
-                    })
-                    .catch(() => {
-                        setDups(prev => ({ ...prev, [field]: false })); // 에러시 중복 아님 처리
-                    });
+            debounce[field] = setTimeout(async () => {
+                try {
+                    const { data } = await checkDuplicate({ type: field, value: formData[field] });
+                    setDups(prev => ({ ...prev, [field]: !!data.exists }));
+                } catch {
+                    setDups(prev => ({ ...prev, [field]: false }));
+                }
             }, 500);
         });
         return () => Object.values(debounce).forEach(clearTimeout);
@@ -123,20 +112,15 @@ const SignUpPage = () => {
         }
         setIsSubmitting(true);
         try {
-            const res = await SignApiClient.signUp({ ...formData, birthDate });
-            const msg = await res.json();
-            if (res.ok) {          
-                toast.success("회원가입이 완료되었습니다! 🎉");      
-                navigate("/");
-            } else {
-                setAlert({ show: true, message: msg.message, type: "danger" });
-                // 서버단 오류 발생 시 포커스
-                if (msg && msg.field && inputRefs[msg.field]) {
-                    inputRefs[msg.field].current.focus();
-                }
-            }
+            await signUp({ ...formData, birthDate });
+            toast.success("회원가입이 완료되었습니다! 🎉");
+            navigate("/");
         } catch (error) {
-            setAlert({ show: true, message: "에러가 발생했습니다.", type: "danger" });
+            const msg = error.response?.data;
+            setAlert({ show: true, message: msg?.message || "에러가 발생했습니다.", type: "danger" });
+            if (msg?.field && inputRefs[msg.field]) {
+                inputRefs[msg.field].current.focus();
+            }
         }
         setIsSubmitting(false);
     };

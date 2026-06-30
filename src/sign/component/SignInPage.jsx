@@ -1,7 +1,7 @@
 ﻿import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useState, useEffect } from 'react';
-import SignApiClient from '../service/SignApiClient';
+import { signIn, getMemberDetail } from '../../api/signApi';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getLoginIdFromToken, isAdmin } from '../../utils/tokenUtils';
@@ -23,33 +23,21 @@ const SignInPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await SignApiClient.signIn(loginData);
-            if (res.ok) {
-                const data = await res.json();
-                localStorage.setItem('accessToken', data.accessToken);
-                const resDetail = await SignApiClient.getMemberDetail({loginId: getLoginIdFromToken(data.accessToken)});
-                if (resDetail.ok) {
-                    const member = await resDetail.json();
-                    localStorage.setItem('nickname', member.nickname);
-                    window._mtm = window._mtm || [];
-                    window._mtm.push({
-                        nickname: member.nickname,
-                        gender: member.gender,
-                        age: member.age,
-                        role: isAdmin(data.accessToken) ? "admin" : "user"
-                    });
-                    toast.success(`${member.nickname}님 환영합니다.`);   
-                    navigate("/");
-                } else {
-                    const data = await resDetail.json();                   
-                    showAlert(data.message, "danger" );
-                }
-            } else {
-                const data = await res.json();
-                showAlert(data.message, "danger" );
-            }
+            const { data } = await signIn(loginData);
+            localStorage.setItem('accessToken', data.accessToken);
+            const { data: member } = await getMemberDetail({ loginId: getLoginIdFromToken(data.accessToken) });
+            localStorage.setItem('nickname', member.nickname);
+            window._mtm = window._mtm || [];
+            window._mtm.push({
+                nickname: member.nickname,
+                gender: member.gender,
+                age: member.age,
+                role: isAdmin(data.accessToken) ? "admin" : "user"
+            });
+            toast.success(`${member.nickname}님 환영합니다.`);
+            navigate("/");
         } catch (error) {
-            showAlert("에러가 발생했습니다.", "danger" );
+            showAlert(error.response?.data?.message || "에러가 발생했습니다.", "danger");
         }
     };
 

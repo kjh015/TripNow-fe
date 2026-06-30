@@ -1,7 +1,7 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import BoardApiClient from "../../board/service/BoardApiClient";
+import { getPostList, getPostListBySearch } from "../../api/postApi";
 import PostSearch from "../components/PostSearch";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import PostListCard from "../components/PostListCard";
@@ -23,7 +23,6 @@ const PostListPage = () => {
     "viewCount-desc": "조회수 순",
   };
 
-
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const category = params.get("category") || "";
@@ -39,11 +38,8 @@ const PostListPage = () => {
   const pageNumbers = Array.from({ length: pageCount }, (_, i) => i + 1);
 
   useEffect(() => {
-    // setLoading(true);
-    // setError(true);
     setSearched(true);
     getBoardList();
-
   }, [location.search]);
 
   const goToWrite = () => {
@@ -54,18 +50,12 @@ const PostListPage = () => {
     }
   };
 
-  // 전체 게시판 (테스트용)
   const getBoardListAll = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await BoardApiClient.getBoardList();
-      if (res.ok) {
-        const data = await res.json();
-        setPosts(data);
-      } else {
-        setError(new Error("서버 응답 에러"));
-      }
+      const { data } = await getPostList();
+      setPosts(data);
     } catch (e) {
       setError(e);
     } finally {
@@ -73,22 +63,16 @@ const PostListPage = () => {
     }
   };
 
-  // 검색/필터 게시판
   const [retryCount, setRetryCount] = useState(0);
 
   const getBoardList = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await BoardApiClient.getBoardListBySearch({ category, region, keyword, sort, direction, page });
-      if (res.ok) {
-        const data = await res.json();
-        setPosts(data.result);
-        setDocCount(data.docCount);
-        setRetryCount(0); // 성공시 재시도 초기화
-      } else {
-        throw new Error("서버 응답 에러");
-      }
+      const { data } = await getPostListBySearch({ category, region, keyword, sort, direction, page });
+      setPosts(data.result);
+      setDocCount(data.docCount);
+      setRetryCount(0);
     } catch (e) {
       setError(e);
     } finally {
@@ -116,12 +100,10 @@ const PostListPage = () => {
     getBoardList();
   };
 
-
-
-  const handleSort = ({ sort, direction, name }) => {
+  const handleSort = ({ sort, direction }) => {
     params.set("sort", sort);
     params.set("direction", direction);
-    params.set("page", 0); // 정렬 바뀌면 1페이지로
+    params.set("page", 0);
     navigate(`/post/list?${params.toString()}`);
   };
 
@@ -130,37 +112,22 @@ const PostListPage = () => {
     navigate(`/post/list?${params.toString()}`);
   };
 
-  // 전체 페이지 배경색 + 내용 카드로 감싸기
   return (
-    <div
-      className="bg-light min-vh-100 py-4"
-      style={{ overflowX: "hidden" }}
-    >
-      <div style={{ marginTop: "3rem", }} />
-
+    <div className="bg-light min-vh-100 py-4" style={{ overflowX: "hidden" }}>
+      <div style={{ marginTop: "3rem" }} />
       <PostSearch selectedCategory={category} selectedRegion={region} />
       <div
         style={{
-          height: "3.5px",
-          width: "60px",
-          margin: "0.7rem auto 1.1rem auto",
-          borderRadius: "2rem",
-          background: "linear-gradient(90deg,#bdaafc 20%, #92e0f6 90%)",
-          opacity: 0.88,
-          marginTop: "1rem",
-          marginBottom: "5rem"
+          height: "3.5px", width: "60px", margin: "0.7rem auto 1.1rem auto",
+          borderRadius: "2rem", background: "linear-gradient(90deg,#bdaafc 20%, #92e0f6 90%)",
+          opacity: 0.88, marginTop: "1rem", marginBottom: "5rem"
         }}
       />
-      <div className="container py-3" style={{ maxWidth: 850, }}>
-        {/* 헤더, 정렬, 글쓰기 */}
+      <div className="container py-3" style={{ maxWidth: 850 }}>
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div>
             <h3 className="fw-bold mb-1"
-              style={{
-                color: "#6c45e0",
-                fontFamily: "'Montserrat', 'Gowun Dodum', sans-serif",
-                fontSize: "2rem"
-              }}>
+              style={{ color: "#6c45e0", fontFamily: "'Montserrat', 'Gowun Dodum', sans-serif", fontSize: "2rem" }}>
               여행지 목록
             </h3>
             <div className="text-secondary" style={{ fontSize: "1.07rem" }}>
@@ -174,31 +141,24 @@ const PostListPage = () => {
                 {sortName}
               </button>
               <ul className="dropdown-menu">
-                <li><button className="dropdown-item" onClick={() => handleSort({ sort: "popular", direction: "desc", name: "인기 순" })}>인기 순</button></li>
-                <li><button className="dropdown-item" onClick={() => handleSort({ sort: "modifiedDate", direction: "desc", name: "최신 순" })}>최신 순</button></li>
-                <li><button className="dropdown-item" onClick={() => handleSort({ sort: "modifiedDate", direction: "asc", name: "오래된 순" })}>오래된 순</button></li>
-                <li><button className="dropdown-item" onClick={() => handleSort({ sort: "ratingAvg", direction: "desc", name: "높은 평점 순" })}>높은 평점 순</button></li>
-                <li><button className="dropdown-item" onClick={() => handleSort({ sort: "ratingAvg", direction: "asc", name: "낮은 평점 순" })}>낮은 평점 순</button></li>
-                <li><button className="dropdown-item" onClick={() => handleSort({ sort: "viewCount", direction: "desc", name: "조회수 순" })}>조회수 순</button></li>
-
-
+                <li><button className="dropdown-item" onClick={() => handleSort({ sort: "popular", direction: "desc" })}>인기 순</button></li>
+                <li><button className="dropdown-item" onClick={() => handleSort({ sort: "modifiedDate", direction: "desc" })}>최신 순</button></li>
+                <li><button className="dropdown-item" onClick={() => handleSort({ sort: "modifiedDate", direction: "asc" })}>오래된 순</button></li>
+                <li><button className="dropdown-item" onClick={() => handleSort({ sort: "ratingAvg", direction: "desc" })}>높은 평점 순</button></li>
+                <li><button className="dropdown-item" onClick={() => handleSort({ sort: "ratingAvg", direction: "asc" })}>낮은 평점 순</button></li>
+                <li><button className="dropdown-item" onClick={() => handleSort({ sort: "viewCount", direction: "desc" })}>조회수 순</button></li>
               </ul>
             </div>
             {isLoggedIn && (
               <button
                 className="btn fw-bold px-4"
-                style={{
-                  background: "linear-gradient(90deg, #a084ee 30%, #7c3aed 100%)",
-                  color: "#fff",
-                  border: "none"
-                }}
+                style={{ background: "linear-gradient(90deg, #a084ee 30%, #7c3aed 100%)", color: "#fff", border: "none" }}
                 onClick={goToWrite}
               >글쓰기</button>
             )}
           </div>
         </div>
 
-        {/* 카드 리스트 */}
         {loading ? (
           <LoadingSpinner minHeight={140} />
         ) : error ? (
@@ -227,7 +187,6 @@ const PostListPage = () => {
           </div>
         )}
 
-        {/* 페이지네이션 */}
         <div className="mt-4 mb-3 text-center">
           <button
             type="button"
@@ -247,7 +206,6 @@ const PostListPage = () => {
               {num}
             </button>
           ))}
-
           <button
             type="button"
             className="btn btn-outline-primary px-4"
@@ -256,7 +214,6 @@ const PostListPage = () => {
           >
             다음
           </button>
-
         </div>
       </div>
       <style>

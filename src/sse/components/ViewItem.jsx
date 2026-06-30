@@ -1,6 +1,6 @@
 // ViewItem.jsx
 import React, { useEffect, useRef } from 'react';
-import ItemApiClient from '../service/ItemApiClient';
+import { sendItem } from '../../api/sseApi';
 
 const ViewItem = ({ query, onClose }) => {
     const overlayRef = useRef(null);
@@ -22,18 +22,13 @@ const ViewItem = ({ query, onClose }) => {
     for (const [key, value] of params.entries()) {
         parsed[key] = value;
     }
-    const handleSend = () => {
-        ItemApiClient.sendItem(parsed).then(
-            res => {
-                if(res.ok){
-                    console.log(res);
-                }
-                else{
-                    console.log("Error");
-                }
-            }
-        )
-    }
+    const handleSend = async () => {
+        try {
+            await sendItem(parsed);
+        } catch {
+            console.error("Error sending item");
+        }
+    };
 
     return (
         <div ref={overlayRef} style={overlayStyle}>
