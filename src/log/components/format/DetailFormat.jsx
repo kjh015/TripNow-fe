@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import FormatApiClient from '../../service/FormatApiClient';
+import { viewFormat as viewFormatApi, updateFormat as updateFormatApi, removeFormat as removeFormatApi } from '../../../api/log/formatApi';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -26,34 +26,27 @@ const
         };
 
         // 포맷 상세 가져오기
-        const viewFormat = () => {
-            FormatApiClient.viewFormat(formatId).then(
-                res => {
-                    if (res.ok) {
-                        res.json().then(data => {
-                            setFormatEntry(Object.entries(JSON.parse(data.formatJson)).map(([key, value]) => ({ key, value })));
-                            setDefaultEntry(Object.entries(JSON.parse(data.defaultJson)).map(([key, value]) => ({ key, value })));
-                            setName(data.name);
-                            setActive(data.active);
-                        });
-                    } else {
-                        showAlert("danger", "포맷 정보를 불러오지 못했습니다.");
-                    }
-                }
-            );
+        const viewFormat = async () => {
+            try {
+                const { data } = await viewFormatApi(formatId);
+                setFormatEntry(Object.entries(JSON.parse(data.formatJson)).map(([key, value]) => ({ key, value })));
+                setDefaultEntry(Object.entries(JSON.parse(data.defaultJson)).map(([key, value]) => ({ key, value })));
+                setName(data.name);
+                setActive(data.active);
+            } catch {
+                showAlert("danger", "포맷 정보를 불러오지 못했습니다.");
+            }
         };
 
         // 삭제
-        const removeFormat = () => {
-
-            FormatApiClient.removeFormat(formatId).then(res => {
-                if (res.ok) {
-                    showAlert("danger", "포맷 삭제 성공!");
-                    onClose();
-                } else {
-                    showAlert("danger", "포맷 삭제 실패");
-                }
-            });
+        const removeFormat = async () => {
+            try {
+                await removeFormatApi(formatId);
+                showAlert("danger", "포맷 삭제 성공!");
+                onClose();
+            } catch {
+                showAlert("danger", "포맷 삭제 실패");
+            }
         };
 
         // 수정(저장)
@@ -70,16 +63,13 @@ const
             const formatJson = JSON.stringify(toObject(formatEntry));
             const defaultJson = JSON.stringify(toObject(defaultEntry));
 
-            FormatApiClient.updateFormat(formatId, name, active, formatJson, defaultJson).then(
-                res => {
-                    if (res.ok) {
-                        showAlert("success", "포맷 수정 성공!");
-                        onClose();
-                    } else {
-                        showAlert("danger", "포맷 수정 실패");
-                    }
-                }
-            );
+            try {
+                await updateFormatApi(formatId, name, active, formatJson, defaultJson);
+                showAlert("success", "포맷 수정 성공!");
+                onClose();
+            } catch {
+                showAlert("danger", "포맷 수정 실패");
+            }
         };
 
         useEffect(() => {

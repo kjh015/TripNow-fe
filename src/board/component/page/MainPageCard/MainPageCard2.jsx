@@ -1,6 +1,6 @@
 ﻿import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import BoardApiClient from '../../../service/BoardApiClient';
+import { getPost } from '../../../../api/postApi';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CountUp from 'react-countup';
@@ -18,13 +18,15 @@ const MainPageCard2 = ({ boardId, score, rank }) => {
   });
 
   useEffect(() => {
-    BoardApiClient.getBoard(boardId).then(
-      res => {
-        if (res.ok) {
-          res.json().then(data => setBoard({ ...data, imagePaths: data.imagePaths || [] }));
-        }
+    const load = async () => {
+      try {
+        const { data } = await getPost(boardId);
+        setBoard({ ...data, imagePaths: data.imagePaths || [] });
+      } catch {
+        // 에러 시 기본 상태 유지
       }
-    );
+    };
+    load();
   }, [boardId]);
 
   const prevScoreRef = useRef(score);

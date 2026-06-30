@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Form, Button, Card, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -6,53 +6,46 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import RegionRadioComp from "../../board/component/page/RegionRadioComp";
 import CategoryCard from "../../board/component/page/CategoryCard";
-import BoardApiClient from "../../board/service/BoardApiClient";
+import { autoCompleteSearch } from "../../api/postApi";
 
-const PostSearch = ({selectedCategory, selectedRegion}) => {
-    const [post, setPost] = useState({
-        category: "",
-        region: ""
-    });
+const PostSearch = ({ selectedCategory, selectedRegion }) => {
+    const [post, setPost] = useState({ category: "", region: "" });
     const [keyword, setKeyword] = useState("");
     const [suggestions, setSuggestions] = useState([]);
     const [showList, setShowList] = useState(false);
-    const [highlightIdx, setHighlightIdx] = useState(-1); // highlight index
+    const [highlightIdx, setHighlightIdx] = useState(-1);
     const inputRef = useRef();
     const listRef = useRef();
     const navigate = useNavigate();
     const abortRef = useRef();
 
-    // 자동완성 fetch
     useEffect(() => {
-        setPost({category: selectedCategory, region: selectedRegion});
+        setPost({ category: selectedCategory, region: selectedRegion });
         if (!keyword) {
             setSuggestions([]);
             setShowList(false);
             return;
         }
-        const timer = setTimeout(() => {
+        const timer = setTimeout(async () => {
             if (abortRef.current) abortRef.current.abort();
             const controller = new AbortController();
             abortRef.current = controller;
-            BoardApiClient.autoCompleteSearch({ keyword, signal: controller.signal })
-                .then(res => res.json())
-                .then(data => {
-                    setSuggestions(data);
-                    setShowList(true);
-                    setHighlightIdx(-1);
-                })
-                .catch(e => {
-                    if (e.name !== "AbortError") {
-                        setSuggestions([]);
-                        setShowList(false);
-                    }
-                });
+            try {
+                const { data } = await autoCompleteSearch(keyword, controller.signal);
+                setSuggestions(data);
+                setShowList(true);
+                setHighlightIdx(-1);
+            } catch (e) {
+                if (e.code !== 'ERR_CANCELED') {
+                    setSuggestions([]);
+                    setShowList(false);
+                }
+            }
         }, 200);
 
         return () => clearTimeout(timer);
     }, [keyword]);
 
-    // 외부 클릭 시 드롭다운 닫기
     useEffect(() => {
         if (!showList) return;
         function onClickOutside(e) {
@@ -90,28 +83,21 @@ const PostSearch = ({selectedCategory, selectedRegion}) => {
         navigate(`/post/list?${params.toString()}`);
     };
 
-    // 자동완성 선택
     const handleSuggestionClick = (text) => {
         setKeyword(text);
         setShowList(false);
         inputRef.current.blur();
     };
 
-    // input 이탈시 자동완성 닫힘 (조금 늦게 닫음)
     const handleBlur = () => setTimeout(() => setShowList(false), 120);
 
-    // 키보드 네비게이션
     const handleKeyDown = (e) => {
         if (!showList) return;
         if (e.key === "ArrowDown") {
-            setHighlightIdx(prev =>
-                prev < suggestions.length - 1 ? prev + 1 : 0
-            );
+            setHighlightIdx(prev => prev < suggestions.length - 1 ? prev + 1 : 0);
             e.preventDefault();
         } else if (e.key === "ArrowUp") {
-            setHighlightIdx(prev =>
-                prev > 0 ? prev - 1 : suggestions.length - 1
-            );
+            setHighlightIdx(prev => prev > 0 ? prev - 1 : suggestions.length - 1);
             e.preventDefault();
         } else if (e.key === "Enter") {
             if (highlightIdx >= 0 && highlightIdx < suggestions.length) {
@@ -122,7 +108,6 @@ const PostSearch = ({selectedCategory, selectedRegion}) => {
         }
     };
 
-    // 입력 키워드 강조 표시
     const highlightText = (text) => {
         if (!keyword) return text;
         const idx = text.toLowerCase().indexOf(keyword.toLowerCase());
@@ -167,34 +152,19 @@ const PostSearch = ({selectedCategory, selectedRegion}) => {
                             onKeyDown={handleKeyDown}
                             style={{ height: "40px", flexGrow: 1, zIndex: 11 }}
                         />
-                        {/* 자동완성 드롭다운 */}
                         {showList && (
                             <ul
                                 ref={listRef}
                                 style={{
-                                    position: "absolute",
-                                    top: 44, left: 0, right: 0,
-                                    zIndex: 10,
-                                    margin: 0, padding: 0,
-                                    background: "white",
-                                    border: "1px solid #eee",
-                                    borderRadius: "0 0 12px 12px",
-                                    boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-                                    listStyle: "none",
-                                    maxHeight: 260,
-                                    overflowY: "auto",
-                                    minWidth: 200,
-                                    transition: "box-shadow 0.2s"
+                                    position: "absolute", top: 44, left: 0, right: 0, zIndex: 10,
+                                    margin: 0, padding: 0, background: "white",
+                                    border: "1px solid #eee", borderRadius: "0 0 12px 12px",
+                                    boxShadow: "0 6px 20px rgba(0,0,0,0.08)", listStyle: "none",
+                                    maxHeight: 260, overflowY: "auto", minWidth: 200, transition: "box-shadow 0.2s"
                                 }}
                             >
                                 {suggestions.length === 0 && (
-                                    <li
-                                        style={{
-                                            padding: "12px 16px",
-                                            color: "#bbb",
-                                            fontStyle: "italic"
-                                        }}
-                                    >
+                                    <li style={{ padding: "12px 16px", color: "#bbb", fontStyle: "italic" }}>
                                         검색 결과가 없습니다
                                     </li>
                                 )}
@@ -203,14 +173,12 @@ const PostSearch = ({selectedCategory, selectedRegion}) => {
                                         key={idx}
                                         onMouseDown={() => handleSuggestionClick(item)}
                                         style={{
-                                            padding: "12px 16px",
-                                            cursor: "pointer",
+                                            padding: "12px 16px", cursor: "pointer",
                                             background: idx === highlightIdx ? "#f8f9fa" : "transparent",
                                             fontWeight: idx === highlightIdx ? "bold" : "normal",
                                             color: "#333",
                                             borderBottom: idx < suggestions.length - 1 ? "1px solid #f5f5f5" : "none",
-                                            fontSize: 17,
-                                            transition: "background 0.1s"
+                                            fontSize: 17, transition: "background 0.1s"
                                         }}
                                         onMouseEnter={() => setHighlightIdx(idx)}
                                     >
@@ -219,20 +187,12 @@ const PostSearch = ({selectedCategory, selectedRegion}) => {
                                 ))}
                             </ul>
                         )}
-                        <Button
-                            variant="dark btn-sm"
-                            type="submit"
-                            style={{
-                                whiteSpace: 'nowrap',
-                                padding: '0.2rem 0.35rem',
-                                height: "40px"
-                            }}
-                        >
+                        <Button variant="dark btn-sm" type="submit"
+                            style={{ whiteSpace: 'nowrap', padding: '0.2rem 0.35rem', height: "40px" }}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="mx-3" role="img" viewBox="0 0 24 24"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"></circle><path d="M21 21l-5.2-5.2"></path></svg>
                         </Button>
                     </div>
                 </Form>
-                
             </Card>
         </div>
     );

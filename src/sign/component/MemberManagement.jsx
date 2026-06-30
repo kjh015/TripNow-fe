@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import SignApiClient from '../service/SignApiClient';
+import { getMemberList as getMemberListApi, delegateAdmin as delegateAdminApi } from '../../api/signApi';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaTrash, FaUserShield } from 'react-icons/fa';
 
@@ -7,29 +7,25 @@ const MemberManagement = () => {
     const [memberList, setMemberList] = useState([]);
     const [alert, setAlert] = useState({ show: false, message: '', type: '' }); // alert 상태 추가
 
-    const getMemberList = () => {
-        SignApiClient.getMemberList()
-            .then(res => res.json()
-                .then(data => {
-                    if (res.ok) {
-                        setMemberList(data);
-                    }
-                    else {
-                        setAlert({ show: true, message: "회원 조회 오류", type: "danger" });
-                    }
-                }))
-    }
+    const getMemberList = async () => {
+        try {
+            const { data } = await getMemberListApi();
+            setMemberList(data);
+        } catch {
+            setAlert({ show: true, message: "회원 조회 오류", type: "danger" });
+        }
+    };
 
-    const delegateAdmin = ({ loginId }) => {
-        SignApiClient.delegateAdmin({ loginId })
-            .then(res => res.text()
-                .then(msg => {
-                    setAlert({ show: true, message: msg, type: res.ok ? "success" : "danger" });
-                    if (res.ok) {
-                        getMemberList();
-                    }
-                }))
-    }
+    const delegateAdmin = async ({ loginId }) => {
+        try {
+            const { data: msg } = await delegateAdminApi({ loginId });
+            setAlert({ show: true, message: msg, type: "success" });
+            getMemberList();
+        } catch (error) {
+            const msg = error.response?.data || "오류가 발생했습니다.";
+            setAlert({ show: true, message: msg, type: "danger" });
+        }
+    };
     const formatDate = (isoString) => {
         if (!isoString) return "-";
         return isoString.substring(0, 16).replace("T", " ");
