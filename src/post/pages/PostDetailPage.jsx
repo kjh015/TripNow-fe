@@ -2,14 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { Tooltip, Card, Badge, OverlayTrigger, Carousel } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 
 import { getPost } from "../../api/postApi";
 import { toggleFavorite, existsFavorite } from "../../api/favoriteApi";
-import { useSearchParams, Link, useNavigate, useLocation } from "react-router-dom";
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import CommentPage from "../../comment/component/CommentPage";
-import { categoryColors, regionColors } from "../../constants/colorMaps";
 import useAlert from "../../hooks/useAlert";
+import PostContent from "../components/PostContent";
 
 const PostDetailPage = () => {
   const enterTime = useRef(Date.now());
@@ -23,7 +23,6 @@ const PostDetailPage = () => {
     createdDate: '', modifiedDate: '', ratingAvg: '', viewCount: '', favoriteCount: '', commentCount: ''
   });
   const [commentFlag, setCommentFlag] = useState(false);
-
   const [liked, setLiked] = useState(false);
   const { alert, showAlert } = useAlert(2500);
 
@@ -87,14 +86,6 @@ const PostDetailPage = () => {
     }
   };
 
-  const goToEdit = () => {
-    if (localStorage.getItem('nickname') == post.memberNickname) {
-      navigate(`/post/edit?no=${post.id}`);
-    } else {
-      showAlert("권한이 없습니다.", "danger");
-    }
-  };
-
   useEffect(() => {
     viewBoard();
     getLike();
@@ -151,92 +142,27 @@ const PostDetailPage = () => {
           {alert.message}
         </div>
       )}
-      <div
-        style={{
-          minHeight: "100vh",
-          width: "100vw",
-          overflowX: "hidden",
-          position: "relative"
-        }}
-      >
+      <div style={{ minHeight: "100vh", width: "100vw", overflowX: "hidden", position: "relative" }}>
         <div className="container py-5 mt-5" style={{ minHeight: "100vh", maxWidth: "1600px" }}>
           <div style={{ display: "flex", gap: "32px", width: "95%", margin: "0 auto", alignItems: "stretch" }}>
-            <Card className="shadow-sm flex-fill"
-              style={{ borderRadius: "18px", width: "100%", minWidth: "0", background: "#fff", display: "flex", flexDirection: "column" }}>
-              <Card.Body className="pb-2 pt-4 d-flex flex-column" style={{ flex: 1 }}>
-                {post.imagePaths && post.imagePaths.length > 0 && (
-                  <Carousel
-                    interval={null}
-                    indicators={post.imagePaths.length > 1}
-                    style={{ maxWidth: 800, margin: "0 auto 24px auto", borderRadius: 16, overflow: "hidden", boxShadow: "0 6px 18px #0001" }}
-                  >
-                    {post.imagePaths.map(filename => (
-                      <Carousel.Item key={filename}>
-                        <img
-                          src={`${process.env.REACT_APP_IMAGE_BASE_URL}${filename}`}
-                          alt="uploaded"
-                          style={{ width: "100%", height: 400, objectFit: "cover", display: "block", background: "#eee" }}
-                        />
-                      </Carousel.Item>
-                    ))}
-                  </Carousel>
-                )}
-                <div className="d-flex justify-content-between align-items-start mb-1">
-                  <h4 className="fw-bold mb-1">{post.title}</h4>
-                  <Badge bg={categoryColors[post.category] || "secondary"} style={{ fontSize: "1rem" }}>
-                    {post.category}
-                  </Badge>
-                </div>
-                <div className="mb-2 text-muted" style={{ fontSize: "0.96rem" }}>
-                  조회수: <span className="fw-semibold">{post.viewCount}</span> | 작성자: <span className="fw-semibold">{post.memberNickname ? post.memberNickname : 0}</span> |
-                </div>
-                <hr className="my-2" />
-                <div className="mb-2">
-                  <span className="fw-semibold"><i className="bi bi-geo-alt-fill"></i> 여행지:</span> {post.travelPlace}
-                  <div className="text-muted" style={{ fontSize: "0.97rem" }}>{post.address}</div>
-                </div>
-                <div className="mb-2 d-flex align-items-center justify-content-between">
-                  <div>
-                    <span className="fw-semibold"><i className="bi bi-map-fill"></i> 지역:</span>
-                    <Badge bg={regionColors[post.region] || "secondary"} className="ms-1">{post.region}</Badge>
-                  </div>
-                  {(nickname === post.memberNickname) && (
-                    <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-edit">수정하기</Tooltip>}>
-                      <Link
-                        to={`/post/edit?no=${post.id}`}
-                        className="btn btn-outline-primary btn-sm ms-2"
-                        style={{ whiteSpace: "nowrap" }}
-                      >
-                        🖊
-                      </Link>
-                    </OverlayTrigger>
-                  )}
-                </div>
-                <Card className="mb-0" style={{ background: "#f7fafc", border: "none" }}>
-                  <Card.Body className="py-2 px-3" style={{ minHeight: "50px", fontSize: "1.08rem", whiteSpace: "pre-line" }}>
-                    {post.content}
-                  </Card.Body>
-                </Card>
-                <div className="d-flex justify-content-between align-items-center mt-auto pt-3">
-                  <button
-                    className={`favorite-btn btn btn-link p-0 heart-btn${liked ? " liked" : ""}`}
-                    data-travel="123"
-                    onClick={handleLike}
-                    style={{ textDecoration: "none" }}
-                    aria-label={liked ? "찜 취소" : "찜하기"}
-                  >
-                    <i className={liked ? "bi bi-heart-fill" : "bi bi-heart"} />
-                    <span className="fw-semibold"> {post.favoriteCount ? post.favoriteCount : 0}</span>
-                  </button>
-                </div>
-              </Card.Body>
-            </Card>
-            <Card className="shadow-sm flex-fill"
-              style={{ borderRadius: "18px", width: "70%", minWidth: "0", background: "#fff", display: "flex", flexDirection: "column" }}>
-              {post.id &&
+            <PostContent post={post} liked={liked} onLike={handleLike} nickname={nickname} />
+            <Card
+              className="shadow-sm flex-fill"
+              style={{ borderRadius: "18px", width: "70%", minWidth: "0", background: "#fff", display: "flex", flexDirection: "column" }}
+            >
+              {post.id && (
                 <Card.Body className="d-flex flex-column py-4" style={{ flex: 1 }}>
-                  <CommentPage no={post.id} isLoggedIn={isLoggedIn} ratingAvg={post.ratingAvg} setCommentFlag={setCommentFlag} category={post.category} region={post.region} title={post.title} />
-                </Card.Body>}
+                  <CommentPage
+                    no={post.id}
+                    isLoggedIn={isLoggedIn}
+                    ratingAvg={post.ratingAvg}
+                    setCommentFlag={setCommentFlag}
+                    category={post.category}
+                    region={post.region}
+                    title={post.title}
+                  />
+                </Card.Body>
+              )}
             </Card>
           </div>
         </div>
