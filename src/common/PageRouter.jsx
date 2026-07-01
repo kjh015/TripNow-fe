@@ -33,6 +33,7 @@ import DeduplicationManagement from "../log/components/deduplication/Deduplicati
 // layout & guards
 import RootLayout from "../components/layout/RootLayout";
 import PrivateRoute from "../components/PrivateRoute";
+import NotFoundPage from "../components/NotFoundPage";
 
 const PageRouter = () => {
     return (
@@ -64,6 +65,9 @@ const PageRouter = () => {
                     <Route path="/log/filter" element={<PrivateRoute adminOnly><FilterManagement /></PrivateRoute>} />
                     <Route path="/log/db" element={<PrivateRoute adminOnly><LogManagement /></PrivateRoute>} />
                     <Route path="/log/deduplication" element={<PrivateRoute adminOnly><DeduplicationManagement /></PrivateRoute>} />
+
+                    {/* 404 */}
+                    <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </RootLayout>
         </BrowserRouter>
