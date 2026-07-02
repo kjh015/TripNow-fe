@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { getMyBoard } from '../api/commonApi';
+import { getMyPosts } from '../api/postSearchApi';
 
 import LoadingSpinner from "../components/LoadingSpinner";
 import useAlert from "../hooks/useAlert";
@@ -19,8 +19,8 @@ const CheckMyArt = () => {
         setLoading(true);
         setError(null);
         try {
-            const { data } = await getMyBoard(nickname);
-            setBoards(data);
+            const { data } = await getMyPosts();
+            setBoards(data.result?.content ?? data.result ?? data);
         } catch (e) {
             setError(e);
         } finally {

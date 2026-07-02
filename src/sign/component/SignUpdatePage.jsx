@@ -2,8 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getMemberDetail, updateMember } from '../../api/signApi';
-import UserAuthentication from '../service/UserAuthentication';
+import { getMyProfile, updateMyProfile } from '../../api/memberApi';
 
 const inputBoxStyle = {
     width: "100%",
@@ -51,8 +50,8 @@ const SignUpdatePage = () => {
 
     const getMember = async () => {
         try {
-            const { data } = await getMemberDetail({ loginId: UserAuthentication.getLoginIdFromToken() });
-            setFormData(data);
+            const { data } = await getMyProfile();
+            setFormData(data.result ?? data);
         } catch {
             setAlert({ show: true, message: "회원 정보 조회 실패", type: "danger" });
         }
@@ -70,7 +69,7 @@ const SignUpdatePage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await updateMember(formData);
+            await updateMyProfile({ nickname: formData.nickname });
             setAlert({ show: true, message: "회원수정 성공", type: "success" });
             localStorage.setItem('nickname', formData.nickname);
             setTimeout(() => {

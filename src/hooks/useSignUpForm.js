@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { checkDuplicate, signUp } from '../api/signApi';
+import { checkNickname, checkLoginId, checkEmail, signUp } from '../api/memberApi';
 
 const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+~\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -47,13 +47,19 @@ const useSignUpForm = () => {
 
     useEffect(() => {
         const debounce = {};
+        const checkers = {
+            loginId: () => checkLoginId(formData.loginId),
+            email:   () => checkEmail(formData.email),
+            nickname: () => checkNickname(formData.nickname),
+        };
         ["loginId", "email", "nickname"].forEach(field => {
             if (!formData[field]) return;
             if (debounce[field]) clearTimeout(debounce[field]);
             debounce[field] = setTimeout(async () => {
                 try {
-                    const { data } = await checkDuplicate({ type: field, value: formData[field] });
-                    setDups(prev => ({ ...prev, [field]: !!data.exists }));
+                    const { data } = await checkers[field]();
+                    const result = data.result ?? data;
+                    setDups(prev => ({ ...prev, [field]: result.exists === true || result.available === false }));
                 } catch {
                     setDups(prev => ({ ...prev, [field]: false }));
                 }

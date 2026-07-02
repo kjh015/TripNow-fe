@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { getPostList, getPostListBySearch, removePost, migratePost } from "../../../api/postApi";
+import { getPostListBySearch } from "../../../api/postSearchApi";
+import { deletePost } from "../../../api/postApi";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "react-bootstrap";
 import { toast } from "react-toastify";
@@ -88,22 +89,15 @@ const BoardList = ({ title, boards, loading, error, categoryColors, regionColors
 );
 
 const AdmnBoard = () => {
-    const [mysqlBoards, setMysqlBoards] = useState([]);
     const [esBoards, setEsBoards] = useState([]);
-    const [mysqlLoading, setMysqlLoading] = useState(false);
     const [esLoading, setEsLoading] = useState(false);
-    const [mysqlError, setMysqlError] = useState(null);
     const [esError, setEsError] = useState(null);
     const [showConfirm, setShowConfirm] = useState(false);
     const [removeTarget, setRemoveTarget] = useState(null);
 
-    const MYSQL_PAGE_SIZE = 10;
     const ES_PAGE_SIZE = 10;
-    const [mysqlPage, setMysqlPage] = useState(0);
     const [esPage, setEsPage] = useState(0);
     const [esDocCount, setEsDocCount] = useState(0);
-
-    const pagedMysqlBoards = mysqlBoards.slice(mysqlPage * MYSQL_PAGE_SIZE, (mysqlPage + 1) * MYSQL_PAGE_SIZE);
 
     const categoryColors = {
         축제: "danger", 공연: "primary", 행사: "success", 체험: "warning",
@@ -126,36 +120,14 @@ const AdmnBoard = () => {
 
     const removeBoard = async () => {
         try {
-            await removePost(removeTarget);
+            await deletePost(removeTarget);
             toast.success("삭제에 성공했습니다.");
-            getMysqlBoards();
             getEsBoards();
         } catch {
             toast.error("삭제에 실패했습니다.");
         } finally {
             setShowConfirm(false);
             setRemoveTarget(null);
-        }
-    };
-
-    const migrateData = async () => {
-        try {
-            await migratePost();
-            toast.success("동기화에 성공했습니다.");
-        } catch {
-            toast.error("동기화에 실패했습니다.");
-        }
-    };
-
-    const getMysqlBoards = async () => {
-        setMysqlLoading(true);
-        try {
-            const { data } = await getPostList();
-            setMysqlBoards(data);
-        } catch (e) {
-            setMysqlError(e);
-        } finally {
-            setMysqlLoading(false);
         }
     };
 
@@ -173,13 +145,12 @@ const AdmnBoard = () => {
     };
 
     useEffect(() => {
-        getMysqlBoards();
         getEsBoards(0);
     }, []);
 
     const navigate = useNavigate();
     const handleGoDetail = (board) => navigate(`/post/detail?no=${board.id}`);
-    const handleMysqlPageChange = (newPage) => setMysqlPage(newPage);
+
     const handleEsPageChange = (newPage) => {
         setEsPage(newPage);
         getEsBoards(newPage);
@@ -215,35 +186,19 @@ const AdmnBoard = () => {
             <div className="container" style={{ maxWidth: 1500, paddingBottom: 40 }}>
                 <h2 className="fw-bold">여행지 관리</h2>
                 <div className="row g-4">
-                    <div className="col-12 col-md-6">
+                    <div className="col-12">
                         <div className="panel-bg p-4 rounded-4 h-100 shadow-sm" style={{ background: "rgba(250,251,255,0.97)", minHeight: 540 }}>
                             <BoardList
-                                title={<span className="text-primary"><i className="bi bi-database me-1"></i>MySQL 게시글</span>}
-                                boards={pagedMysqlBoards} loading={mysqlLoading} error={mysqlError}
-                                categoryColors={categoryColors} regionColors={regionColors}
-                                formatDate={formatDate} onRemove={handleRemove} onClickCard={handleGoDetail}
-                            />
-                            <Pagination total={mysqlBoards.length} page={mysqlPage} onChange={handleMysqlPageChange} pageSize={MYSQL_PAGE_SIZE} />
-                        </div>
-                    </div>
-                    <div className="col-12 col-md-6">
-                        <div className="panel-bg p-4 rounded-4 h-100 shadow-sm" style={{ background: "rgba(250,251,255,0.97)", minHeight: 540 }}>
-                            <BoardList
-                                title={<span className="text-info"><i className="bi bi-search me-1"></i>Elasticsearch 게시글</span>}
+                                title={<span className="text-info"><i className="bi bi-search me-1"></i>게시글 목록</span>}
                                 boards={esBoards} loading={esLoading} error={esError}
                                 categoryColors={categoryColors} regionColors={regionColors}
-                                formatDate={formatDate} onClickCard={handleGoDetail}
+                                formatDate={formatDate} onRemove={handleRemove} onClickCard={handleGoDetail}
                             />
                             <Pagination total={esDocCount} page={esPage} onChange={handleEsPageChange} pageSize={ES_PAGE_SIZE} />
                         </div>
                     </div>
                 </div>
-                <div className="d-flex justify-content-end my-3">
-                    <button className="btn btn-danger mb-4 px-4 fw-semibold shadow-sm" onClick={migrateData}
-                        style={{ borderRadius: "1.4rem" }}>
-                        <i className="bi bi-cloud-arrow-up me-2"></i>DB 동기화 (MySQL → ES)
-                    </button>
-                </div>
+
             </div>
             <style>
                 {`

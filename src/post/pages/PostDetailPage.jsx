@@ -4,8 +4,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { Card } from "react-bootstrap";
 
-import { getPost } from "../../api/postApi";
-import { toggleFavorite, existsFavorite } from "../../api/favoriteApi";
+import { getPost } from "../../api/postSearchApi";
+import { addLike, deleteLike, getMyLikes } from "../../api/likeApi";
 import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import CommentPage from "../../comment/component/CommentPage";
 import useAlert from "../../hooks/useAlert";
@@ -35,31 +35,19 @@ const PostDetailPage = () => {
   };
 
   const handleLike = async () => {
-    const nickname = localStorage.getItem("nickname");
-    const payload = { boardId: no, memberNickname: nickname };
     try {
-      const { data } = await toggleFavorite(payload);
-      setLiked(data);
-      if (data) {
+      if (liked) {
+        await deleteLike(Number(no));
+        setLiked(false);
         window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: "travel_favorite_add",
-          boardId: no,
-          category: post.category,
-          region: post.region,
-          title: post.title
-        });
-        showAlert("찜 목록에 추가되었습니다.", "success");
-      } else {
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: "travel_favorite_remove",
-          boardId: no,
-          category: post.category,
-          region: post.region,
-          title: post.title
-        });
+        window.dataLayer.push({ event: "travel_favorite_remove", boardId: no, category: post.category, region: post.region, title: post.title });
         showAlert("찜 목록에서 삭제되었습니다.", "danger");
+      } else {
+        await addLike(Number(no));
+        setLiked(true);
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: "travel_favorite_add", boardId: no, category: post.category, region: post.region, title: post.title });
+        showAlert("찜 목록에 추가되었습니다.", "success");
       }
     } catch {
       showAlert("오류가 발생했습니다.", "danger");
@@ -67,11 +55,10 @@ const PostDetailPage = () => {
   };
 
   const getLike = async () => {
-    const nickname = localStorage.getItem("nickname");
-    const payload = { boardId: no, memberNickname: nickname };
     try {
-      const { data } = await existsFavorite(payload);
-      setLiked(data);
+      const { data } = await getMyLikes();
+      const likes = data.result?.content ?? data.result ?? [];
+      setLiked(likes.some((p) => String(p.postId) === String(no)));
     } catch {
       showAlert("오류가 발생했습니다.", "danger");
     }
@@ -80,7 +67,8 @@ const PostDetailPage = () => {
   const viewBoard = async () => {
     try {
       const { data } = await getPost(no);
-      setPost({ ...data, images: data.images || [] });
+      const post = data.result ?? data;
+      setPost({ ...post, images: post.images || [] });
     } catch {
       showAlert("게시글을 불러오지 못했습니다.", "danger");
     }

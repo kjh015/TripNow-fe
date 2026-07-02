@@ -52,14 +52,15 @@ apiClient.interceptors.response.use(
 
       try {
         const { data } = await axios.post(
-          `${BASE_URL}/api/sign/refresh`,
+          `${BASE_URL}/api/v1/auth/tokens/refresh`,
           {},
           { withCredentials: true }
         );
-        localStorage.setItem("accessToken", data.accessToken);
-        apiClient.defaults.headers.common.Authorization = `Bearer ${data.accessToken}`;
-        processQueue(null, data.accessToken);
-        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+        const accessToken = data.result?.accessToken ?? data.accessToken;
+        localStorage.setItem("accessToken", accessToken);
+        apiClient.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+        processQueue(null, accessToken);
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);

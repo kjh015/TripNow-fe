@@ -2,7 +2,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getPost, editPost, removePost } from '../../api/postApi';
+import { getPost } from '../../api/postSearchApi';
+import { updatePost, deletePost } from '../../api/postApi';
 import useAlert from '../../hooks/useAlert';
 import PostForm from '../components/PostForm';
 
@@ -29,10 +30,11 @@ const PostEditPage = () => {
     const viewBoard = async () => {
         try {
             const { data } = await getPost(no);
-            setPost(data);
-            setExistingImages(data.imagePaths || []);
+            const post = data.result ?? data;
+            setPost(post);
+            setExistingImages(post.imagePaths || []);
             setNewImages([]);
-            setImagePreviews(data.imagePaths || []);
+            setImagePreviews(post.imagePaths || []);
         } catch {
             showAlert("게시글을 불러오지 못했습니다.", "danger");
         }
@@ -40,7 +42,7 @@ const PostEditPage = () => {
 
     const removeBoard = async () => {
         try {
-            await removePost(no);
+            await deletePost(no);
             showAlert("삭제 성공", "success");
             setTimeout(() => navigate('/post/list'), 500);
         } catch {
@@ -104,7 +106,7 @@ const PostEditPage = () => {
         formData.append('existingImages', JSON.stringify(existingImages));
         newImages.forEach(file => formData.append('images', file));
         try {
-            await editPost(formData);
+            await updatePost(no, formData);
             showAlert("글 수정이 완료되었습니다.", "success");
             setTimeout(() => navigate('/post/list'), 500);
         } catch {

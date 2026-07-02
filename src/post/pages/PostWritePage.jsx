@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from 'react-router-dom';
-import { addPost } from '../../api/postApi';
+import { createPost } from '../../api/postApi';
 import { useState, useEffect } from 'react';
 import useAlert from '../../hooks/useAlert';
 import PostForm from '../components/PostForm';
@@ -67,7 +67,7 @@ const PostWritePage = () => {
         formData.append('board', postBlob);
         images.forEach(file => formData.append('images', file));
         try {
-            await addPost(formData);
+            await createPost(formData);
             showAlert("글 작성이 완료되었습니다.", "success");
             setTimeout(() => navigate('/post/list'), 500);
         } catch {

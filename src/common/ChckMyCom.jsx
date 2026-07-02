@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { getMyComment } from "../api/commonApi";
+import { getMyComments } from "../api/commentApi";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
 
@@ -21,8 +21,8 @@ const ChckMyCom = () => {
     const getCommentList = async () => {
         setLoading(true);
         try {
-            const { data } = await getMyComment(nickname);
-            setCommentList(data);
+            const { data } = await getMyComments();
+            setCommentList(data.result?.content ?? data.result ?? data);
         } catch {
             // 에러 시 빈 목록 유지
         } finally {

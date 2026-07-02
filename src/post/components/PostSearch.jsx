@@ -6,7 +6,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import RegionRadioComp from "../../board/component/page/RegionRadioComp";
 import CategoryCard from "../../board/component/page/CategoryCard";
-import { autoCompleteSearch } from "../../api/postApi";
+import { autoCompleteSearch } from "../../api/postSearchApi";
 
 const PostSearch = ({ selectedCategory, selectedRegion }) => {
     const [post, setPost] = useState({ category: "", region: "" });

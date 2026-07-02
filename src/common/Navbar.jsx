@@ -1,7 +1,7 @@
 import { Button } from 'react-bootstrap';
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from 'react-router-dom';
-import { signOut, testAuth } from "../api/signApi";
+import { logout } from "../api/authApi";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -23,7 +23,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await signOut();
+      await logout();
       localStorage.removeItem('accessToken');
       localStorage.removeItem('nickname');
       toast.info("로그아웃 되었습니다.");
@@ -31,15 +31,6 @@ const Navbar = () => {
       navigate("/");
     } catch {
       toast.error("로그아웃에 실패했습니다.");
-    }
-  };
-
-  const handleTest = async () => {
-    try {
-      const { data } = await testAuth();
-      showAlert(data, "success");
-    } catch {
-      showAlert("실패", "danger");
     }
   };
 

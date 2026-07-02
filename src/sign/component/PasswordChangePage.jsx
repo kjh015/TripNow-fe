@@ -1,8 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { updatePassword } from '../../api/signApi';
-import { getLoginIdFromToken } from '../../utils/tokenUtils';
+import { changePassword } from '../../api/memberApi';
 
 const cardStyle = {
     maxWidth: "420px",
@@ -71,13 +70,9 @@ const PasswordChangePage = () => {
             setAlert({ show: true, message: '새 비밀번호가 일치하지 않습니다.', type: 'danger' });
             return;
         }
-        const payload = {
-            curPassword: curPwd,
-            newPassword: newPwd,
-            loginId: getLoginIdFromToken()
-        };
+        const payload = { curPassword: curPwd, newPassword: newPwd };
         try {
-            await updatePassword(payload);
+            await changePassword(payload);
             setAlert({ show: true, message: '비밀번호가 변경되었습니다.', type: 'success' });
             setTimeout(() => navigate('/'), 1300);
         } catch (error) {
