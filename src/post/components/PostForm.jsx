@@ -33,7 +33,7 @@ const PostForm = ({
             >
                 <div className="container my-5" style={{ maxWidth: '900px' }}>
                     <div className="card shadow-lg border-0 rounded-4 p-4" style={{ background: "#ffffffeb" }}>
-                        <h2 className="mb-3 fw-bold" style={{ textAlign: 'center', letterSpacing: '2px' }}>
+                        <h2 className="mb-3 fw-bold text-center" style={{ letterSpacing: '2px' }}>
                             {isEdit ? '글 수정' : '글 작성'}
                         </h2>
                         <div className="text-secondary text-center mb-4" style={{ fontSize: '1.07rem' }}>

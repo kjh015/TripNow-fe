@@ -32,13 +32,13 @@ const PostContent = ({ post, liked, onLike, nickname }) => {
                         {post.category}
                     </Badge>
                 </div>
-                <div className="mb-2 text-muted" style={{ fontSize: "0.96rem" }}>
+                <div className="mb-2 text-muted small">
                     조회수: <span className="fw-semibold">{post.viewCount}</span> | 작성자: <span className="fw-semibold">{post.memberNickname ? post.memberNickname : 0}</span> |
                 </div>
                 <hr className="my-2" />
                 <div className="mb-2">
                     <span className="fw-semibold"><i className="bi bi-geo-alt-fill"></i> 여행지:</span> {post.travelPlace}
-                    <div className="text-muted" style={{ fontSize: "0.97rem" }}>{post.address}</div>
+                    <div className="text-muted small">{post.address}</div>
                 </div>
                 <div className="mb-2 d-flex align-items-center justify-content-between">
                     <div>
@@ -64,10 +64,9 @@ const PostContent = ({ post, liked, onLike, nickname }) => {
                 </Card>
                 <div className="d-flex justify-content-between align-items-center mt-auto pt-3">
                     <button
-                        className={`favorite-btn btn btn-link p-0 heart-btn${liked ? " liked" : ""}`}
+                        className={`favorite-btn btn btn-link p-0 heart-btn text-decoration-none${liked ? " liked" : ""}`}
                         data-travel="123"
                         onClick={onLike}
-                        style={{ textDecoration: "none" }}
                         aria-label={liked ? "찜 취소" : "찜하기"}
                     >
                         <i className={liked ? "bi bi-heart-fill" : "bi bi-heart"} />
