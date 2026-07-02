@@ -18,9 +18,9 @@ const PostDetailPage = () => {
   const no = searchParams.get('no');
   const navigate = useNavigate();
   const [post, setPost] = useState({
-    id: '', title: '', content: '', memberNickname: '',
-    travelPlace: '', address: '', category: '', region: '', imagePaths: [],
-    createdDate: '', modifiedDate: '', ratingAvg: '', viewCount: '', favoriteCount: '', commentCount: ''
+    postId: '', title: '', content: '', memberNickname: '',
+    travelPlace: '', address: '', category: '', region: '', images: [],
+    updatedAt: '', starAvg: '', viewCount: '', likeCount: '', commentCount: ''
   });
   const [commentFlag, setCommentFlag] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -67,7 +67,7 @@ const PostDetailPage = () => {
   const viewBoard = async () => {
     try {
       const { data } = await getPost(no);
-      const post = data.result ?? data;
+      const post = data.result;
       setPost({ ...post, images: post.images || [] });
     } catch {
       showAlert("게시글을 불러오지 못했습니다.", "danger");
@@ -138,12 +138,12 @@ const PostDetailPage = () => {
               className="shadow-sm flex-fill"
               style={{ borderRadius: "18px", width: "70%", minWidth: "0", background: "#fff", display: "flex", flexDirection: "column" }}
             >
-              {post.id && (
+              {post.postId && (
                 <Card.Body className="d-flex flex-column py-4" style={{ flex: 1 }}>
                   <CommentPage
-                    no={post.id}
+                    no={post.postId}
                     isLoggedIn={isLoggedIn}
-                    ratingAvg={post.ratingAvg}
+                    ratingAvg={post.starAvg}
                     setCommentFlag={setCommentFlag}
                     category={post.category}
                     region={post.region}

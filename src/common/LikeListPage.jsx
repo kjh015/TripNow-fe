@@ -63,7 +63,7 @@ const LikeListPage = () => {
                 ) : (
                     <div className="d-flex flex-column gap-4">
                         {boards.map((board) => (
-                            <PostListCard key={board.id} post={board} />
+                            <PostListCard key={board.postId} post={board} />
                         ))}
                     </div>
                 )}

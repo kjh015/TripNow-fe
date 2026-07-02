@@ -9,16 +9,16 @@ const PostContent = ({ post, liked, onLike, nickname }) => {
             style={{ borderRadius: "18px", width: "100%", minWidth: "0", background: "#fff", display: "flex", flexDirection: "column" }}
         >
             <Card.Body className="pb-2 pt-4 d-flex flex-column" style={{ flex: 1 }}>
-                {post.imagePaths && post.imagePaths.length > 0 && (
+                {post.images && post.images.length > 0 && (
                     <Carousel
                         interval={null}
-                        indicators={post.imagePaths.length > 1}
+                        indicators={post.images.length > 1}
                         style={{ maxWidth: 800, margin: "0 auto 24px auto", borderRadius: 16, overflow: "hidden", boxShadow: "0 6px 18px #0001" }}
                     >
-                        {post.imagePaths.map(filename => (
-                            <Carousel.Item key={filename}>
+                        {post.images.map(img => (
+                            <Carousel.Item key={img.imageKey}>
                                 <img
-                                    src={`${process.env.REACT_APP_IMAGE_BASE_URL}${filename}`}
+                                    src={`${process.env.REACT_APP_IMAGE_BASE_URL}/${img.imageKey}`}
                                     alt="uploaded"
                                     style={{ width: "100%", height: 400, objectFit: "cover", display: "block", background: "#eee" }}
                                 />
@@ -48,7 +48,7 @@ const PostContent = ({ post, liked, onLike, nickname }) => {
                     {nickname === post.memberNickname && (
                         <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-edit">수정하기</Tooltip>}>
                             <Link
-                                to={`/post/edit?no=${post.id}`}
+                                to={`/post/edit?no=${post.postId}`}
                                 className="btn btn-outline-primary btn-sm ms-2"
                                 style={{ whiteSpace: "nowrap" }}
                             >
@@ -70,7 +70,7 @@ const PostContent = ({ post, liked, onLike, nickname }) => {
                         aria-label={liked ? "찜 취소" : "찜하기"}
                     >
                         <i className={liked ? "bi bi-heart-fill" : "bi bi-heart"} />
-                        <span className="fw-semibold"> {post.favoriteCount ? post.favoriteCount : 0}</span>
+                        <span className="fw-semibold"> {post.likeCount ? post.likeCount : 0}</span>
                     </button>
                 </div>
             </Card.Body>

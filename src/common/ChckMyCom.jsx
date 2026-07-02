@@ -54,11 +54,11 @@ const ChckMyCom = () => {
                     <div>
                         {commentList.map((c, idx) => (
                             <div key={idx} className="mainpage-card-hover card mb-3 border-0 shadow-sm rounded-3 position-relative"
-                                onClick={() => navigate(`/post/detail/?no=${c.no}`)}>
+                                onClick={() => navigate(`/post/detail/?no=${c.postId}`)}>
                                 <div className="card-body">
                                     <div className="d-flex align-items-center mb-2">
-                                        <strong className="me-2">{c.nickname}</strong>
-                                        {c.rating > 0 && <span className="ms-1">{renderStarsStatic(c.rating)}</span>}
+                                        <strong className="me-2">{c.memberNickname}</strong>
+                                        {c.star > 0 && <span className="ms-1">{renderStarsStatic(c.star)}</span>}
                                     </div>
                                     <div className="mb-2">{c.content}</div>
                                 </div>

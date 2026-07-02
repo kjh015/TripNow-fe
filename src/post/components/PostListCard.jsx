@@ -7,7 +7,7 @@ const PostListCard = ({ post, navigateTo, navigateState }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    const to = navigateTo ?? `/post/detail?no=${post.id}`;
+    const to = navigateTo ?? `/post/detail?no=${post.postId}`;
     navigate(to, navigateState ? { state: navigateState } : undefined);
   };
 
@@ -46,7 +46,7 @@ const PostListCard = ({ post, navigateTo, navigateState }) => {
           </span>
         </div>
         <span className="text-secondary ms-2" style={{ fontSize: "0.95rem", whiteSpace: "nowrap" }}>
-          {formatDate(post.modifiedDate)}
+          {formatDate(post.updatedAt)}
         </span>
       </div>
 
@@ -66,7 +66,7 @@ const PostListCard = ({ post, navigateTo, navigateState }) => {
           </span>
           <span className="badge" style={{ color: "#ffc107", fontSize: "1rem", fontWeight: 500 }}>
             <i className="bi bi-star-fill me-1" />
-            {post.ratingAvg ? post.ratingAvg.toFixed(1) : 0}
+            {post.starAvg ? post.starAvg.toFixed(1) : 0}
           </span>
         </div>
       </div>

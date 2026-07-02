@@ -26,11 +26,6 @@ const MemberManagement = () => {
             setAlert({ show: true, message: msg, type: "danger" });
         }
     };
-    const formatDate = (isoString) => {
-        if (!isoString) return "-";
-        return isoString.substring(0, 16).replace("T", " ");
-    };
-
     useEffect(() => {
         getMemberList();
     }, []);
@@ -70,23 +65,22 @@ const MemberManagement = () => {
                             </tr>
                         )}
                         {memberList
-                            .filter(member => member.id !== 10)
+                            .filter(member => member.memberId !== 10)
                             .map((member, idx) => (
-                                <tr key={member.id}>
+                                <tr key={member.memberId}>
                                     <td>{idx + 1}</td>
                                     <td>{member.loginId}</td>
                                     <td>{member.nickname}</td>
                                     <td>{member.email}</td>
                                     <td>{member.gender}</td>
-                                    <td>{formatDate(member.regDate)}</td>
+                                    <td>-</td>
                                     <td>{member.roles?.includes("ROLE_ADMIN") ? "관리자" : "회원"}</td>
                                     <td className='text-center'>
                                         <button
                                             className="btn btn-sm btn-outline-success"
                                             title="관리자 위임"
-                                            onClick={() => delegateAdmin({ memberId: member.memberId ?? member.id })}
+                                            onClick={() => delegateAdmin({ memberId: member.memberId })}
                                             disabled={member.roles?.includes("ROLE_ADMIN")}
-
                                         >
                                             <FaUserShield />
                                         </button>

@@ -12,7 +12,7 @@ const PostListPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(false);
-  const [docCount, setDocCount] = useState(0);
+  const [pagination, setPagination] = useState({ totalPages: 0, isFirst: true, isLast: true });
   const { alert, showAlert } = useAlert(500);
   const SORT_NAME_MAP = {
     "popular-desc": "인기 순",
@@ -34,8 +34,6 @@ const PostListPage = () => {
   const sortName = SORT_NAME_MAP[`${sort}-${direction}`] || "정렬";
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem('accessToken');
-  const pageCount = Math.ceil(docCount / 10);
-  const pageNumbers = Array.from({ length: pageCount }, (_, i) => i + 1);
 
   useEffect(() => {
     setSearched(true);
@@ -57,8 +55,9 @@ const PostListPage = () => {
     setError(null);
     try {
       const { data } = await getPostListBySearch({ category, region, keyword, sort, direction, page });
-      setPosts(data.result);
-      setDocCount(data.docCount);
+      const result = data.result;
+      setPosts(result.content ?? []);
+      setPagination({ totalPages: result.totalPages ?? 0, isFirst: result.isFirst ?? true, isLast: result.isLast ?? true });
       setRetryCount(0);
     } catch (e) {
       setError(e);
@@ -165,9 +164,9 @@ const PostListPage = () => {
           <div className="d-flex flex-column gap-4">
             {posts.map((post) => (
               <PostListCard
-                key={post.id}
+                key={post.postId}
                 post={post}
-                navigateTo={`/post/detail?no=${post.id}`}
+                navigateTo={`/post/detail?no=${post.postId}`}
                 navigateState={{ from: location.search }}
               />
             ))}
@@ -179,25 +178,25 @@ const PostListPage = () => {
             type="button"
             className="btn btn-outline-primary me-2 px-4"
             onClick={() => handlePage(page - 1)}
-            disabled={page === 0}
+            disabled={pagination.isFirst}
           >
             이전
           </button>
-          {pageNumbers.map(num => (
+          {Array.from({ length: pagination.totalPages }, (_, i) => i).map(num => (
             <button
               key={num}
-              className={`btn mx-1 px-3 ${page === num - 1 ? 'btn-primary' : 'btn-outline-primary'}`}
-              onClick={() => handlePage(num - 1)}
-              style={{ fontWeight: page === num - 1 ? 'bold' : undefined }}
+              className={`btn mx-1 px-3 ${page === num ? 'btn-primary' : 'btn-outline-primary'}`}
+              onClick={() => handlePage(num)}
+              style={{ fontWeight: page === num ? 'bold' : undefined }}
             >
-              {num}
+              {num + 1}
             </button>
           ))}
           <button
             type="button"
             className="btn btn-outline-primary px-4"
             onClick={() => handlePage(page + 1)}
-            disabled={page === pageCount - 1 || pageCount === 0}
+            disabled={pagination.isLast}
           >
             다음
           </button>
