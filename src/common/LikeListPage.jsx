@@ -35,7 +35,7 @@ const LikeListPage = () => {
         setError(null);
         try {
             const { data } = await getMyLikes();
-            setBoards(data.result?.content ?? data.result ?? data);
+            setBoards(data.result.content);
         } catch (e) {
             setError(e);
         } finally {

@@ -33,7 +33,7 @@ const CommentPage = ({ no, isLoggedIn, ratingAvg, setCommentFlag, category, regi
     const getCommentList = async () => {
         try {
             const { data } = await commentApi.getCommentList(no);
-            setCommentList(data.result?.content ?? data.result ?? data);
+            setCommentList(data.result.content);
         } catch {}
     };
 

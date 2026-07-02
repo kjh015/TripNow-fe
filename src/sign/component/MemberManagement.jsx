@@ -10,7 +10,7 @@ const MemberManagement = () => {
     const getMemberList = async () => {
         try {
             const { data } = await getAdminMembers();
-            setMemberList(data.result?.content ?? data.result ?? data);
+            setMemberList(data.result.content);
         } catch {
             setAlert({ show: true, message: "회원 조회 오류", type: "danger" });
         }

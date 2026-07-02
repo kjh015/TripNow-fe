@@ -20,7 +20,7 @@ const CheckMyArt = () => {
         setError(null);
         try {
             const { data } = await getMyPosts();
-            setBoards(data.result?.content ?? data.result ?? data);
+            setBoards(data.result.content);
         } catch (e) {
             setError(e);
         } finally {

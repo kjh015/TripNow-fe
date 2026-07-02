@@ -42,7 +42,7 @@ const MyPage = () => {
   const getMember = async () => {
     try {
       const { data } = await getMyProfile();
-      setMember(data.result ?? data);
+      setMember(data.result);
     } catch {
       showAlert("회원 정보 조회 실패", "danger");
     }

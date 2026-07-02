@@ -43,7 +43,6 @@ const SignUpdatePage = () => {
         nickname: '',
         gender: '',
         roles: [],
-        regDate: ''
     });
     const [alert, setAlert] = useState({ show: false, message: '', type: '' }); // 추가
     const navigate = useNavigate();
@@ -51,7 +50,7 @@ const SignUpdatePage = () => {
     const getMember = async () => {
         try {
             const { data } = await getMyProfile();
-            setFormData(data.result ?? data);
+            setFormData(data.result);
         } catch {
             setAlert({ show: true, message: "회원 정보 조회 실패", type: "danger" });
         }

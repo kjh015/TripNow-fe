@@ -57,7 +57,7 @@ const PostDetailPage = () => {
   const getLike = async () => {
     try {
       const { data } = await getMyLikes();
-      const likes = data.result?.content ?? data.result ?? [];
+      const likes = data.result.content ?? [];
       setLiked(likes.some((p) => String(p.postId) === String(no)));
     } catch {
       showAlert("오류가 발생했습니다.", "danger");

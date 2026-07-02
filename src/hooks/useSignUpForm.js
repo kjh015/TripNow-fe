@@ -58,7 +58,7 @@ const useSignUpForm = () => {
             debounce[field] = setTimeout(async () => {
                 try {
                     const { data } = await checkers[field]();
-                    const result = data.result ?? data;
+                    const result = data.result;
                     setDups(prev => ({ ...prev, [field]: result.exists === true || result.available === false }));
                 } catch {
                     setDups(prev => ({ ...prev, [field]: false }));

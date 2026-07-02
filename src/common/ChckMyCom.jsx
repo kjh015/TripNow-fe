@@ -22,7 +22,7 @@ const ChckMyCom = () => {
         setLoading(true);
         try {
             const { data } = await getMyComments();
-            setCommentList(data.result?.content ?? data.result ?? data);
+            setCommentList(data.result.content);
         } catch {
             // 에러 시 빈 목록 유지
         } finally {

@@ -42,7 +42,7 @@ const PostEditPage = () => {
     const loadPost = async () => {
         try {
             const { data } = await getPost(no);
-            const postData = data.result ?? data;
+            const postData = data.result;
             setPost({
                 title: postData.title,
                 content: postData.content,
