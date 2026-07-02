@@ -33,7 +33,7 @@ const CommentPage = ({ no, isLoggedIn, ratingAvg, setCommentFlag, category, regi
     const getCommentList = async () => {
         try {
             const { data } = await commentApi.getCommentList(no);
-            setCommentList(data);
+            setCommentList(data.result?.content ?? data.result ?? data);
         } catch {}
     };
 
@@ -45,7 +45,8 @@ const CommentPage = ({ no, isLoggedIn, ratingAvg, setCommentFlag, category, regi
             onConfirm: async () => {
                 setModal(prev => ({ ...prev, show: false }));
                 try {
-                    const { data: message } = await commentApi.removeComment(commentId);
+                    await commentApi.deleteComment(commentId);
+                    const message = "댓글이 삭제되었습니다.";
                     setAlert({ show: true, message, type: "success" });
                     window.dataLayer = window.dataLayer || [];
                     window.dataLayer.push({ event: "travel_comment_remove", boardId: no, category, region, title });

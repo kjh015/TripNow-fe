@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getMemberList as getMemberListApi, delegateAdmin as delegateAdminApi } from '../../api/signApi';
+import { getAdminMembers, updateMemberRole } from '../../api/memberApi';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaTrash, FaUserShield } from 'react-icons/fa';
 
@@ -9,17 +9,17 @@ const MemberManagement = () => {
 
     const getMemberList = async () => {
         try {
-            const { data } = await getMemberListApi();
-            setMemberList(data);
+            const { data } = await getAdminMembers();
+            setMemberList(data.result?.content ?? data.result ?? data);
         } catch {
             setAlert({ show: true, message: "회원 조회 오류", type: "danger" });
         }
     };
 
-    const delegateAdmin = async ({ loginId }) => {
+    const delegateAdmin = async ({ memberId }) => {
         try {
-            const { data: msg } = await delegateAdminApi({ loginId });
-            setAlert({ show: true, message: msg, type: "success" });
+            await updateMemberRole(memberId);
+            setAlert({ show: true, message: "관리자 권한이 부여되었습니다.", type: "success" });
             getMemberList();
         } catch (error) {
             const msg = error.response?.data || "오류가 발생했습니다.";
@@ -84,7 +84,7 @@ const MemberManagement = () => {
                                         <button
                                             className="btn btn-sm btn-outline-success"
                                             title="관리자 위임"
-                                            onClick={() => delegateAdmin({ loginId: member.loginId })}
+                                            onClick={() => delegateAdmin({ memberId: member.memberId ?? member.id })}
                                             disabled={member.roles?.includes("ROLE_ADMIN")}
 
                                         >

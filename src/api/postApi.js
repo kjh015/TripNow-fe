@@ -1,25 +1,17 @@
 import apiClient from './client';
 
-export const getPostListBySearch = ({ keyword, category, region, sort, direction, page }) =>
-  apiClient.get('/api/board/search', { params: { keyword, category, region, sort, direction, page } });
+// 게시글 생성
+export const createPost = (payload) =>
+  apiClient.post('/api/v1/posts', payload);
 
-export const autoCompleteSearch = (keyword, signal) =>
-  apiClient.get('/api/board/autocomplete', { params: { keyword: encodeURIComponent(keyword) }, signal });
+// 게시글 수정
+export const updatePost = (postId, payload) =>
+  apiClient.patch(`/api/v1/posts/${postId}`, payload);
 
-export const getPostList = () =>
-  apiClient.get('/api/board/list');
+// 게시글 삭제
+export const deletePost = (postId) =>
+  apiClient.delete(`/api/v1/posts/${postId}`);
 
-export const getPost = (no) =>
-  apiClient.get('/api/board/view', { params: { no } });
-
-export const addPost = (formData) =>
-  apiClient.post('/api/board/add', formData);
-
-export const editPost = (formData) =>
-  apiClient.post('/api/board/edit', formData);
-
-export const removePost = (no) =>
-  apiClient.post('/api/board/remove', null, { params: { no } });
-
-export const migratePost = () =>
-  apiClient.post('/api/board/admin/migrate-data');
+// 이미지 업로드용 Presigned URL 발급
+export const getPresignedUrl = () =>
+  apiClient.get('/api/v1/posts/images/presigned-url');

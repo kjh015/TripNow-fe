@@ -1,9 +1,8 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { Link, useNavigate } from 'react-router-dom';
-import { getMemberDetail, withdraw } from '../api/signApi';
+import { getMyProfile, deleteMyProfile } from '../api/memberApi';
 import { useEffect, useState } from 'react';
-import UserAuthentication from '../sign/service/UserAuthentication';
 import { formatDate } from '../utils/dateUtils';
 import { toast } from 'react-toastify';
 
@@ -31,7 +30,7 @@ const MyPage = () => {
   const handleDelete = async () => {
     setShowConfirm(false);
     try {
-      await withdraw();
+      await deleteMyProfile();
       localStorage.removeItem('accessToken');
       localStorage.removeItem('nickname');
       toast.info("회원 탈퇴가 완료되었습니다.");
@@ -42,8 +41,8 @@ const MyPage = () => {
 
   const getMember = async () => {
     try {
-      const { data } = await getMemberDetail({ loginId: UserAuthentication.getLoginIdFromToken() });
-      setMember(data);
+      const { data } = await getMyProfile();
+      setMember(data.result ?? data);
     } catch {
       showAlert("회원 정보 조회 실패", "danger");
     }

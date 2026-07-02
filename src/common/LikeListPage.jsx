@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { getMyFavorite } from '../api/commonApi';
+import { getMyLikes } from '../api/likeApi';
 
 import LoadingSpinner from "../components/LoadingSpinner";
 import useAlert from "../hooks/useAlert";
@@ -34,8 +34,8 @@ const LikeListPage = () => {
         setLoading(true);
         setError(null);
         try {
-            const { data } = await getMyFavorite(nickname);
-            setBoards(data);
+            const { data } = await getMyLikes();
+            setBoards(data.result?.content ?? data.result ?? data);
         } catch (e) {
             setError(e);
         } finally {

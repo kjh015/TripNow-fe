@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { getPostList, getPostListBySearch } from "../../api/postApi";
+import { getPostListBySearch } from "../../api/postSearchApi";
 import PostSearch from "../components/PostSearch";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import PostListCard from "../components/PostListCard";
@@ -47,19 +47,6 @@ const PostListPage = () => {
       navigate("/post/write");
     } else {
       showAlert("로그인 필요", "danger");
-    }
-  };
-
-  const getBoardListAll = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data } = await getPostList();
-      setPosts(data);
-    } catch (e) {
-      setError(e);
-    } finally {
-      setLoading(false);
     }
   };
 

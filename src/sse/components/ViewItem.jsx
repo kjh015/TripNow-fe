@@ -1,6 +1,4 @@
-// ViewItem.jsx
 import React, { useEffect, useRef } from 'react';
-import { sendItem } from '../../api/sseApi';
 
 const ViewItem = ({ query, onClose }) => {
     const overlayRef = useRef(null);
@@ -22,13 +20,6 @@ const ViewItem = ({ query, onClose }) => {
     for (const [key, value] of params.entries()) {
         parsed[key] = value;
     }
-    const handleSend = async () => {
-        try {
-            await sendItem(parsed);
-        } catch {
-            console.error("Error sending item");
-        }
-    };
 
     return (
         <div ref={overlayRef} style={overlayStyle}>
@@ -39,7 +30,6 @@ const ViewItem = ({ query, onClose }) => {
                     <p key={k}><strong>{k}:</strong> {v}</p>
                 ))}
                 <button onClick={onClose}>닫기</button>
-                <button onClick={handleSend}>Send</button>
             </div>
         </div>
     );
