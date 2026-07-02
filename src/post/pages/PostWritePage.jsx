@@ -1,17 +1,27 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from 'react-router-dom';
-import { createPost } from '../../api/postApi';
+import { createPost, getPresignedUrl } from '../../api/postApi';
 import { useState, useEffect } from 'react';
 import useAlert from '../../hooks/useAlert';
 import PostForm from '../components/PostForm';
+
+const uploadImageToS3 = async (file, sortOrder) => {
+    const { data } = await getPresignedUrl();
+    const { url, imageKey } = data.result;
+    await fetch(url, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+    });
+    return { imageKey, sortOrder };
+};
 
 const PostWritePage = () => {
     const navigate = useNavigate();
     const [post, setPost] = useState({
         title: '',
         content: '',
-        memberNickname: '',
         travelPlace: '',
         address: '',
         category: '',
@@ -19,6 +29,7 @@ const PostWritePage = () => {
     });
     const [images, setImages] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
+    const [uploading, setUploading] = useState(false);
     const { alert, showAlert } = useAlert(500);
 
     useEffect(() => {
@@ -26,9 +37,7 @@ const PostWritePage = () => {
         if (!nickname) {
             showAlert("로그인이 필요합니다.", "danger");
             setTimeout(() => navigate(-1), 500);
-            return;
         }
-        setPost(prev => ({ ...prev, memberNickname: nickname }));
     }, [navigate]);
 
     const handleChange = (e) => {
@@ -62,16 +71,18 @@ const PostWritePage = () => {
             showAlert("사진을 한 장 이상 첨부해 주세요!", "danger");
             return;
         }
-        const formData = new FormData();
-        const postBlob = new Blob([JSON.stringify(post)], { type: "application/json" });
-        formData.append('board', postBlob);
-        images.forEach(file => formData.append('images', file));
+        setUploading(true);
         try {
-            await createPost(formData);
+            const uploadedImages = await Promise.all(
+                images.map((file, idx) => uploadImageToS3(file, idx))
+            );
+            await createPost({ ...post, images: uploadedImages });
             showAlert("글 작성이 완료되었습니다.", "success");
             setTimeout(() => navigate('/post/list'), 500);
         } catch {
             showAlert("글 작성에 실패하였습니다.", "danger");
+        } finally {
+            setUploading(false);
         }
     };
 
@@ -111,7 +122,7 @@ const PostWritePage = () => {
             onSubmit={handleSubmit}
             imageSection={imageSection}
             alert={alert}
-            submitDisabled={images.length === 0}
+            submitDisabled={images.length === 0 || uploading}
         />
     );
 };

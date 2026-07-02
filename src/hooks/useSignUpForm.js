@@ -105,7 +105,8 @@ const useSignUpForm = () => {
         }
         setIsSubmitting(true);
         try {
-            await signUp({ ...formData, birthDate });
+            const { passwordConfirm: _, ...rest } = formData;
+            await signUp({ ...rest, birthDate });
             toast.success("회원가입이 완료되었습니다! 🎉");
             navigate("/");
         } catch (error) {
