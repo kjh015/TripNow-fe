@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import DeduplicationApiClient from '../../service/DeduplicationApiClient';
+import { getFormatKeys } from '../../../api/log/deduplicationApi';
 
 // DeduplicationRow는 "포맷-데이터 쌍을 여러 개 입력"할 수 있도록 바뀜
 const DeduplicationRow = ({ processId, index, data, onChange, onRemove }) => {
     const [formatList, setFormatList] = useState([]);
 
     useEffect(() => {
-        DeduplicationApiClient.getFormatKeys(processId)
-            .then(res => res.json().then(data => setFormatList(data)));
+        const load = async () => {
+            try {
+                const { data } = await getFormatKeys(processId);
+                setFormatList(data);
+            } catch {
+                // 에러 시 빈 목록 유지
+            }
+        };
+        load();
     }, [processId]);
 
     // 조건(포맷-데이터) 한 줄의 기본값

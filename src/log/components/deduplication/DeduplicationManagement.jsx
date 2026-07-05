@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import InputDeduplication from './InputDeduplication';
-import DeduplicationApiClient from '../../service/DeduplicationApiClient';
+import { getDeduplicationList as getDeduplicationListApi } from '../../../api/log/deduplicationApi';
 import DetailDeduplication from './DetailDeduplication';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -15,12 +15,13 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
     if (duration > 0) setTimeout(() => setAlert(null), duration);
   }, []);
 
-  const getDeduplicationList = () => {
-    DeduplicationApiClient.getDeduplicationList(processId)
-      .then(res => res.json().then(data => {
-        if (res.ok) setDdpList(data);
-        else alert(data);
-      }));
+  const getDeduplicationList = async () => {
+    try {
+        const { data } = await getDeduplicationListApi(processId);
+        setDdpList(data);
+    } catch {
+        // 에러 시 목록 유지
+    }
   };
 
   // 입력창/상세창 닫기 콜백

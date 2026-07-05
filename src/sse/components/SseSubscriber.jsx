@@ -9,7 +9,7 @@ const SseSubscriber = () => {
     const [test2, settest2] = useState("not send");
 
     useEffect(() => {
-        const eventSource = new EventSource("http://localhost:8000/sse/subscribe");
+        const eventSource = new EventSource(`${process.env.REACT_APP_API_BASE_URL}/api/v1/rankings/live`, { withCredentials: true });
         eventSource.onopen = () => {
             setTest("connected!!");
         };

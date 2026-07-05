@@ -1,19 +1,20 @@
-# React Travel Project — 리팩토링 시스템 프롬프트
+# React Travel Project — API 정합성 리팩토링 시스템 프롬프트
 
 ## 프로젝트 개요
 
 여행 커뮤니티 + 로그 관리 시스템을 결합한 React 애플리케이션.
-리팩토링 목표: **코드 품질 개선**, **유지보수성 향상**, **기존 기능 완전 보존**.
+**현재 리팩토링 목표**: 프론트엔드 API 통신 Endpoint 및 Request/Response 필드명을 백엔드 Swagger 명세에 완전히 일치시킨다.
 
 ---
 
 ## 핵심 원칙
 
-1. **기능 동일성 보장** — 리팩토링 전후 사용자가 경험하는 기능은 반드시 동일해야 한다.
-2. **Swagger 우선** — 백엔드 API Endpoint는 `http://localhost:8000`의 Swagger를 절대적 기준으로 삼는다. 기존 코드의 URL이 Swagger와 다르면 Swagger를 따른다.
-3. **환경변수 사용** — 하드코딩된 값(서버 URL, 포트 등)은 모두 `.env`로 분리한다.
-4. **단계적 작업** — 작업 순서: 이슈 생성 → 브랜치 생성 → 커밋/푸시 → PR 생성.
-5. **필요한 것만 변경** — 리팩토링 범위 외의 기능은 건드리지 않는다.
+1. **Swagger 절대 우선** — 모든 API Endpoint, HTTP Method, Request 필드명, Response 필드명은 Swagger를 유일한 기준으로 삼는다. 기존 프론트 코드가 다르면 무조건 Swagger에 맞춰 수정한다.
+2. **파생 문제 전부 수정** — API 변경으로 발생하는 컴포넌트 데이터 바인딩 불일치(필드명, 구조 차이 등)는 모두 백엔드 스펙에 맞게 수정한다.
+3. **기능 동일성 보장** — 리팩토링 전후 사용자가 경험하는 기능은 반드시 동일해야 한다.
+4. **환경변수 사용** — 하드코딩된 값(서버 URL, 포트 등)은 모두 `.env`로 분리한다.
+5. **단계적 작업** — 작업 순서: 이슈 생성 → 브랜치 생성 → 커밋/푸시 → PR 생성.
+6. **필요한 것만 변경** — API 정합성 범위 외의 기능은 건드리지 않는다.
 
 ---
 
@@ -64,105 +65,303 @@ closes #<이슈번호>
 
 ---
 
-## 네이밍 컨벤션
+## Swagger 명세 정보
 
-### Board → Post 전환 (전체 프로젝트)
-- 파일명: `BoardXxx.jsx` → `PostXxx.jsx`
-- 컴포넌트명: `BoardDetail` → `PostDetail`
-- 변수명: `board`, `boards` → `post`, `posts`
-- URL 경로: `/board/*` → `/post/*`
-- API 메서드명: `getBoard()` → `getPost()`
-- 상태명: `setBoard` → `setPost`
-
-> **주의**: 백엔드 API Endpoint 자체는 Swagger 기준을 따른다.
-
----
-
-## 디렉토리 구조 (목표)
-
-```
-src/
-├── api/                        # API 클라이언트 (기존 service/ 폴더 통합)
-│   ├── client.js               # axios 인스턴스 + 인터셉터 (AuthFetch.js 대체)
-│   ├── postApi.js              # Post(게시판) API
-│   ├── commentApi.js           # 댓글 API
-│   ├── signApi.js              # 인증 API
-│   ├── favoriteApi.js          # 즐겨찾기 API
-│   ├── commonApi.js            # 공통 API
-│   └── log/                    # 로그 관련 API
-│       ├── formatApi.js
-│       ├── filterApi.js
-│       ├── processApi.js
-│       ├── deduplicationApi.js
-│       ├── logDbApi.js
-│       └── monitoringApi.js
-│
-├── constants/                  # 상수 정의
-│   ├── colorMaps.js            # categoryColors, regionColors
-│   ├── sizes.js                # 카드 크기, 레이아웃 상수
-│   └── routes.js               # 경로 상수
-│
-├── hooks/                      # 커스텀 훅
-│   ├── useAlert.js             # Alert 상태 관리
-│   ├── usePost.js              # Post 데이터 페칭
-│   ├── useAuth.js              # 인증 상태
-│   └── usePagination.js        # 페이지네이션
-│
-├── utils/                      # 유틸 함수
-│   ├── dateUtils.js            # 날짜 포매팅
-│   └── tokenUtils.js           # JWT 토큰 파싱
-│
-├── components/                 # 공통 컴포넌트
-│   ├── LoadingSpinner.jsx      # 로딩 스피너 (6곳 중복 → 1곳)
-│   ├── AlertMessage.jsx        # Alert 표시
-│   ├── PrivateRoute.jsx        # 인증 가드
-│   ├── ErrorBoundary.jsx       # 에러 경계
-│   └── layout/
-│       ├── RootLayout.jsx      # Navbar + Footer 포함 레이아웃
-│       └── AdminLayout.jsx     # 어드민 레이아웃
-│
-├── post/                       # 게시판 (기존 board/ → post/)
-│   ├── components/
-│   │   ├── PostListCard.jsx    # 게시글 카드 컴포넌트 (3곳 중복 → 1곳)
-│   │   ├── PostFilter.jsx      # 검색/필터
-│   │   └── PostForm.jsx        # 작성/수정 공통 폼
-│   └── pages/
-│       ├── PostListPage.jsx
-│       ├── PostDetailPage.jsx
-│       ├── PostWritePage.jsx
-│       └── PostEditPage.jsx
-│
-├── comment/                    # 댓글 (구조 유지)
-├── sign/                       # 인증 (구조 유지)
-├── log/                        # 로그 관리 (구조 유지)
-├── sse/                        # SSE (구조 유지)
-│
-├── common/                     # 공통 UI
-│   ├── Navbar.jsx
-│   ├── Footers.jsx
-│   ├── GlobalNavigator.jsx
-│   ├── MyPage.jsx
-│   ├── LikeListPage.jsx
-│   ├── CheckMyArt.jsx          # 내 게시글 (Post 네이밍으로 수정)
-│   ├── ChckMyCom.jsx           # 내 댓글
-│   └── PageRouter.jsx
-│
-├── css/
-│   ├── App.css
-│   └── index.css
-│
-├── App.js
-└── index.js
-```
-
----
-
-## API 규칙
-
-### Swagger 확인 방법
-- Swagger UI: `http://localhost:8000/swagger-ui/index.html`
+- **API 문서 JSON**: `http://localhost:8000/api/v1/web-api/v3/api-docs/web-api-service`
+- **Swagger UI**: `http://localhost:8000/swagger-ui/index.html`
 - 작업 전 반드시 Swagger에서 해당 Endpoint 확인 후 진행
-- Request/Response 스펙이 기존 코드와 다를 경우 Swagger 기준으로 수정
+- Request/Response 스펙이 기존 코드와 다를 경우 **무조건 Swagger 기준으로 수정**
+
+---
+
+## 전체 API Endpoint 목록 (Swagger 기준)
+
+### Auth API
+| Method | Path | 설명 |
+|--------|------|------|
+| POST | `/api/v1/auth/login` | 일반 로그인 |
+| POST | `/api/v1/auth/logout` | 로그아웃 |
+| POST | `/api/v1/auth/tokens/refresh` | 토큰 재발급 |
+| POST | `/api/v1/auth/oauth2/tokens` | 소셜 로그인 토큰 발급 |
+
+### Member API
+| Method | Path | 설명 |
+|--------|------|------|
+| POST | `/api/v1/members` | 회원 가입 |
+| GET | `/api/v1/members/me` | 내 프로필 조회 |
+| PATCH | `/api/v1/members/me` | 내 정보 수정 |
+| DELETE | `/api/v1/members/me` | 회원 탈퇴 |
+| PATCH | `/api/v1/members/me/password` | 비밀번호 변경 |
+| GET | `/api/v1/members/availability/nickname` | 닉네임 중복 확인 |
+| GET | `/api/v1/members/availability/login-id` | 로그인 ID 중복 확인 |
+| GET | `/api/v1/members/availability/email` | 이메일 중복 확인 |
+
+### Post API (CUD)
+| Method | Path | 설명 |
+|--------|------|------|
+| POST | `/api/v1/posts` | 게시글 생성 |
+| PATCH | `/api/v1/posts/{postId}` | 게시글 수정 |
+| DELETE | `/api/v1/posts/{postId}` | 게시글 삭제 |
+| GET | `/api/v1/posts/images/presigned-url` | 이미지 업로드용 Presigned URL 발급 |
+
+### Post Search API (Read)
+| Method | Path | 설명 |
+|--------|------|------|
+| GET | `/api/v1/search/posts` | 게시글 통합 검색 |
+| GET | `/api/v1/search/posts/{postId}` | 게시글 상세 조회 |
+| GET | `/api/v1/search/posts/me` | 내 게시글 검색 |
+| GET | `/api/v1/search/posts/autocomplete` | 검색어 자동완성 |
+
+### Comment API
+| Method | Path | 설명 |
+|--------|------|------|
+| POST | `/api/v1/comments` | 댓글 작성 |
+| PATCH | `/api/v1/comments/{commentId}` | 댓글 수정 |
+| DELETE | `/api/v1/comments/{commentId}` | 댓글 삭제 |
+| GET | `/api/v1/search/comments` | 게시글별 댓글 조회 |
+| GET | `/api/v1/search/comments/me` | 내가 쓴 댓글 조회 |
+
+### Like API
+| Method | Path | 설명 |
+|--------|------|------|
+| POST | `/api/v1/likes` | 좋아요 등록 |
+| DELETE | `/api/v1/likes` | 좋아요 취소 |
+| GET | `/api/v1/search/likes/me` | 내가 좋아요 한 게시글 목록 |
+
+### Ranking API (SSE)
+| Method | Path | 설명 |
+|--------|------|------|
+| GET | `/api/v1/rankings/live` | 실시간 랭킹 스트림 구독 |
+
+### Admin API
+| Method | Path | 설명 |
+|--------|------|------|
+| GET | `/api/v1/admin/members` | 전체 회원 목록 조회 |
+| GET | `/api/v1/admin/members/{memberId}` | 회원 상세 정보 조회 |
+| PATCH | `/api/v1/admin/members/{memberId}/role` | 관리자 권한 부여 |
+| DELETE | `/api/v1/admin/members/{memberId}` | 회원 강제 탈퇴 |
+
+### Log Process Admin API
+| Method | Path | 설명 |
+|--------|------|------|
+| GET | `/api/v1/admin/log-processes` | 로그 프로세스 목록 |
+| POST | `/api/v1/admin/log-processes` | 로그 프로세스 생성 |
+| PATCH | `/api/v1/admin/log-processes/{logProcessId}` | 로그 프로세스 수정 |
+| DELETE | `/api/v1/admin/log-processes/{logProcessId}` | 로그 프로세스 삭제 |
+| GET | `/api/v1/admin/log-processes/{logProcessId}/format-rules` | 포맷 규칙 목록 |
+| POST | `/api/v1/admin/log-processes/{logProcessId}/format-rules` | 포맷 규칙 생성 |
+| GET | `/api/v1/admin/log-processes/{logProcessId}/format-rules/fields` | 활성 포맷 규칙 필드 |
+| GET | `/api/v1/admin/log-processes/{logProcessId}/filter-rules` | 필터 규칙 목록 |
+| POST | `/api/v1/admin/log-processes/{logProcessId}/filter-rules` | 필터 규칙 생성 |
+| GET | `/api/v1/admin/log-processes/{logProcessId}/dedup-rules` | 중복제거 규칙 목록 |
+| POST | `/api/v1/admin/log-processes/{logProcessId}/dedup-rules` | 중복제거 규칙 생성 |
+| GET | `/api/v1/admin/format-rules/{formatRuleId}` | 포맷 규칙 상세 |
+| PATCH | `/api/v1/admin/format-rules/{formatRuleId}` | 포맷 규칙 수정 |
+| DELETE | `/api/v1/admin/format-rules/{formatRuleId}` | 포맷 규칙 삭제 |
+| GET | `/api/v1/admin/filter-rules/{filterRuleId}` | 필터 규칙 상세 |
+| PATCH | `/api/v1/admin/filter-rules/{filterRuleId}` | 필터 규칙 수정 |
+| DELETE | `/api/v1/admin/filter-rules/{filterRuleId}` | 필터 규칙 삭제 |
+| GET | `/api/v1/admin/dedup-rules/{dedupRuleId}` | 중복제거 규칙 상세 |
+| PATCH | `/api/v1/admin/dedup-rules/{dedupRuleId}` | 중복제거 규칙 수정 |
+| DELETE | `/api/v1/admin/dedup-rules/{dedupRuleId}` | 중복제거 규칙 삭제 |
+| GET | `/api/v1/admin/histories` | 처리 기록 목록 |
+| GET | `/api/v1/admin/histories/{historyId}` | 처리 기록 상세 |
+
+---
+
+## Request / Response 필드 명세 (Swagger 기준)
+
+> 프론트 코드의 필드명이 아래와 다르면 **아래 기준으로 수정**한다.
+> `*` 표시는 required 필드.
+
+### Auth
+
+**POST `/api/v1/auth/login`** Request
+```json
+{ "loginId": "string*", "password": "string*" }
+```
+
+**POST `/api/v1/auth/login`** Response (`result`)
+```json
+{ "memberId": integer, "nickname": "string" }
+```
+
+**POST `/api/v1/auth/oauth2/tokens`** Request
+```json
+{ "code": "string*" }
+```
+
+### Member
+
+**POST `/api/v1/members`** Request (회원가입)
+```json
+{
+  "loginId": "string*",
+  "password": "string*",
+  "email": "string*",
+  "nickname": "string*",
+  "gender": "string*",
+  "birthDate": "string*"
+}
+```
+
+**GET `/api/v1/members/me`** Response (`result`)
+```json
+{
+  "memberId": integer,
+  "loginId": "string",
+  "email": "string",
+  "nickname": "string",
+  "gender": "string",
+  "birthDate": "string",
+  "age": integer,
+  "roles": ["string"]
+}
+```
+
+**PATCH `/api/v1/members/me`** Request
+```json
+{ "nickname": "string*" }
+```
+
+**PATCH `/api/v1/members/me/password`** Request
+```json
+{ "curPassword": "string*", "newPassword": "string*" }
+```
+
+### Post
+
+**POST `/api/v1/posts`** / **PATCH `/api/v1/posts/{postId}`** Request
+```json
+{
+  "title": "string*",
+  "content": "string*",
+  "travelPlace": "string*",
+  "address": "string*",
+  "category": "string*",
+  "region": "string*",
+  "images": [{ "imageKey": "string", "sortOrder": integer }]
+}
+```
+
+**GET `/api/v1/search/posts`** Query Parameters
+```
+keyword, category, region, sort, direction, page (integer), size (integer)
+```
+
+**GET `/api/v1/search/posts`** / **`/me`** / **`/search/likes/me`** Response (`result.content[]`)
+```json
+{
+  "postId": integer,
+  "memberId": integer,
+  "memberNickname": "string",
+  "title": "string",
+  "category": "string",
+  "region": "string",
+  "starAvg": number,
+  "viewCount": integer,
+  "likeCount": integer,
+  "commentCount": integer,
+  "popularityScore": integer,
+  "updatedAt": "string"
+}
+```
+
+**GET `/api/v1/search/posts/{postId}`** Response (`result`)
+```json
+{
+  "postId": integer,
+  "memberId": integer,
+  "memberNickname": "string",
+  "title": "string",
+  "content": "string",
+  "travelPlace": "string",
+  "address": "string",
+  "category": "string",
+  "region": "string",
+  "starAvg": number,
+  "viewCount": integer,
+  "likeCount": integer,
+  "commentCount": integer,
+  "updatedAt": "string",
+  "images": [{ "imageKey": "string", "sortOrder": integer }]
+}
+```
+
+**GET `/api/v1/posts/images/presigned-url`** Response (`result`)
+```json
+{ "url": "string", "imageKey": "string" }
+```
+
+### Comment
+
+**POST `/api/v1/comments`** Request
+```json
+{ "postId": integer*, "content": "string*", "star": integer* }
+```
+
+**PATCH `/api/v1/comments/{commentId}`** Request
+```json
+{ "content": "string*", "star": integer* }
+```
+
+**GET `/api/v1/search/comments`** Query Parameters
+```
+postId (integer, required), page, size, sort
+```
+
+**GET `/api/v1/search/comments`** / **`/me`** Response (`result.content[]`)
+```json
+{
+  "commentId": integer,
+  "postId": integer,
+  "memberId": integer,
+  "memberNickname": "string",
+  "content": "string",
+  "star": integer
+}
+```
+
+### Like
+
+**POST `/api/v1/likes`** Request
+```json
+{ "postId": integer* }
+```
+
+**DELETE `/api/v1/likes`** Request
+```json
+{ "postId": integer* }
+```
+
+### 공통 Response Wrapper 구조
+
+모든 API는 아래 구조로 응답한다:
+```json
+{
+  "success": boolean,
+  "code": "string",
+  "message": "string",
+  "result": { ... }
+}
+```
+
+페이지네이션 응답 (`result` 내부):
+```json
+{
+  "content": [...],
+  "currentPage": integer,
+  "size": integer,
+  "totalElements": integer,
+  "totalPages": integer,
+  "isFirst": boolean,
+  "isLast": boolean
+}
+```
+
+---
+
+## API 통신 규칙
 
 ### axios 클라이언트 구조
 - `src/api/client.js`에 axios 인스턴스를 생성하고 인터셉터로 토큰 처리
@@ -170,7 +369,6 @@ src/
 - 모든 API 모듈은 이 클라이언트를 사용
 
 ```javascript
-// 구조 예시
 const apiClient = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL,
   withCredentials: true,
@@ -184,16 +382,15 @@ apiClient.interceptors.response.use(...);
 ```
 
 ### API 모듈 작성 규칙
-- 각 도메인별 API 함수를 파일 단위로 분리
+- 각 도메인별 API 함수를 `src/api/` 파일 단위로 분리
 - 클래스 대신 함수형으로 작성
-- 모든 API 함수는 async/await 사용 (Promise 체이닝 금지)
+- 모든 API 함수는 async/await 사용 (Promise 체이닝 `.then().then()` 금지)
 - 에러는 인터셉터에서 1차 처리, 컴포넌트에서 try/catch로 2차 처리
+- API 응답에서 데이터 접근 시 `response.data.result` 또는 `response.data.result.content` 패턴 사용
 
 ---
 
 ## 환경변수 (.env)
-
-프로젝트 루트에 `.env` 파일 생성 (없으면 생성):
 
 ```env
 # API
@@ -203,8 +400,85 @@ REACT_APP_API_BASE_URL=http://localhost:8000
 REACT_APP_APP_NAME=Travel Project
 ```
 
-- `.env`는 `.gitignore`에 포함되어 있어야 함 (현재 확인 필요)
-- `.env.example` 파일을 함께 생성해서 필요한 변수 목록을 문서화
+- `.env`는 `.gitignore`에 포함
+- `.env.example` 파일로 필요한 변수 목록 문서화
+
+---
+
+## 디렉토리 구조 (목표)
+
+```
+src/
+├── api/
+│   ├── client.js               # axios 인스턴스 + 인터셉터
+│   ├── postApi.js              # Post CUD + Presigned URL
+│   ├── postSearchApi.js        # Post Search (Read)
+│   ├── commentApi.js           # Comment CUD + Search
+│   ├── likeApi.js              # Like 등록/취소/조회
+│   ├── authApi.js              # 로그인/로그아웃/토큰
+│   ├── memberApi.js            # 회원 CRUD + 중복확인
+│   ├── rankingApi.js           # SSE 랭킹
+│   └── log/
+│       ├── logProcessApi.js
+│       ├── formatApi.js
+│       ├── filterApi.js
+│       ├── deduplicationApi.js
+│       └── historyApi.js
+│
+├── constants/
+│   ├── colorMaps.js
+│   ├── sizes.js
+│   └── routes.js
+│
+├── hooks/
+│   ├── useAlert.js
+│   ├── usePost.js
+│   ├── useAuth.js
+│   └── usePagination.js
+│
+├── utils/
+│   ├── dateUtils.js
+│   └── tokenUtils.js
+│
+├── components/
+│   ├── LoadingSpinner.jsx
+│   ├── AlertMessage.jsx
+│   ├── PrivateRoute.jsx
+│   ├── ErrorBoundary.jsx
+│   └── layout/
+│       ├── RootLayout.jsx
+│       └── AdminLayout.jsx
+│
+├── post/
+│   ├── components/
+│   │   ├── PostListCard.jsx
+│   │   ├── PostFilter.jsx
+│   │   └── PostForm.jsx
+│   └── pages/
+│       ├── PostListPage.jsx
+│       ├── PostDetailPage.jsx
+│       ├── PostWritePage.jsx
+│       └── PostEditPage.jsx
+│
+├── comment/
+├── sign/
+├── log/
+├── sse/
+│
+├── common/
+│   ├── Navbar.jsx
+│   ├── Footers.jsx
+│   ├── GlobalNavigator.jsx
+│   ├── MyPage.jsx
+│   ├── LikeListPage.jsx
+│   ├── CheckMyArt.jsx
+│   ├── ChckMyCom.jsx
+│   └── PageRouter.jsx
+│
+├── css/
+├── App.js
+└── index.js
+```
 
 ---
 
@@ -212,24 +486,13 @@ REACT_APP_APP_NAME=Travel Project
 
 ### 공통
 - 하드코딩된 서버 URL, 포트 번호는 모두 환경변수로 대체
-- 인라인 스타일은 CSS 클래스 또는 CSS 모듈로 전환 (Bootstrap 클래스 최대 활용)
-- `console.log` 는 개발용으로만 허용, `console.error`는 에러 처리 시 사용
+- `console.log`는 개발용으로만 허용, `console.error`는 에러 처리 시 사용
 - 매직 넘버/문자열은 `src/constants/`에 상수로 정의
 
 ### 컴포넌트
 - 단일 책임 원칙: 한 컴포넌트는 하나의 역할만 수행
-- 300줄 이상 컴포넌트는 분리 대상
-- 3곳 이상 반복되는 UI는 공통 컴포넌트로 추출
-- props에 PropTypes 정의 (TypeScript 미도입 시)
-
-### 커스텀 훅
-- 컴포넌트에서 상태 + 비즈니스 로직이 혼재하면 커스텀 훅으로 분리
-- 훅 파일명: `use<Name>.js`
-
-### 상태 관리
-- 서버 데이터(API 응답)와 UI 상태(모달 열림 여부 등)를 명확히 분리
-- 3개 이상의 연관 상태는 `useReducer`로 통합 검토
-- 전역 상태가 필요한 경우 Context API 사용 (별도 라이브러리 최소화)
+- API 응답 필드명을 컴포넌트에서 직접 참조할 때 Swagger 기준 필드명 사용
+- props에 PropTypes 정의
 
 ### async/await
 - Promise 체이닝(`.then().then()`) 사용 금지, async/await로 통일
@@ -237,65 +500,48 @@ REACT_APP_APP_NAME=Travel Project
 
 ---
 
-## 주요 개선 사항 목록
+## 주요 작업 목록
 
-### Phase 1 — 기반 작업 (즉시)
-- [ ] `.env` 파일 생성, 서버 URL 환경변수화
-- [ ] `src/constants/colorMaps.js` 생성 (4곳 중복 해소)
-- [ ] `src/utils/dateUtils.js` 생성 (4곳 중복 해소)
-- [ ] `src/utils/tokenUtils.js` 생성 (3곳 중복 해소)
-- [ ] `src/api/client.js` axios 인스턴스 생성 (AuthFetch.js 대체)
-- [ ] `notUse/` 폴더 전체 삭제
-- [ ] `.env.example` 파일 생성
+### Phase A — API Endpoint 수정
+- [ ] `src/api/client.js` baseURL 및 인터셉터 정비
+- [ ] `authApi.js`: `/api/v1/auth/login`, `/logout`, `/tokens/refresh` 로 수정
+- [ ] `memberApi.js`: `/api/v1/members/**` 로 수정, 필드명 정합
+- [ ] `postApi.js`: CUD → `/api/v1/posts/**`, Read → `/api/v1/search/posts/**`
+- [ ] `commentApi.js`: CUD → `/api/v1/comments/**`, Read → `/api/v1/search/comments/**`
+- [ ] `likeApi.js`: `/api/v1/likes` (POST/DELETE), `/api/v1/search/likes/me` (GET)
+- [ ] `rankingApi.js`: SSE → `/api/v1/rankings/live`
 
-### Phase 2 — 공통 컴포넌트/훅 (1주차)
-- [ ] `src/components/LoadingSpinner.jsx` (6곳 중복 해소)
-- [ ] `src/hooks/useAlert.js` (8곳 중복 해소)
-- [ ] `src/components/PrivateRoute.jsx` (인증 가드)
-- [ ] `src/components/layout/RootLayout.jsx` (Navbar + Footer 레이아웃)
-- [ ] `src/post/components/PostListCard.jsx` (3곳 중복 해소)
+### Phase B — Request 필드명 수정
+- [ ] 로그인: `username` → `loginId` (있는 경우)
+- [ ] 게시글: 기존 필드명 → `title, content, travelPlace, address, category, region, images`
+- [ ] 댓글: 기존 필드명 → `postId, content, star`
+- [ ] 비밀번호 변경: → `curPassword, newPassword`
 
-### Phase 3 — Board → Post 전환 (2주차)
-- [ ] `board/` 디렉토리 → `post/` 로 이동 및 파일명 변경
-- [ ] 컴포넌트명, 변수명, 상태명 Post로 통일
-- [ ] URL 경로 `/board/*` → `/post/*` 변경
-- [ ] PageRouter.jsx 경로 정리 (일관된 네이밍, 오타 수정)
+### Phase C — Response 필드명 수정 (컴포넌트 바인딩)
+- [ ] 게시글 목록: `postId, memberNickname, starAvg, viewCount, likeCount, commentCount, popularityScore, updatedAt`
+- [ ] 게시글 상세: + `travelPlace, address, content, images[].imageKey, images[].sortOrder`
+- [ ] 댓글: `commentId, postId, memberId, memberNickname, content, star`
+- [ ] 내 프로필: `memberId, loginId, email, nickname, gender, birthDate, age, roles`
+- [ ] 페이지네이션: `result.content`, `result.currentPage`, `result.totalPages`, `result.totalElements`, `result.isFirst`, `result.isLast`
+- [ ] 공통 응답 래퍼: `response.data.result` 로 데이터 접근
 
-### Phase 4 — API 클라이언트 리팩토링 (2~3주차)
-- [ ] 각 도메인별 API 모듈을 `src/api/`로 통합
-- [ ] Swagger 기준으로 Endpoint 검증 및 수정
-- [ ] 모든 API 호출 async/await + try/catch로 변환
-- [ ] 에러 처리 통일
-
-### Phase 5 — 컴포넌트 분리 (3~4주차)
-- [ ] `PostDetailPage.jsx` 분리 (본문/액션/댓글)
-- [ ] `SignUpPage.jsx` → `useSignUpForm.js` 훅 추출
-- [ ] `PostWritePage.jsx` / `PostEditPage.jsx` → `PostForm.jsx` 공통화
-- [ ] `Navbar.jsx` 분리
-
-### Phase 6 — 스타일/UX 개선 (4주차+)
-- [ ] 인라인 스타일 → Bootstrap 클래스 또는 CSS 모듈 전환
-- [ ] 매직 넘버 → `src/constants/sizes.js` 정의
-- [ ] 404 페이지 추가
-- [ ] 에러 경계(ErrorBoundary) 컴포넌트 추가
-
----
-
-## 삭제 대상 파일
-
-리팩토링 진행 시 아래 파일/폴더는 삭제한다:
-
-```
-src/notUse/                         # 사용하지 않는 파일 전체
-src/AuthFetch.js                    # axios 인터셉터로 대체 후 삭제
-src/log/components/filter/notUse/   # 미사용 필터 컴포넌트
-```
+### Phase D — 기존 리팩토링 완료 항목 유지
+- [x] `src/api/client.js` axios 인스턴스 생성
+- [x] `src/constants/colorMaps.js`
+- [x] `src/utils/dateUtils.js`, `tokenUtils.js`
+- [x] `src/components/LoadingSpinner.jsx`
+- [x] `src/hooks/useAlert.js`
+- [x] Board → Post 네이밍 전환
+- [x] 컴포넌트 분리 (Phase 5)
+- [x] 스타일/UX 개선 (Phase 6)
 
 ---
 
 ## 주의사항
 
-- `src/log/` 하위 로그 관리 시스템은 별도 도메인으로, 기능 변경 없이 구조만 정리
-- SSE (`src/sse/`) 기능은 실시간 연결을 다루므로 변경 시 신중하게 테스트
-- 댓글, 좋아요, 즐겨찾기 등 상태 동기화 로직은 기능 테스트 필수
-- Matomo 분석 트래킹 코드(`window.dataLayer`)는 위치는 변경 가능하나 제거 금지
+- `src/log/` 하위 로그 관리 Admin API는 `/api/v1/admin/log-processes/**` 기준으로 수정
+- SSE (`src/sse/`, `rankingApi.js`) 기능은 `/api/v1/rankings/live` 로 변경, 실시간 연결이므로 신중하게 테스트
+- 댓글 `star` 필드: 별점 기능이 현재 UI에 없으면 백엔드 required이므로 기본값(예: 0) 처리 필요
+- 이미지 업로드: Presigned URL 발급(`GET /api/v1/posts/images/presigned-url`) → S3 업로드 → `imageKey`를 Post 요청에 포함하는 플로우
+- 좋아요 취소(DELETE `/api/v1/likes`)는 body에 `{ "postId": integer }` 를 포함
+- Matomo 분석 트래킹 코드(`window.dataLayer`)는 위치 변경 가능하나 제거 금지
