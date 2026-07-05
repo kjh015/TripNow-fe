@@ -3,38 +3,55 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getPost } from '../../api/postSearchApi';
-import { updatePost, deletePost } from '../../api/postApi';
+import { updatePost, deletePost, getPresignedUrl } from '../../api/postApi';
 import useAlert from '../../hooks/useAlert';
 import PostForm from '../components/PostForm';
+
+const IMAGE_BASE_URL = process.env.REACT_APP_IMAGE_BASE_URL || '';
+
+const uploadImageToS3 = async (file, sortOrder) => {
+    const { data } = await getPresignedUrl();
+    const { url, imageKey } = data.result;
+    await fetch(url, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+    });
+    return { imageKey, sortOrder };
+};
 
 const PostEditPage = () => {
     const [searchParams] = useSearchParams();
     const no = searchParams.get('no');
     const navigate = useNavigate();
     const [post, setPost] = useState({
-        no: '',
         title: '',
         content: '',
-        memberNickname: '',
         travelPlace: '',
         address: '',
         category: '',
         region: '',
-        imagePaths: []
     });
+    // 기존 이미지: { imageKey, sortOrder }[]
     const [existingImages, setExistingImages] = useState([]);
-    const [newImages, setNewImages] = useState([]);
-    const [imagePreviews, setImagePreviews] = useState([]);
+    const [newImageFiles, setNewImageFiles] = useState([]);
+    const [newImagePreviews, setNewImagePreviews] = useState([]);
+    const [uploading, setUploading] = useState(false);
     const { alert, showAlert } = useAlert(500);
 
-    const viewBoard = async () => {
+    const loadPost = async () => {
         try {
             const { data } = await getPost(no);
-            const post = data.result ?? data;
-            setPost(post);
-            setExistingImages(post.imagePaths || []);
-            setNewImages([]);
-            setImagePreviews(post.imagePaths || []);
+            const postData = data.result ?? data;
+            setPost({
+                title: postData.title,
+                content: postData.content,
+                travelPlace: postData.travelPlace,
+                address: postData.address,
+                category: postData.category,
+                region: postData.region,
+            });
+            setExistingImages(postData.images || []);
         } catch {
             showAlert("게시글을 불러오지 못했습니다.", "danger");
         }
@@ -51,14 +68,13 @@ const PostEditPage = () => {
     };
 
     useEffect(() => {
-        viewBoard();
         const nickname = localStorage.getItem("nickname");
-        if (nickname == null) {
+        if (!nickname) {
             showAlert("로그인이 필요합니다.", "danger");
             setTimeout(() => navigate(-1), 500);
             return;
         }
-        setPost(prev => ({ ...prev, memberNickname: nickname }));
+        loadPost();
     }, [no]);
 
     const handleChange = (e) => {
@@ -74,43 +90,41 @@ const PostEditPage = () => {
         setPost(prev => ({ ...prev, region: regionValue }));
     };
 
-    const handleImageChange = (e) => {
+    const handleNewImageChange = (e) => {
         const files = Array.from(e.target.files);
-        const allFilenames = new Set([
-            ...existingImages.map(path => path.split('/').pop()),
-            ...newImages.map(file => file.name),
-        ]);
-        const newFiles = files.filter(f => !allFilenames.has(f.name));
-        setNewImages(prev => [...prev, ...newFiles]);
-        setImagePreviews(prev => [...prev, ...newFiles.map(file => URL.createObjectURL(file))]);
+        const existingNames = new Set(newImageFiles.map(f => f.name));
+        const newFiles = files.filter(f => !existingNames.has(f.name));
+        setNewImageFiles(prev => [...prev, ...newFiles]);
+        setNewImagePreviews(prev => [...prev, ...newFiles.map(file => URL.createObjectURL(file))]);
     };
 
     const handleExistingImageRemove = (idx) => {
         setExistingImages(prev => prev.filter((_, i) => i !== idx));
-        setImagePreviews(prev => prev.filter((_, i) => i !== idx));
     };
 
     const handleNewImageRemove = (idx) => {
-        setNewImages(prev => prev.filter((_, i) => i !== idx));
-        setImagePreviews(prev => {
-            const existLen = existingImages.length;
-            return prev.filter((_, i) => i !== (existLen + idx));
-        });
+        setNewImageFiles(prev => prev.filter((_, i) => i !== idx));
+        setNewImagePreviews(prev => prev.filter((_, i) => i !== idx));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const formData = new FormData();
-        const postBlob = new Blob([JSON.stringify(post)], { type: "application/json" });
-        formData.append('board', postBlob);
-        formData.append('existingImages', JSON.stringify(existingImages));
-        newImages.forEach(file => formData.append('images', file));
+        setUploading(true);
         try {
-            await updatePost(no, formData);
+            const startOrder = existingImages.length;
+            const uploadedImages = await Promise.all(
+                newImageFiles.map((file, idx) => uploadImageToS3(file, startOrder + idx))
+            );
+            // 기존 이미지 sortOrder 재정렬 후 신규 이미지 합산
+            const reorderedExisting = existingImages.map((img, idx) => ({ ...img, sortOrder: idx }));
+            const images = [...reorderedExisting, ...uploadedImages];
+            await updatePost(no, { ...post, images });
             showAlert("글 수정이 완료되었습니다.", "success");
             setTimeout(() => navigate('/post/list'), 500);
         } catch {
             showAlert("글 수정에 실패하였습니다.", "danger");
+        } finally {
+            setUploading(false);
         }
     };
 
@@ -120,13 +134,13 @@ const PostEditPage = () => {
                 사진 첨부 <span className="text-secondary" style={{ fontSize: "0.95em" }}>(여러 장 첨부 가능)</span>
             </label>
             <div className="bg-light rounded-4 p-3 px-4 border">
-                <input type="file" accept="image/*" multiple onChange={handleImageChange} className="form-control mb-3" />
+                <input type="file" accept="image/*" multiple onChange={handleNewImageChange} className="form-control mb-3" />
                 <div className="d-flex flex-wrap gap-3">
-                    {existingImages.map((src, idx) => (
+                    {existingImages.map((img, idx) => (
                         <div key={`exist-${idx}`} style={{ position: 'relative' }}>
                             <img
-                                src={src.startsWith('/images/') ? `${process.env.REACT_APP_IMAGE_BASE_URL}${src}` : src}
-                                alt={`preview-exist-${idx}`}
+                                src={`${IMAGE_BASE_URL}/${img.imageKey}`}
+                                alt={`existing-${idx}`}
                                 style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 14, border: '1px solid #eee', boxShadow: "0 2px 6px rgba(0,0,0,0.06)" }}
                             />
                             <button
@@ -136,11 +150,11 @@ const PostEditPage = () => {
                             >×</button>
                         </div>
                     ))}
-                    {newImages.map((file, idx) => (
+                    {newImagePreviews.map((src, idx) => (
                         <div key={`new-${idx}`} style={{ position: 'relative' }}>
                             <img
-                                src={imagePreviews[existingImages.length + idx]}
-                                alt={`preview-new-${idx}`}
+                                src={src}
+                                alt={`new-${idx}`}
                                 style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 14, border: '1px solid #eee', boxShadow: "0 2px 6px rgba(0,0,0,0.06)" }}
                             />
                             <button
@@ -166,6 +180,7 @@ const PostEditPage = () => {
             onDelete={removeBoard}
             imageSection={imageSection}
             alert={alert}
+            submitDisabled={uploading}
         />
     );
 };

@@ -63,8 +63,7 @@ const CommentPage = ({ no, isLoggedIn, ratingAvg, setCommentFlag, category, regi
     const addComment = async ({ rating, comment }) => {
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({ event: "travel_comment_add", boardId: no, category, region, title });
-        const nickname = localStorage.getItem("nickname");
-        const payload = { rating, content: comment, nickname, no };
+        const payload = { postId: parseInt(no), content: comment, star: rating };
         try {
             const { data: message } = await commentApi.addComment(payload);
             setAlert({ show: true, message, type: "success" });
