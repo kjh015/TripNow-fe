@@ -1,18 +1,19 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
+﻿import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useState, useEffect } from 'react';
-import SignApiClient from '../service/SignApiClient';
+import { login } from '../../api/authApi';
+import { getMyProfile } from '../../api/memberApi';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import UserAuthentication from '../service/UserAuthentication';
+import { isAdmin } from '../../utils/tokenUtils';
+import useAlert from '../../hooks/useAlert';
 
 const SignInPage = () => {
     const [loginData, setLoginData] = useState({
         loginId: '',
         password: ''
     });
-    // alert 상태 추가
-    const [alert, setAlert] = useState({ show: false, message: '', type: '' }); // type: 'success' | 'danger'
+    const { alert, showAlert } = useAlert();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -23,63 +24,25 @@ const SignInPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await SignApiClient.signIn(loginData);
-            if (res.ok) {
-                const data = await res.json();
-                localStorage.setItem('accessToken', data.accessToken);
-                const resDetail = await SignApiClient.getMemberDetail({loginId: getLoginIdFromToken({token: data.accessToken})});                
-                if (resDetail.ok) {
-                    const member = await resDetail.json();
-                    localStorage.setItem('nickname', member.nickname);
-                    window._mtm = window._mtm || [];
-                    window._mtm.push({
-                        nickname: member.nickname,
-                        gender: member.gender,
-                        age: member.age,
-                        role: isAdmin({token: data.accessToken}) ? "admin" : "user"
-                    });
-                    toast.success(`${member.nickname}님 환영합니다.`);   
-                    navigate("/");
-                } else {
-                    const data = await resDetail.json();                   
-                    setAlert({ show: true, message: data.message, type: "danger" });
-                }
-            } else {
-                const data = await res.json();
-                setAlert({ show: true, message: data.message, type: "danger" });
-            }
+            const { data } = await login(loginData);
+            const accessToken = data.result?.accessToken ?? data.accessToken;
+            localStorage.setItem('accessToken', accessToken);
+            const { data: profileRes } = await getMyProfile();
+            const member = profileRes.result ?? profileRes;
+            localStorage.setItem('nickname', member.nickname);
+            window._mtm = window._mtm || [];
+            window._mtm.push({
+                nickname: member.nickname,
+                gender: member.gender,
+                age: member.age,
+                role: isAdmin(accessToken) ? "admin" : "user"
+            });
+            toast.success(`${member.nickname}님 환영합니다.`);
+            navigate("/");
         } catch (error) {
-            setAlert({ show: true, message: "에러가 발생했습니다.", type: "danger" });
+            showAlert(error.response?.data?.message || "에러가 발생했습니다.", "danger");
         }
     };
-
-    const getLoginIdFromToken = ({token}) => {
-        if (!token) return null;
-        try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            return payload.sub || payload.loginId;
-        } catch (e) {
-            console.error("토큰 디코딩 실패:", e);
-            return null;
-        }
-    };
-
-    const isAdmin = ({token}) => {
-        if (!token) {
-            return false;
-        }
-        try {            
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            return payload.roles?.includes("ROLE_ADMIN");
-        } catch (e) {
-            console.error("토큰 디코딩 실패:", e);
-            return false;
-        }
-    }
-
-    // alert 자동 사라짐 (2초)
-    useEffect(() => {
-    }, [alert.show]);
 
     useEffect(() => {
         document.body.classList.add('bg-body-tertiary');

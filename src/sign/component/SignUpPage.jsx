@@ -1,152 +1,29 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { useState, useEffect, useRef } from 'react';
-import { toast } from 'react-toastify';
-import SignApiClient from '../service/SignApiClient';
-import { useNavigate } from 'react-router-dom';
-
-// 임시로 사용할 fetch 예시
-async function checkDuplicate(type, value) {
-    if (!value) return false;
-    const res = await fetch(`/api/check-duplicate?type=${type}&value=${encodeURIComponent(value)}`);
-    const data = await res.json();
-    return data.exists;
-}
-
-const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+~\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-
+import { useEffect } from 'react';
+import useSignUpForm from '../../hooks/useSignUpForm';
 
 const SignUpPage = () => {
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        loginId: '',
-        password: '',
-        passwordConfirm: '',
-        email: '',
-        nickname: '',
-        gender: '',
-    });
-    const [birthDate, setBirthDate] = useState('');
-    const [alert, setAlert] = useState({ show: false, message: '', type: '' });
-    const [touched, setTouched] = useState({});
-    const [errors, setErrors] = useState({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [dups, setDups] = useState({
-        loginId: null,  // true: 중복, false: 사용가능, null: 미확인
-        email: null,
-        nickname: null,
-    });
-    const inputRefs = {
-        loginId: useRef(null),
-        password: useRef(null),
-        passwordConfirm: useRef(null),
-        nickname: useRef(null),
-        email: useRef(null),
-        gender: useRef(null),
-        birthDate: useRef(null)
-    };
-
-    // 값 변경
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        setTouched(prev => ({ ...prev, [name]: true }));
-        // 중복 체크 항목은 변경시 중복상태 초기화
-        if (['loginId', 'email', 'nickname'].includes(name)) {
-            setDups(prev => ({ ...prev, [name]: null }));
-        }
-    };
-
-    // 중복체크 (디바운스 포함, 즉시 변경시 API 너무 많이 나가는 것 방지)
-    useEffect(() => {
-        const debounce = {};
-        ["loginId", "email", "nickname"].forEach(field => {
-            if (!formData[field]) return;
-            if (debounce[field]) clearTimeout(debounce[field]);
-            debounce[field] = setTimeout(() => {
-                // fetch 이후 JSON 파싱, exists값만 setDups에 반영
-                SignApiClient.checkDuplicate({ type: field, value: formData[field] })
-                    .then(res => res.json())
-                    .then(data => {
-                        setDups(prev => ({ ...prev, [field]: !!data.exists }));
-                    })
-                    .catch(() => {
-                        setDups(prev => ({ ...prev, [field]: false })); // 에러시 중복 아님 처리
-                    });
-            }, 500);
-        });
-        return () => Object.values(debounce).forEach(clearTimeout);
-        // eslint-disable-next-line
-    }, [formData.loginId, formData.email, formData.nickname]);
-
-
-    // 생년월일
-    const handleBirthDate = (e) => {
-        setBirthDate(e.target.value);
-        setTouched(prev => ({ ...prev, birthDate: true }));
-    };
-
-    // 유효성 검사
-    useEffect(() => {
-        const newErrors = {};
-        if (!formData.loginId) newErrors.loginId = "아이디를 입력하세요.";
-        else if (dups.loginId === true) newErrors.loginId = "이미 사용중인 아이디입니다.";
-        if (!formData.password) newErrors.password = "비밀번호를 입력하세요.";
-        else if (!passwordPattern.test(formData.password)) newErrors.password = "8자 이상, 영문/숫자/특수문자 조합으로 입력하세요.";
-        if (!formData.passwordConfirm) newErrors.passwordConfirm = "비밀번호 확인을 입력하세요.";
-        else if (formData.password && formData.password !== formData.passwordConfirm) newErrors.passwordConfirm = "비밀번호가 일치하지 않습니다.";
-        if (!formData.nickname) newErrors.nickname = "닉네임을 입력하세요.";
-        else if (dups.nickname === true) newErrors.nickname = "이미 사용중인 닉네임입니다.";
-        if (!formData.email) newErrors.email = "이메일을 입력하세요.";
-        else if (!emailPattern.test(formData.email)) newErrors.email = "이메일 형식이 올바르지 않습니다.";
-        else if (dups.email === true) newErrors.email = "이미 사용중인 이메일입니다.";
-        if (!formData.gender) newErrors.gender = "성별을 선택하세요.";
-        if (!birthDate) newErrors.birthDate = "생년월일을 입력하세요.";
-        setErrors(newErrors);
-    }, [formData, birthDate, dups]);
-
-    // 제출
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setTouched({
-            loginId: true, password: true, passwordConfirm: true, nickname: true, email: true, gender: true, birthDate: true
-        });
-        if (Object.keys(errors).length > 0) {
-            // 첫 에러 필드로 focus
-            const firstError = Object.keys(errors)[0];
-            inputRefs[firstError]?.current?.focus();
-            setAlert({ show: true, message: "모든 항목을 올바르게 입력해주세요.", type: "danger" });
-            return;
-        }
-        setIsSubmitting(true);
-        try {
-            const res = await SignApiClient.signUp({ ...formData, birthDate });
-            const msg = await res.json();
-            if (res.ok) {          
-                toast.success("회원가입이 완료되었습니다! 🎉");      
-                navigate("/");
-            } else {
-                setAlert({ show: true, message: msg.message, type: "danger" });
-                // 서버단 오류 발생 시 포커스
-                if (msg && msg.field && inputRefs[msg.field]) {
-                    inputRefs[msg.field].current.focus();
-                }
-            }
-        } catch (error) {
-            setAlert({ show: true, message: "에러가 발생했습니다.", type: "danger" });
-        }
-        setIsSubmitting(false);
-    };
+    const {
+        formData,
+        birthDate,
+        alert,
+        setAlert,
+        touched,
+        errors,
+        isSubmitting,
+        dups,
+        isFormValid,
+        inputRefs,
+        handleChange,
+        handleBirthDate,
+        handleSubmit,
+    } = useSignUpForm();
 
     useEffect(() => {
         document.body.classList.add('bg-body-tertiary');
         return () => document.body.classList.remove('bg-body-tertiary');
     }, []);
-    // 모든 조건 충족해야 버튼 활성화
-    const isFormValid = Object.keys(errors).length === 0 && !isSubmitting;
 
     return (
         <div className="min-vh-100 d-flex flex-column" style={{
@@ -275,7 +152,6 @@ const SignUpPage = () => {
                                 )}
                             </div>
 
-                            {/* 성별 */}
                             <div className="mb-3">
                                 <label className="form-label fw-semibold d-block mb-2">성별</label>
                                 <div className="form-check form-check-inline">
