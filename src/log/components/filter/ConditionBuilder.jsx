@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { getFormatKeys, addFilter } from '../../../api/log/filterApi';
+import FilterApiClient from '../../service/FilterApiClient';
 
 const operatorOptions = ['>', '<', '>=', '<=', '==', '!=', 'Equals'];
 
@@ -20,15 +20,9 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
 
 
     useEffect(() => {
-        const load = async () => {
-            try {
-                const { data } = await getFormatKeys(processId);
-                setFieldList(data);
-            } catch {
-                // 에러 시 빈 목록 유지
-            }
-        };
-        load();
+        FilterApiClient.getFormatKeys(processId)
+            .then(res => res.json())
+            .then(data => setFieldList(data));
     }, [processId]);
 
     const addCondition = () => {
@@ -144,13 +138,18 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
         const expr = buildExpression();
         console.log('전송 문자열:', expr);
 
-        try {
-            await addFilter(processId, name, active, expr, tokensWithType);
-            showOutAlert({ message: '필터 추가 성공', type: 'success' });
-            onClose();
-        } catch {
-            showAlert({ message: '에러가 발생했습니다.', type: 'danger' });
-        }
+        FilterApiClient.addFilter(processId, name, active, expr, tokensWithType)
+            .then(res => {
+                if (res.ok) {
+                    showOutAlert({ message: '필터 추가 성공', type: 'success' });
+                    onClose();
+                } else {
+                    showAlert({ message: '실패', type: 'danger' });
+                }
+            })
+            .catch(err => {
+                showAlert({ message: '에러가 발생했습니다.', type: 'danger' });
+            });
     };
 
     return (

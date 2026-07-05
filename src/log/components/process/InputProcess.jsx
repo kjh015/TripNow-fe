@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
-import { addProcess as addProcessApi } from '../../../api/log/processApi';
+import ProcessApiClient from '../../service/ProcessApiClient';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const InputProcess = ({ onClose, showAlert }) => {
     const [name, setName] = useState("");
 
-    const addProcess = async () => {
-        try {
-            await addProcessApi(name);
-            showAlert("success", "프로세스가 추가되었습니다!");
-            onClose();
-        } catch {
-            showAlert("danger", "프로세스 추가 실패");
-        }
+    const addProcess = () => {
+        ProcessApiClient.addProcess(name).then(
+            res => {
+                if (res.ok) {
+                    showAlert("success", "프로세스가 추가되었습니다!");
+                    onClose();
+                } else {
+                    showAlert("danger", "프로세스 추가 실패");
+                }
+            }
+        );
     };
 
     return (

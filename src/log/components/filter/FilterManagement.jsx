@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getFilterList } from '../../../api/log/filterApi';
+import FilterApiClient from '../../service/FilterApiClient';
 import DetailFilter from './DetailFilter';
 import ConditionBuilder from './ConditionBuilder';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -17,13 +17,10 @@ const FilterManagement = ({ processId, onMenuClick }) => {
         if (duration > 0) setTimeout(() => setAlert(null), duration);
     }, []);
 
-    const getFilters = async () => {
-        try {
-            const { data } = await getFilterList(processId);
-            setFilterList(data);
-        } catch {
-            // 에러 시 목록 유지
-        }
+    const getFilters = () => {
+        FilterApiClient.getFilterList(processId).then(res => {
+            if (res.ok) res.json().then(data => setFilterList(data));
+        });
     };
 
     useEffect(() => { getFilters(); }, [processId, builderComp, detailComp]);

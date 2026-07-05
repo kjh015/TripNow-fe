@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import DeduplicationRow from './DeduplicationRow';
-import { addDeduplication } from '../../../api/log/deduplicationApi';
+import DeduplicationApiClient from '../../service/DeduplicationApiClient';
 
 const initialRow = {
     conditions: [{ format: '', value: '' }],
@@ -40,14 +40,25 @@ const InputDeduplication = ({ processId, onClose,  showOutAlert}) => {
         }
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         try {
-            const { data: message } = await addDeduplication({ processId, name, active, rows });
-            showOutAlert({ message, type: "success" });
-            onClose();
+            DeduplicationApiClient.addDeduplication({
+                processId,
+                name,
+                active,
+                rows
+            }).then(res => res.text()
+                .then(message => {
+                    if (res.ok) {
+                        showOutAlert({ message, type: "success" });
+                        onClose();
+                    } else {
+                        showAlert({ message, type: "danger" });
+                    }
+                })
+            )
         } catch (error) {
-            const message = error.response?.data || '에러 발생';
-            showAlert({ message, type: "danger" });
+            showAlert({ message: '에러 발생', type: 'danger' });
         }
     };
 

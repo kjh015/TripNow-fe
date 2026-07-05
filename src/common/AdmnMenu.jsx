@@ -23,7 +23,7 @@ const AdmnMenu = ({ onMenuClick }) => {
             <button className="list-group-item list-group-item-action" onClick={() => onMenuClick('dashboard')}>
                 DashBoard
             </button>
-            {/* <button className="list-group-item list-group-item-action" onClick={() => window.open(process.env.REACT_APP_MATOMO_URL)}>
+            {/* <button className="list-group-item list-group-item-action" onClick={() => window.open('http://14.63.178.161:9080')}>
                 Matomo
             </button>
             <button className="list-group-item list-group-item-action" onClick={() => window.open('http://14.63.178.160:8085')}>

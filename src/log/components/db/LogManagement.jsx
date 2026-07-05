@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getSuccessList, getFailListByFilter, getFailListByDeduplication } from '../../../api/log/logDbApi';
+import LogDBApiClient from '../../service/LogDBApiClient';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import LogTable from './LogTable';
 
@@ -20,27 +20,18 @@ const LogManagement = ({ onMenuClick }) => {
     const [alert, setAlert] = useState({ show: false, message: '', type: '' });
 
     useEffect(() => {
-        const load = async () => {
-            try {
-                const { data } = await getSuccessList();
-                setSuccessList(data);
-            } catch {
-                setAlert({ show: true, message: "Success Log DB get fail", type: "danger" });
-            }
-            try {
-                const { data } = await getFailListByFilter();
-                setFailFilterList(data);
-            } catch {
-                setAlert({ show: true, message: "Fail-Filter Log DB get fail", type: "danger" });
-            }
-            try {
-                const { data } = await getFailListByDeduplication();
-                setFailDedupList(data);
-            } catch {
-                setAlert({ show: true, message: "Fail-Deduplication Log DB get fail", type: "danger" });
-            }
-        };
-        load();
+        LogDBApiClient.getSuccessList().then(res => {
+            if (res.ok) res.json().then(setSuccessList);
+            else setAlert({ show: true, message: "Success Log DB get fail", type: "danger" });
+        });
+        LogDBApiClient.getFailListByFilter().then(res => {
+            if (res.ok) res.json().then(setFailFilterList);
+            else setAlert({ show: true, message: "Fail-Filter Log DB get fail", type: "danger" });
+        });
+        LogDBApiClient.getFailListByDeduplication().then(res => {
+            if (res.ok) res.json().then(setFailDedupList);
+            else setAlert({ show: true, message: "Fail-Deduplication Log DB get fail", type: "danger" });
+        });
     }, []);
 
     const columnsSuccess = [

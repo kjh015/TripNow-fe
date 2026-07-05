@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAdminMembers, updateMemberRole } from '../../api/memberApi';
+import SignApiClient from '../service/SignApiClient';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaTrash, FaUserShield } from 'react-icons/fa';
 
@@ -7,25 +7,29 @@ const MemberManagement = () => {
     const [memberList, setMemberList] = useState([]);
     const [alert, setAlert] = useState({ show: false, message: '', type: '' }); // alert 상태 추가
 
-    const getMemberList = async () => {
-        try {
-            const { data } = await getAdminMembers();
-            setMemberList(data.result?.content ?? data.result ?? data);
-        } catch {
-            setAlert({ show: true, message: "회원 조회 오류", type: "danger" });
-        }
-    };
+    const getMemberList = () => {
+        SignApiClient.getMemberList()
+            .then(res => res.json()
+                .then(data => {
+                    if (res.ok) {
+                        setMemberList(data);
+                    }
+                    else {
+                        setAlert({ show: true, message: "회원 조회 오류", type: "danger" });
+                    }
+                }))
+    }
 
-    const delegateAdmin = async ({ memberId }) => {
-        try {
-            await updateMemberRole(memberId);
-            setAlert({ show: true, message: "관리자 권한이 부여되었습니다.", type: "success" });
-            getMemberList();
-        } catch (error) {
-            const msg = error.response?.data || "오류가 발생했습니다.";
-            setAlert({ show: true, message: msg, type: "danger" });
-        }
-    };
+    const delegateAdmin = ({ loginId }) => {
+        SignApiClient.delegateAdmin({ loginId })
+            .then(res => res.text()
+                .then(msg => {
+                    setAlert({ show: true, message: msg, type: res.ok ? "success" : "danger" });
+                    if (res.ok) {
+                        getMemberList();
+                    }
+                }))
+    }
     const formatDate = (isoString) => {
         if (!isoString) return "-";
         return isoString.substring(0, 16).replace("T", " ");
@@ -84,7 +88,7 @@ const MemberManagement = () => {
                                         <button
                                             className="btn btn-sm btn-outline-success"
                                             title="관리자 위임"
-                                            onClick={() => delegateAdmin({ memberId: member.memberId ?? member.id })}
+                                            onClick={() => delegateAdmin({ loginId: member.loginId })}
                                             disabled={member.roles?.includes("ROLE_ADMIN")}
 
                                         >
