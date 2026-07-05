@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { updateProcess as updateProcessApi, removeProcess as removeProcessApi } from '../../../api/log/processApi';
+import { updateLogProcess, deleteLogProcess } from '../../../api/log/logProcessApi';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -9,7 +9,7 @@ const EditProcess = ({ onClose, processId, _name, showAlert }) => {
 
     const updateProcess = async () => {
         try {
-            await updateProcessApi(processId, name);
+            await updateLogProcess(processId, { name });
             showAlert("success", "수정 성공!");
             onClose();
         } catch {
@@ -19,7 +19,7 @@ const EditProcess = ({ onClose, processId, _name, showAlert }) => {
 
     const removeProcess = async () => {
         try {
-            await removeProcessApi(processId);
+            await deleteLogProcess(processId);
             showAlert("danger", "삭제 성공!");
             onClose();
         } catch {

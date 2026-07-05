@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getFilterList } from '../../../api/log/filterApi';
+import { getFilterRules } from '../../../api/log/filterApi';
 import DetailFilter from './DetailFilter';
 import ConditionBuilder from './ConditionBuilder';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -19,8 +19,8 @@ const FilterManagement = ({ processId, onMenuClick }) => {
 
     const getFilters = async () => {
         try {
-            const { data } = await getFilterList(processId);
-            setFilterList(data);
+            const { data } = await getFilterRules(processId, { size: 100 });
+            setFilterList(data.result.content);
         } catch {
             // 에러 시 목록 유지
         }
@@ -106,35 +106,35 @@ const FilterManagement = ({ processId, onMenuClick }) => {
                                 <td colSpan="5" className="text-muted py-5">필터가 없습니다.</td>
                             </tr>
                         ) : filterList.map(filter => (
-                            <React.Fragment key={filter.id}>
+                            <React.Fragment key={filter.filterRuleId}>
                                 <tr>
-                                    <td>{filter.id}</td>
+                                    <td>{filter.filterRuleId}</td>
                                     <td className="text-start">
                                         <span
                                             className="format-name-hover fw-bold"
                                             role="button"
-                                            onClick={() => setDetailComp(detailComp === filter.id ? 0 : filter.id)}
+                                            onClick={() => setDetailComp(detailComp === filter.filterRuleId ? 0 : filter.filterRuleId)}
                                             title={filter.name}
                                         >
                                             {filter.name}
                                         </span>
                                     </td>
-                                    <td>{filterDate(filter.createdTime)}</td>
-                                    <td>{filterDate(filter.updatedTime)}</td>
+                                    <td>{filterDate(filter.createdAt)}</td>
+                                    <td>{filterDate(filter.updatedAt)}</td>
                                     <td>
                                         <button
-                                            className={`btn btn-sm ${filter.active ? 'btn-success' : 'btn-outline-success'}`}
+                                            className={`btn btn-sm ${filter.isActive ? 'btn-success' : 'btn-outline-success'}`}
                                         >
-                                            {filter.active ? 'ON' : 'OFF'}
+                                            {filter.isActive ? 'ON' : 'OFF'}
                                         </button>
                                     </td>
                                 </tr>
-                                {detailComp === filter.id && (
+                                {detailComp === filter.filterRuleId && (
                                     <tr>
                                         <td colSpan="5" className="text-center bg-light">
                                             <DetailFilter
                                                 onClose={() => setDetailComp(0)}
-                                                filterId={filter.id}
+                                                filterId={filter.filterRuleId}
                                                 processId={processId}
                                                 showOutAlert={showAlert}
                                             />

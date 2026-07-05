@@ -6,7 +6,7 @@ export const addLike = (postId) =>
 
 // 좋아요 취소
 export const deleteLike = (postId) =>
-  apiClient.delete('/api/v1/likes', { data: { postId } });
+  apiClient.delete('/api/v1/likes', { params: { postId } });
 
 // 내가 좋아요 한 게시글 목록
 export const getMyLikes = ({ page, size } = {}) =>

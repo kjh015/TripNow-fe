@@ -51,12 +51,12 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const { data } = await axios.post(
+        const refreshRes = await axios.post(
           `${BASE_URL}/api/v1/auth/tokens/refresh`,
           {},
           { withCredentials: true }
         );
-        const accessToken = data.result?.accessToken ?? data.accessToken;
+        const accessToken = refreshRes.headers.authorization?.replace(/^Bearer\s+/i, "");
         localStorage.setItem("accessToken", accessToken);
         apiClient.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
         processQueue(null, accessToken);

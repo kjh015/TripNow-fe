@@ -1,18 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { viewDeduplication as viewDeduplicationApi, updateDeduplication, removeDeduplication } from '../../../api/log/deduplicationApi';
+import { getDedupRule, updateDedupRule, deleteDedupRule } from '../../../api/log/deduplicationApi';
 import DeduplicationRow from './DeduplicationRow';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 const initialRow = {
-    conditions: [{ format: '', value: '' }],
-    year: 0,
-    month: 0,
-    day: 0,
-    hour: 0,
-    minute: 0,
-    second: 0,
+    conditions: [{ field: '', value: '', matchType: 'Exact' }],
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
 };
+
+const toUiRows = (rules) => (rules || []).map(rule => ({
+    conditions: rule.conditions,
+    days: rule.expirationTime?.days ?? 0,
+    hours: rule.expirationTime?.hours ?? 0,
+    minutes: rule.expirationTime?.minutes ?? 0,
+    seconds: rule.expirationTime?.seconds ?? 0,
+}));
+
+const toApiRules = (rows) => rows.map(row => ({
+    conditions: row.conditions,
+    expirationTime: { days: row.days, hours: row.hours, minutes: row.minutes, seconds: row.seconds },
+}));
 
 const DetailDeduplication = ({ processId, id, onClose, showOutAlert }) => {
     const [rows, setRows] = useState([]);
@@ -21,10 +32,11 @@ const DetailDeduplication = ({ processId, id, onClose, showOutAlert }) => {
 
     const viewDeduplication = async () => {
         try {
-            const { data } = await viewDeduplicationApi(id);
-            setRows(data.rows);
-            setName(data.name);
-            setActive(data.active);
+            const { data } = await getDedupRule(id);
+            const result = data.result;
+            setRows(toUiRows(result.rules));
+            setName(result.name);
+            setActive(result.isActive);
         } catch {
             showOutAlert({ message: "view error", type: "danger" });
         }
@@ -50,8 +62,8 @@ const DetailDeduplication = ({ processId, id, onClose, showOutAlert }) => {
 
     const handleSubmit = async () => {
         try {
-            const { data: message } = await updateDeduplication({ id, name, active, rows });
-            showOutAlert({ message, type: "success" });
+            await updateDedupRule(id, { name, isActive: active, rules: toApiRules(rows) });
+            showOutAlert({ message: '수정되었습니다.', type: "success" });
             setTimeout(() => onClose(true));
         } catch {
             showOutAlert({ message: '에러 발생', type: 'danger' });
@@ -60,8 +72,8 @@ const DetailDeduplication = ({ processId, id, onClose, showOutAlert }) => {
 
     const handleRemove = async () => {
         try {
-            const { data: message } = await removeDeduplication(id);
-            showOutAlert({ message, type: "danger" });
+            await deleteDedupRule(id);
+            showOutAlert({ message: '삭제되었습니다.', type: "danger" });
             setTimeout(() => onClose(true));
         } catch {
             showOutAlert({ message: '에러 발생', type: 'danger' });

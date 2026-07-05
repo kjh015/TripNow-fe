@@ -24,8 +24,8 @@ const SignInPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const { data } = await login(loginData);
-            const accessToken = data.result?.accessToken ?? data.accessToken;
+            const { headers } = await login(loginData);
+            const accessToken = headers.authorization?.replace(/^Bearer\s+/i, '');
             localStorage.setItem('accessToken', accessToken);
             const { data: profileRes } = await getMyProfile();
             const member = profileRes.result ?? profileRes;

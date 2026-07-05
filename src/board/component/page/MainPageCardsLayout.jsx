@@ -13,9 +13,9 @@ const mainCardHeight = 520;
  * - 데이터가 5개 미만이면 비행기 로딩 애니메이션 표시
  * - 5개 이상이면 1~5위 카드 정렬
  */
-const MainPageCardsLayout = ({ top5Board }) => {
+const MainPageCardsLayout = ({ top5Posts }) => {
     // 데이터가 5개 미만이면 로딩 화면
-    if (!top5Board || top5Board.length < 5) {
+    if (!top5Posts || top5Posts.length < 5) {
         return <LoadingSpinner text="여행지 인기순위를 불러오는 중..." minHeight={mainCardHeight} />;
     }
 
@@ -41,7 +41,7 @@ const MainPageCardsLayout = ({ top5Board }) => {
             >
                 <AnimatePresence mode="wait">
                     <motion.div
-                        key={top5Board[0].boardId}
+                        key={top5Posts[0].postId}
                         initial={{ opacity: 0, scale: 0.95, y: 25 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.93, y: -18 }}
@@ -71,7 +71,7 @@ const MainPageCardsLayout = ({ top5Board }) => {
                                 }}
                             >
                                 <motion.div
-                                    key={top5Board[0].boardId}
+                                    key={top5Posts[0].postId}
                                     initial={{ opacity: 0.6, scale: 1.1, boxShadow: "0 0 14px 8px #ffd70044" }}
                                     animate={{
                                         opacity: 1,
@@ -119,7 +119,7 @@ const MainPageCardsLayout = ({ top5Board }) => {
 
 
                         {/* 카드 본문 */}
-                        <MainPageCard boardId={top5Board[0].boardId} score={top5Board[0].score} rank={1} />
+                        <MainPageCard postId={top5Posts[0].postId} score={top5Posts[0].score} rank={1} />
                     </motion.div>
                 </AnimatePresence>
             </div>
@@ -135,9 +135,9 @@ const MainPageCardsLayout = ({ top5Board }) => {
                     gap: "18px"
                 }}
             >
-                {top5Board.slice(1, 5).map((board, idx) => (
+                {top5Posts.slice(1, 5).map((board, idx) => (
                     <motion.div
-                        key={board.boardId}
+                        key={board.postId}
                         layout
                         style={{
                             height: `calc((100% - 54px) / 4)`,
@@ -146,7 +146,7 @@ const MainPageCardsLayout = ({ top5Board }) => {
                         }}
                         transition={{ type: "spring", stiffness: 350, damping: 34 }}
                     >
-                        <MainPageCard2 boardId={board.boardId} score={board.score} rank={idx + 2} />
+                        <MainPageCard2 postId={board.postId} score={board.score} rank={idx + 2} />
                     </motion.div>
                 ))}
 

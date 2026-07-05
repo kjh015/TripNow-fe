@@ -4,6 +4,7 @@ import { deletePost } from "../../../api/postApi";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "react-bootstrap";
 import { toast } from "react-toastify";
+import { CATEGORY_CODE_TO_LABEL, REGION_CODE_TO_LABEL } from "../../../constants/categoryRegion";
 
 const Pagination = ({ total, page, onChange, pageSize = 10 }) => {
     const pageCount = Math.ceil(total / pageSize);
@@ -43,7 +44,7 @@ const BoardList = ({ title, boards, loading, error, categoryColors, regionColors
             <div className="d-flex flex-column gap-4">
                 {boards.map((board) => (
                     <div
-                        key={board.id}
+                        key={board.postId}
                         className="p-3 rounded-3 border board-list-card"
                         style={{ background: "#fff", minHeight: "88px", boxShadow: "0 2px 10px 0 rgba(0,0,0,0.04)", position: "relative" }}
                         tabIndex={0}
@@ -57,13 +58,13 @@ const BoardList = ({ title, boards, loading, error, categoryColors, regionColors
                                 </span>
                             </div>
                             <span className="text-secondary ms-2" style={{ fontSize: "0.95rem", whiteSpace: "nowrap" }}>
-                                {formatDate(board.modifiedDate)}
+                                {formatDate(board.updatedAt)}
                             </span>
                         </div>
                         <div className="d-flex align-items-center flex-wrap gap-2 justify-content-between" style={{ fontSize: "0.97rem", minHeight: "36px" }}>
                             <div>
-                                <Badge bg={categoryColors[board.category]} className="me-1">{board.category}</Badge>
-                                <Badge bg={regionColors[board.region]} className="me-2">{board.region}</Badge>
+                                <Badge bg={categoryColors[CATEGORY_CODE_TO_LABEL[board.category] ?? board.category]} className="me-1">{CATEGORY_CODE_TO_LABEL[board.category] ?? board.category}</Badge>
+                                <Badge bg={regionColors[REGION_CODE_TO_LABEL[board.region] ?? board.region]} className="me-2">{REGION_CODE_TO_LABEL[board.region] ?? board.region}</Badge>
                                 <span style={{ color: "#222" }}>by {board.memberNickname}</span>
                             </div>
                             <div className="d-flex align-items-center">
@@ -71,11 +72,11 @@ const BoardList = ({ title, boards, loading, error, categoryColors, regionColors
                                     <i className="bi bi-eye me-1" />{board.viewCount || 0}
                                 </span>
                                 <span className="badge" style={{ color: "#ffc107", fontSize: "1rem", fontWeight: 500 }}>
-                                    <i className="bi bi-star-fill me-1" />{board.ratingAvg ? board.ratingAvg.toFixed(1) : 0}
+                                    <i className="bi bi-star-fill me-1" />{board.starAvg ? board.starAvg.toFixed(1) : 0}
                                 </span>
                                 {onRemove &&
                                     <button className="btn btn-sm btn-outline-danger"
-                                        onClick={e => { e.stopPropagation(); onRemove({ no: board.id }); }}>
+                                        onClick={e => { e.stopPropagation(); onRemove({ no: board.postId }); }}>
                                         삭제
                                     </button>
                                 }
@@ -135,8 +136,8 @@ const AdmnBoard = () => {
         setEsLoading(true);
         try {
             const { data } = await getPostListBySearch({ category: "", region: "", keyword: "", sort: "id", direction: "asc", page });
-            setEsBoards(data.result);
-            setEsDocCount(data.docCount);
+            setEsBoards(data.result.content);
+            setEsDocCount(data.result.totalElements);
         } catch (e) {
             setEsError(e);
         } finally {
@@ -149,7 +150,7 @@ const AdmnBoard = () => {
     }, []);
 
     const navigate = useNavigate();
-    const handleGoDetail = (board) => navigate(`/post/detail?no=${board.id}`);
+    const handleGoDetail = (board) => navigate(`/post/detail?no=${board.postId}`);
 
     const handleEsPageChange = (newPage) => {
         setEsPage(newPage);

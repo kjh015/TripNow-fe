@@ -6,18 +6,30 @@ import { getPost } from '../../api/postSearchApi';
 import { updatePost, deletePost, getPresignedUrl } from '../../api/postApi';
 import useAlert from '../../hooks/useAlert';
 import PostForm from '../components/PostForm';
+import {
+    CATEGORY_LABEL_TO_CODE, CATEGORY_CODE_TO_LABEL,
+    REGION_LABEL_TO_CODE, REGION_CODE_TO_LABEL,
+} from '../../constants/categoryRegion';
 
 const IMAGE_BASE_URL = process.env.REACT_APP_IMAGE_BASE_URL || '';
 
-const uploadImageToS3 = async (file, sortOrder) => {
-    const { data } = await getPresignedUrl();
+const buildSafeFileName = (originalName) => {
+    const ext = originalName.includes('.') ? originalName.split('.').pop().toLowerCase() : 'jpg';
+    return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${ext}`;
+};
+
+const uploadImageToS3 = async (file) => {
+    const { data } = await getPresignedUrl(buildSafeFileName(file.name), file.type);
     const { url, imageKey } = data.result;
-    await fetch(url, {
+    const res = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': file.type },
         body: file,
     });
-    return { imageKey, sortOrder };
+    if (!res.ok) {
+        throw new Error(`이미지 업로드 실패 (status: ${res.status})`);
+    }
+    return imageKey;
 };
 
 const PostEditPage = () => {
@@ -48,8 +60,8 @@ const PostEditPage = () => {
                 content: postData.content,
                 travelPlace: postData.travelPlace,
                 address: postData.address,
-                category: postData.category,
-                region: postData.region,
+                category: CATEGORY_CODE_TO_LABEL[postData.category] ?? postData.category,
+                region: REGION_CODE_TO_LABEL[postData.region] ?? postData.region,
             });
             setExistingImages(postData.images || []);
         } catch {
@@ -57,7 +69,7 @@ const PostEditPage = () => {
         }
     };
 
-    const removeBoard = async () => {
+    const removePost = async () => {
         try {
             await deletePost(no);
             showAlert("삭제 성공", "success");
@@ -111,14 +123,15 @@ const PostEditPage = () => {
         e.preventDefault();
         setUploading(true);
         try {
-            const startOrder = existingImages.length;
-            const uploadedImages = await Promise.all(
-                newImageFiles.map((file, idx) => uploadImageToS3(file, startOrder + idx))
-            );
-            // 기존 이미지 sortOrder 재정렬 후 신규 이미지 합산
-            const reorderedExisting = existingImages.map((img, idx) => ({ ...img, sortOrder: idx }));
-            const images = [...reorderedExisting, ...uploadedImages];
-            await updatePost(no, { ...post, images });
+            const uploadedImageKeys = await Promise.all(newImageFiles.map(uploadImageToS3));
+            // 이미지 정렬 순서는 배열 순서 자체로 전달 (기존 이미지 → 신규 이미지 순)
+            const images = [...existingImages.map((img) => img.imageKey), ...uploadedImageKeys];
+            await updatePost(no, {
+                ...post,
+                category: CATEGORY_LABEL_TO_CODE[post.category] ?? post.category,
+                region: REGION_LABEL_TO_CODE[post.region] ?? post.region,
+                images,
+            });
             showAlert("글 수정이 완료되었습니다.", "success");
             setTimeout(() => navigate('/post/list'), 500);
         } catch {
@@ -177,7 +190,7 @@ const PostEditPage = () => {
             onCategorySelect={handleCategorySelect}
             onRegionChange={handleRegionChange}
             onSubmit={handleSubmit}
-            onDelete={removeBoard}
+            onDelete={removePost}
             imageSection={imageSection}
             alert={alert}
             submitDisabled={uploading}

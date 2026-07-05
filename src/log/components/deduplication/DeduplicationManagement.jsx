@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import InputDeduplication from './InputDeduplication';
-import { getDeduplicationList as getDeduplicationListApi } from '../../../api/log/deduplicationApi';
+import { getDedupRules } from '../../../api/log/deduplicationApi';
 import DetailDeduplication from './DetailDeduplication';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -17,8 +17,8 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
 
   const getDeduplicationList = async () => {
     try {
-        const { data } = await getDeduplicationListApi(processId);
-        setDdpList(data);
+        const { data } = await getDedupRules(processId, { size: 100 });
+        setDdpList(data.result.content);
     } catch {
         // 에러 시 목록 유지
     }
@@ -124,37 +124,37 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
             </tr>
           ) : (
             ddpList.map(ddp => (
-              <React.Fragment key={ddp.id}>
+              <React.Fragment key={ddp.dedupRuleId}>
                 <tr>
-                  <td>{ddp.id}</td>
+                  <td>{ddp.dedupRuleId}</td>
                   <td className="text-start">
                     <span
                       className="dedup-name-hover"
                       role="button"
-                      onClick={() => setShowDetail(showDetail === ddp.id ? 0 : ddp.id)}
+                      onClick={() => setShowDetail(showDetail === ddp.dedupRuleId ? 0 : ddp.dedupRuleId)}
                       title={ddp.name}
                     >
                       {ddp.name}
                     </span>
                   </td>
-                  <td>{formatDate(ddp.createdTime)}</td>
-                  <td>{formatDate(ddp.updatedTime)}</td>
+                  <td>{formatDate(ddp.createdAt)}</td>
+                  <td>{formatDate(ddp.updatedAt)}</td>
                   <td>
 
                     <button
-                      className={`btn btn-sm ${ddp.active ? "btn-success" : "btn-outline-secondary"}`}
-                      onClick={() => handleToggleActive(ddp.id, ddp.active)}
+                      className={`btn btn-sm ${ddp.isActive ? "btn-success" : "btn-outline-secondary"}`}
+                      onClick={() => handleToggleActive(ddp.dedupRuleId, ddp.isActive)}
                     >
-                      {ddp.active ? "ON" : "OFF"}
+                      {ddp.isActive ? "ON" : "OFF"}
                     </button>
                   </td>
                 </tr>
-                {showDetail === ddp.id && (
+                {showDetail === ddp.dedupRuleId && (
                   <tr>
                     <td colSpan="5" className="text-center bg-light">
                       <DetailDeduplication
                         processId={processId}
-                        id={ddp.id}
+                        id={ddp.dedupRuleId}
                         onClose={handleDetailClose}
                         showOutAlert={showAlert}
                       />

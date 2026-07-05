@@ -40,13 +40,13 @@ const PostDetailPage = () => {
         await deleteLike(Number(no));
         setLiked(false);
         window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ event: "travel_favorite_remove", boardId: no, category: post.category, region: post.region, title: post.title });
+        window.dataLayer.push({ event: "travel_favorite_remove", postId: no, category: post.category, region: post.region, title: post.title });
         showAlert("찜 목록에서 삭제되었습니다.", "danger");
       } else {
         await addLike(Number(no));
         setLiked(true);
         window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ event: "travel_favorite_add", boardId: no, category: post.category, region: post.region, title: post.title });
+        window.dataLayer.push({ event: "travel_favorite_add", postId: no, category: post.category, region: post.region, title: post.title });
         showAlert("찜 목록에 추가되었습니다.", "success");
       }
     } catch {
@@ -55,6 +55,7 @@ const PostDetailPage = () => {
   };
 
   const getLike = async () => {
+    if (!localStorage.getItem('accessToken')) return;
     try {
       const { data } = await getMyLikes();
       const likes = data.result.content ?? [];
@@ -64,7 +65,7 @@ const PostDetailPage = () => {
     }
   };
 
-  const viewBoard = async () => {
+  const loadPost = async () => {
     try {
       const { data } = await getPost(no);
       const post = data.result;
@@ -75,7 +76,7 @@ const PostDetailPage = () => {
   };
 
   useEffect(() => {
-    viewBoard();
+    loadPost();
     getLike();
     enterTime.current = Date.now();
     return () => {
@@ -84,7 +85,7 @@ const PostDetailPage = () => {
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: "travel_detail_exit",
-        boardId: no,
+        postId: no,
         staySeconds: stayDuration,
         title: post.title
       });
@@ -96,7 +97,7 @@ const PostDetailPage = () => {
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: "travel_detail_pageview",
-        boardId: no,
+        postId: no,
         category: post.category,
         region: post.region,
         title: post.title

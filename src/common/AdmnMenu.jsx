@@ -20,9 +20,6 @@ const AdmnMenu = ({ onMenuClick }) => {
             <button className="list-group-item list-group-item-action" onClick={() => onMenuClick('monitoring')}>
                 Monitoring
             </button>
-            <button className="list-group-item list-group-item-action" onClick={() => onMenuClick('dashboard')}>
-                DashBoard
-            </button>
             {/* <button className="list-group-item list-group-item-action" onClick={() => window.open(process.env.REACT_APP_MATOMO_URL)}>
                 Matomo
             </button>
