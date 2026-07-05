@@ -11,7 +11,7 @@ import {
     Legend
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { getVisit } from '../../../api/log/monitoringApi';
+import MonitoringApiClient from '../../service/MonitoringApiClient';
 
 Chart.register(
     CategoryScale,
@@ -63,28 +63,30 @@ const PageVisitStatsDashboard = () => {
         // eslint-disable-next-line
     }, [period]);
 
-    const fetchData = async () => {
+    const fetchData = () => {
         setIsLoading(true);
-        try {
-            const { data } = await getVisit({ period });
-            const labels = data.map(item => formatLabel(item.period, period));
-            const counts = data.map(item => item.count);
-            setChartData({
-                labels,
-                datasets: [{
-                    label: '메인 페이지 방문자 수',
-                    data: counts,
-                    fill: false,
-                    borderColor: LINE_COLORS[0],
-                    backgroundColor: LINE_COLORS[0],
-                    tension: 0.3,
-                }]
-            });
-        } catch {
-            // 에러 시 chartData 유지
-        } finally {
-            setIsLoading(false);
-        }
+        MonitoringApiClient.getVisit({period})
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                const labels = data.map(item => formatLabel(item.period, period));
+                const counts = data.map(item => item.count);
+
+                setChartData({
+                    labels,
+                    datasets: [
+                        {
+                            label: '메인 페이지 방문자 수',
+                            data: counts,
+                            fill: false,
+                            borderColor: LINE_COLORS[0],
+                            backgroundColor: LINE_COLORS[0],
+                            tension: 0.3,
+                        }
+                    ]
+                });
+            })
+            .finally(() => setIsLoading(false));
     };
 
     return (

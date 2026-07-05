@@ -1,6 +1,6 @@
-﻿import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { getPost } from '../../../../api/postApi';
+import BoardApiClient from '../../../service/BoardApiClient';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CountUp from 'react-countup';
@@ -18,15 +18,13 @@ const MainPageCard2 = ({ boardId, score, rank }) => {
   });
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const { data } = await getPost(boardId);
-        setBoard({ ...data, imagePaths: data.imagePaths || [] });
-      } catch {
-        // 에러 시 기본 상태 유지
+    BoardApiClient.getBoard(boardId).then(
+      res => {
+        if (res.ok) {
+          res.json().then(data => setBoard({ ...data, imagePaths: data.imagePaths || [] }));
+        }
       }
-    };
-    load();
+    );
   }, [boardId]);
 
   const prevScoreRef = useRef(score);
@@ -72,13 +70,13 @@ const MainPageCard2 = ({ boardId, score, rank }) => {
           cursor: "pointer",
           zIndex: 1, // 뱃지보다 낮게!
         }}
-        onClick={() => { navigate(`/post/detail/?no=${board.id}`); }}
+        onClick={() => { navigate(`/board/detail/?no=${board.id}`); }}
       >
         {/* 이미지 or 배경 */}
         <div style={{ width: "40%", height: "100%" }}>
           {board.imagePaths && board.imagePaths.length > 0 ? (
             <img
-              src={`${process.env.REACT_APP_IMAGE_BASE_URL}${board.imagePaths[0]}`}
+              src={`http://14.63.178.161${board.imagePaths[0]}`}
               alt="preview"
               style={{
                 width: "100%",

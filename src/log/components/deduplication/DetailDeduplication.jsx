@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { viewDeduplication as viewDeduplicationApi, updateDeduplication, removeDeduplication } from '../../../api/log/deduplicationApi';
+import DeduplicationApiClient from '../../service/DeduplicationApiClient';
 import DeduplicationRow from './DeduplicationRow';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -19,16 +19,21 @@ const DetailDeduplication = ({ processId, id, onClose, showOutAlert }) => {
     const [name, setName] = useState('');
     const [active, setActive] = useState(false);
 
-    const viewDeduplication = async () => {
-        try {
-            const { data } = await viewDeduplicationApi(id);
-            setRows(data.rows);
-            setName(data.name);
-            setActive(data.active);
-        } catch {
-            showOutAlert({ message: "view error", type: "danger" });
-        }
-    };
+    const viewDeduplication = () => {
+        DeduplicationApiClient.viewDeduplication(id)
+            .then(res => res.json()
+                .then(data => {
+                    if (res.ok) {
+                        setRows(data.rows);
+                        setName(data.name);
+                        setActive(data.active);
+                    } else {
+                        showOutAlert({ message: "view error", type: "danger" });
+                    }
+                })
+            )
+            .catch(() => showOutAlert({ message: "API 오류", type: "danger" }));
+    }
 
     const handleChange = (index, updatedRow) => {
         const newRows = [...rows];
@@ -48,25 +53,49 @@ const DetailDeduplication = ({ processId, id, onClose, showOutAlert }) => {
         }
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         try {
-            const { data: message } = await updateDeduplication({ id, name, active, rows });
-            showOutAlert({ message, type: "success" });
-            setTimeout(() => onClose(true));
-        } catch {
+            DeduplicationApiClient.updateDeduplication({
+                id: id,
+                name: name,
+                active: active,
+                rows: rows
+            }).then(res => res.text()
+                .then(message => {
+                    if (res.ok) {
+                        showOutAlert({ message, type: "success" });
+                        setTimeout(() => {
+                            onClose(true);
+                        }
+                        );
+                    } else {
+                        showOutAlert({ message, type: "danger" });
+                    }
+                })
+            )
+        } catch (error) {
             showOutAlert({ message: '에러 발생', type: 'danger' });
         }
     };
 
-    const handleRemove = async () => {
+    const handleRemove = () => {
         try {
-            const { data: message } = await removeDeduplication(id);
-            showOutAlert({ message, type: "danger" });
-            setTimeout(() => onClose(true));
-        } catch {
+            DeduplicationApiClient.removeDeduplication(id)
+                .then(res => res.text()
+                    .then(message => {
+                        if (res.ok) {
+                            showOutAlert({ message, type: "danger" });
+                            setTimeout(() => {
+                                onClose(true);
+                            });
+                        } else {
+                            showOutAlert({ message, type: "danger" });
+                        }
+                    }))
+        } catch (error) {
             showOutAlert({ message: '에러 발생', type: 'danger' });
         }
-    };
+    }
 
     useEffect(() => {
         viewDeduplication();

@@ -2,7 +2,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getMyProfile, updateMyProfile } from '../../api/memberApi';
+import SignApiClient from '../service/SignApiClient';
+import UserAuthentication from '../service/UserAuthentication';
 
 const inputBoxStyle = {
     width: "100%",
@@ -43,18 +44,24 @@ const SignUpdatePage = () => {
         nickname: '',
         gender: '',
         roles: [],
+        regDate: ''
     });
     const [alert, setAlert] = useState({ show: false, message: '', type: '' }); // 추가
     const navigate = useNavigate();
 
-    const getMember = async () => {
-        try {
-            const { data } = await getMyProfile();
-            setFormData(data.result);
-        } catch {
-            setAlert({ show: true, message: "회원 정보 조회 실패", type: "danger" });
-        }
-    };
+    const getMember = () => {
+        SignApiClient.getMemberDetail({ loginId: UserAuthentication.getLoginIdFromToken() })
+            .then(res => {
+                if (res.ok) {
+                    res.json().then(data => {
+                        setFormData(data);
+                    });
+                }
+                else {
+                    setAlert({ show: true, message: "회원 정보 조회 실패", type: "danger" });
+                }
+            })
+    }
 
     const handleChange = (e) => {
         const { id, name, value } = e.target;
@@ -68,18 +75,22 @@ const SignUpdatePage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await updateMyProfile({ nickname: formData.nickname });
-            setAlert({ show: true, message: "회원수정 성공", type: "success" });
-            localStorage.setItem('nickname', formData.nickname);
-            setTimeout(() => {
-                setAlert({ show: false, message: '', type: '' });
-                navigate("/");
-            }, 500);
+            const res = await SignApiClient.updateMember(formData);
+            if (res.ok) {
+                setAlert({ show: true, message: "회원수정 성공", type: "success" });
+                localStorage.setItem('nickname', formData.nickname);
+                setTimeout(() => {
+                    setAlert({ show: false, message: '', type: '' });
+                    navigate("/");
+                }, 500);
+            } else {
+                const msg = await res.json();
+                setAlert({ show: true, message: msg.message, type: "danger" });
+            }
         } catch (error) {
-            const msg = error.response?.data;
-            setAlert({ show: true, message: msg?.message || "에러가 발생했습니다.", type: "danger" });
+            setAlert({ show: true, message: "에러가 발생했습니다.", type: "danger" });
         }
-    };
+    }
 
     useEffect(() => {
         getMember();

@@ -48,7 +48,7 @@ const CommentList = ({ comments = [], onRemoveComment, ratingAvg }) => {
                             <div key={idx} className="card mb-3 border-0 shadow-sm rounded-3 position-relative">
                                 <div className="card-body">
                                     {/* x 버튼 */}
-                                    {localStorage.getItem("nickname") === c.memberNickname &&
+                                    {localStorage.getItem("nickname") === c.nickname &&
                                         <button
                                             type="button"
                                             className="btn btn-sm btn-light position-absolute"
@@ -61,7 +61,7 @@ const CommentList = ({ comments = [], onRemoveComment, ratingAvg }) => {
                                                 background: "transparent",
                                                 zIndex: 10,
                                             }}
-                                            onClick={() => onRemoveComment({ commentId: c.commentId })}
+                                            onClick={() => onRemoveComment({ commentId: c.id })}
                                             aria-label="댓글 삭제"
                                         >
                                             ×
@@ -69,10 +69,10 @@ const CommentList = ({ comments = [], onRemoveComment, ratingAvg }) => {
                                     }
 
                                     <div className="d-flex align-items mb-2">
-                                        <strong className="me-2">{c.memberNickname || "(탈퇴 회원)"}</strong>
+                                        <strong className="me-2">{c.nickname || "(탈퇴 회원)"}</strong>
                                         <span style={{ fontSize: "0.96rem", color: "#aaa" }}>
-                                            {c.star > 0 && (
-                                                <div className="mb-1">{renderStarsStatic(c.star)}</div>
+                                            {c.rating > 0 && (
+                                                <div className="mb-1">{renderStarsStatic(c.rating)}</div>
                                             )}
                                         </span>
                                     </div>

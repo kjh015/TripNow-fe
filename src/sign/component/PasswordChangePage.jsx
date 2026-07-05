@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { changePassword } from '../../api/memberApi';
+import SignApiClient from '../service/SignApiClient';
 
 const cardStyle = {
     maxWidth: "420px",
@@ -70,16 +70,36 @@ const PasswordChangePage = () => {
             setAlert({ show: true, message: '새 비밀번호가 일치하지 않습니다.', type: 'danger' });
             return;
         }
-        const payload = { curPassword: curPwd, newPassword: newPwd };
+        const payload = {
+            curPassword: curPwd,
+            newPassword: newPwd,
+            loginId: getLoginIdFromToken()
+        }
         try {
-            await changePassword(payload);
-            setAlert({ show: true, message: '비밀번호가 변경되었습니다.', type: 'success' });
-            setTimeout(() => navigate('/'), 1300);
-        } catch (error) {
-            const msg = error.response?.data;
-            setAlert({ show: true, message: msg?.message || '서버 오류가 발생했습니다.', type: 'danger' });
+            const res = await SignApiClient.updatePassword(payload);
+            if (res.ok) {
+                setAlert({ show: true, message: '비밀번호가 변경되었습니다.', type: 'success' });
+                setTimeout(() => navigate('/'), 1300);
+            } else {
+                const msg = await res.json();
+                setAlert({ show: true, message: msg.message, type: 'danger' });
+            }
+        } catch {
+            setAlert({ show: true, message: '서버 오류가 발생했습니다.', type: 'danger' });
         }
     };
+
+    const getLoginIdFromToken = () => {
+        const token = localStorage.getItem("accessToken");
+        if (!token) return null;
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.sub || payload.loginId;
+        } catch (e) {
+            console.error("토큰 디코딩 실패:", e);
+            return null;
+        }
+    }
 
     return (
         <div style={{

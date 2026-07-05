@@ -23,7 +23,7 @@ const MainPage = () => {
       referrer: document.referrer
     });
 
-    const evt = new EventSource(`${process.env.REACT_APP_API_BASE_URL}/realtime-popular/sse`);
+    const evt = new EventSource('http://14.63.178.161:8000/realtime-popular/sse');
     evt.onmessage = (e) => {
 
       const data = JSON.parse(e.data);

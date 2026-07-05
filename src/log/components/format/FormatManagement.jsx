@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getFormatList } from '../../../api/log/formatApi';
+import FormatApiClient from '../../service/FormatApiClient';
 import InputFormat from './InputFormat';
 import DetailFormat from './DetailFormat';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -17,13 +17,10 @@ const FormatManagement = ({ processId, onMenuClick }) => {
         if (duration > 0) setTimeout(() => setAlert(null), duration);
     }, []);
 
-    const getFormats = useCallback(async () => {
-        try {
-            const { data } = await getFormatList(processId);
-            setFormatList(data);
-        } catch {
-            // 에러 시 목록 유지
-        }
+    const getFormats = useCallback(() => {
+        FormatApiClient.getFormatList(processId).then(res => {
+            if (res.ok) res.json().then(data => setFormatList(data));
+        });
     }, [processId]);
 
     useEffect(() => { getFormats(); }, [inputComp, detailComp, getFormats]);

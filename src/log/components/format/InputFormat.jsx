@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { addFormat } from '../../../api/log/formatApi';
+import FormatApiClient from '../../service/FormatApiClient';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -37,13 +37,16 @@ const InputFormat = ({ onClose, processId, showAlert }) => {
         const formatJson = JSON.stringify(toObject(formatEntry));
         const defaultJson = JSON.stringify(toObject(defaultEntry));
 
-        try {
-            await addFormat(processId, name, active, formatJson, defaultJson);
-            showAlert("success", "포맷 추가 성공!");
-            onClose();
-        } catch {
-            showAlert("danger", "포맷 추가 실패!");
-        }
+        FormatApiClient.addFormat(processId, name, active, formatJson, defaultJson).then(
+            res => {
+                if (res.ok) {
+                    showAlert("success", "포맷 추가 성공!");
+                    onClose();
+                } else {
+                    showAlert({ type: 'danger', text: '포맷 추가 실패!' });
+                }
+            }
+        );
     };
 
     return (
