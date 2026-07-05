@@ -1,5 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const CategoryCard = ({ selectedCategory, setCategory }) => {
     const categories = ["축제", "공연", "행사", "체험", "쇼핑", "자연", "역사", "가족", "음식"];

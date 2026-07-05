@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Form, Button, Card, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import RegionRadioComp from "../../board/component/page/RegionRadioComp";
 import CategoryCard from "../../board/component/page/CategoryCard";

@@ -1,5 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const RegionRadioCard = ({ selectedRegion, setRegion }) => {
     const cities = ["강원", "경기", "대구", "부산", "서울", "인천", "전남", "제주", "기타"];

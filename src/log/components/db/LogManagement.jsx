@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { getHistories, getHistory } from '../../../api/log/historyApi';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import LogTable from './LogTable';
 
 const LogManagement = ({ onMenuClick }) => {

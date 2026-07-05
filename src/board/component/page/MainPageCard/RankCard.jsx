@@ -1,5 +1,3 @@
-﻿import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 서울 from '../../imgs/지역별/서울.jpg'
 import 부산 from '../../imgs/지역별/부산.jpg'
 import 강원 from '../../imgs/지역별/강원.jpg'

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getDedupRule, updateDedupRule, deleteDedupRule } from '../../../api/log/deduplicationApi';
 import DeduplicationRow from './DeduplicationRow';
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 const initialRow = {
     conditions: [{ field: '', value: '', matchType: 'Exact' }],

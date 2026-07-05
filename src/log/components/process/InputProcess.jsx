@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { createLogProcess } from '../../../api/log/logProcessApi';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const InputProcess = ({ onClose, showAlert }) => {
     const [name, setName] = useState("");

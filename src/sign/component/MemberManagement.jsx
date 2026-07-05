@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { getAdminMembers, updateMemberRole } from '../../api/memberApi';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaTrash, FaUserShield } from 'react-icons/fa';
 
 const MemberManagement = () => {

@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { getFormatRule, updateFormatRule, deleteFormatRule } from '../../../api/log/formatApi';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const
     DetailFormat = ({ onClose, formatId, showAlert }) => {

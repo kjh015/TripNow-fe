@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { createFormatRule } from '../../../api/log/formatApi';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const InputFormat = ({ onClose, processId, showAlert }) => {
     const [defaultEntry, setDefaultEntry] = useState([{ key: '', value: '' }]);

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const CampaignPlan = () => {
   const [campaignType, setCampaignType] = useState('');

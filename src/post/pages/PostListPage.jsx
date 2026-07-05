@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { getPostListBySearch } from "../../api/postSearchApi";
 import PostSearch from "../components/PostSearch";
 import LoadingSpinner from "../../components/LoadingSpinner";
