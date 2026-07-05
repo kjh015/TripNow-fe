@@ -1,7 +1,7 @@
 ﻿import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { getPost } from '../../../../api/postApi';
-import { useEffect, useRef, useState } from 'react';
+import { getPost } from '../../../../api/postSearchApi';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CountUp from 'react-countup';
 
@@ -26,31 +26,25 @@ const firstRankBadgeStyle = {
   pointerEvents: "none", // 카드 클릭 방해 X
 };
 
-const MainPageCard = ({ boardId, score, rank }) => {
+const MainPageCard = ({ postId, score, rank }) => {
   const navigate = useNavigate();
   const [board, setBoard] = useState({
-    id: '', title: '', content: '', memberNickname: '',
-    travelPlace: '', address: '', category: '', region: '', imagePaths: [],
-    createdDate: '', modifiedDate: ''
+    postId: '', title: '', content: '', memberNickname: '',
+    travelPlace: '', address: '', category: '', region: '', images: [],
   });
 
   useEffect(() => {
     const load = async () => {
       try {
-        const { data } = await getPost(boardId);
-        setBoard({ ...data, imagePaths: data.imagePaths || [] });
+        const { data } = await getPost(postId);
+        const result = data.result || {};
+        setBoard({ ...result, images: result.images || [] });
       } catch {
         // 에러 시 기본 상태 유지
       }
     };
     load();
-  }, [boardId]);
-
-  const prevScoreRef = useRef(score);
-
-  useEffect(() => {
-    prevScoreRef.current = score;
-  }, [score]);
+  }, [postId]);
 
   return (
     <div
@@ -77,13 +71,13 @@ const MainPageCard = ({ boardId, score, rank }) => {
           cursor: "pointer",
           zIndex: 1, // 왕관보다 낮음 (중요)
         }}
-        onClick={() => navigate(`/post/detail/?no=${board.id}`)}
+        onClick={() => navigate(`/post/detail/?no=${board.postId}`)}
       >
         {/* 이미지 */}
         <div style={{ position: "relative", width: "100%" }}>
-          {board.imagePaths && board.imagePaths.length > 0 ? (
+          {board.images && board.images.length > 0 ? (
             <img
-              src={`${process.env.REACT_APP_IMAGE_BASE_URL}${board.imagePaths[0]}`}
+              src={`${process.env.REACT_APP_IMAGE_BASE_URL}/${board.images[0].imageKey}`}
               alt="Main visual"
               className="card-img-top"
               style={{
@@ -114,13 +108,12 @@ const MainPageCard = ({ boardId, score, rank }) => {
             gap: "0.6rem"
           }}>
             Score:
+            {/* start prop을 주면 react-countup이 렌더 중 ref가 붙기 전 인스턴스를 생성해 크래시 — preserveValue가 이전 값 유지를 담당 */}
             <CountUp
-              start={prevScoreRef.current}
-              end={score}
+              end={score ?? 0}
               duration={0.5}
               separator=","
               preserveValue // 리렌더링 중간값 유지
-              redraw // 점수만 바뀔 때도 애니메이션 작동하게
             />
           </div>
         </div>

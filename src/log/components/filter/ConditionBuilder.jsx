@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { getFormatKeys, addFilter } from '../../../api/log/filterApi';
+import { getActiveFormatRuleFields } from '../../../api/log/formatApi';
+import { createFilterRule } from '../../../api/log/filterApi';
 
 const operatorOptions = ['>', '<', '>=', '<=', '==', '!=', 'Equals'];
 
@@ -22,8 +23,8 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
     useEffect(() => {
         const load = async () => {
             try {
-                const { data } = await getFormatKeys(processId);
-                setFieldList(data);
+                const { data } = await getActiveFormatRuleFields(processId);
+                setFieldList(data.result.fields);
             } catch {
                 // 에러 시 빈 목록 유지
             }
@@ -131,21 +132,10 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
             return;
         }
 
-        const tokensWithType = tokens.map(token => {
-            if (token.type === 'condition') {
-                return {
-                    ...token,
-                    valueType: inferValueType(token.value, token.operator)
-                };
-            }
-            return token;
-        });
-
-        const expr = buildExpression();
-        console.log('전송 문자열:', expr);
+        const conditions = toApiConditions(tokens);
 
         try {
-            await addFilter(processId, name, active, expr, tokensWithType);
+            await createFilterRule(processId, { name, conditions, isActive: active });
             showOutAlert({ message: '필터 추가 성공', type: 'success' });
             onClose();
         } catch {
@@ -317,18 +307,42 @@ function getGroups(tokens) {
 
 function inferValueType(value, operator) {
     if (operator === 'Equals') {
-        return 'String';
+        return 'STRING';
     }
     if (value === 'true' || value === 'false') {
-        return 'boolean';
+        return 'BOOLEAN';
     }
     if (/^-?\d+$/.test(value)) {
-        return 'int';
+        return 'INT';
     }
     if (/^-?\d*\.\d+$/.test(value)) {
-        return 'double';
+        return 'DOUBLE';
     }
-    return 'String';
+    return 'STRING';
+}
+
+export function toApiConditions(tokens) {
+    return tokens.map(token => {
+        switch (token.type) {
+            case 'condition':
+                return {
+                    type: 'condition',
+                    groupId: token.groupId,
+                    field: token.field,
+                    operator: token.operator,
+                    value: token.value,
+                    valueType: inferValueType(token.value, token.operator),
+                };
+            case 'operator':
+                return { type: 'operator', groupId: token.groupId, value: token.value };
+            case 'left-paren':
+                return { type: 'left-paren', groupId: token.groupId };
+            case 'right-paren':
+                return { type: 'right-paren', groupId: token.groupId };
+            default:
+                return null;
+        }
+    }).filter(Boolean);
 }
 
 export default ConditionBuilder;

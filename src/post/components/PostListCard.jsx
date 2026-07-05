@@ -1,10 +1,13 @@
 ﻿import { Badge } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { categoryColors, regionColors } from "../../constants/colorMaps";
+import { CATEGORY_CODE_TO_LABEL, REGION_CODE_TO_LABEL } from "../../constants/categoryRegion";
 import { formatDate } from "../../utils/dateUtils";
 
 const PostListCard = ({ post, navigateTo, navigateState }) => {
   const navigate = useNavigate();
+  const categoryLabel = CATEGORY_CODE_TO_LABEL[post.category] ?? post.category;
+  const regionLabel = REGION_CODE_TO_LABEL[post.region] ?? post.region;
 
   const handleClick = () => {
     const to = navigateTo ?? `/post/detail?no=${post.postId}`;
@@ -55,8 +58,8 @@ const PostListCard = ({ post, navigateTo, navigateState }) => {
         style={{ fontSize: "0.97rem" }}
       >
         <div>
-          <Badge bg={categoryColors[post.category]} className="me-1">{post.category}</Badge>
-          <Badge bg={regionColors[post.region]} className="me-2">{post.region}</Badge>
+          <Badge bg={categoryColors[categoryLabel]} className="me-1">{categoryLabel}</Badge>
+          <Badge bg={regionColors[regionLabel]} className="me-2">{regionLabel}</Badge>
           <span style={{ color: "#222" }}>by {post.memberNickname}</span>
         </div>
         <div className="d-flex align-items-center">

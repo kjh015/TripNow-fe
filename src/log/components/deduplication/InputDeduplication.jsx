@@ -1,16 +1,19 @@
 import React, { useState, useCallback } from 'react';
 import DeduplicationRow from './DeduplicationRow';
-import { addDeduplication } from '../../../api/log/deduplicationApi';
+import { createDedupRule } from '../../../api/log/deduplicationApi';
 
 const initialRow = {
-    conditions: [{ format: '', value: '' }],
-    year: 0,
-    month: 0,
-    day: 0,
-    hour: 0,
-    minute: 0,
-    second: 0,
+    conditions: [{ field: '', value: '', matchType: 'Exact' }],
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
 };
+
+const toApiRules = (rows) => rows.map(row => ({
+    conditions: row.conditions,
+    expirationTime: { days: row.days, hours: row.hours, minutes: row.minutes, seconds: row.seconds },
+}));
 
 const InputDeduplication = ({ processId, onClose,  showOutAlert}) => {
     const [rows, setRows] = useState([initialRow]);
@@ -42,12 +45,11 @@ const InputDeduplication = ({ processId, onClose,  showOutAlert}) => {
 
     const handleSubmit = async () => {
         try {
-            const { data: message } = await addDeduplication({ processId, name, active, rows });
-            showOutAlert({ message, type: "success" });
+            await createDedupRule(processId, { name, isActive: active, rules: toApiRules(rows) });
+            showOutAlert({ message: '중복 제거가 추가되었습니다.', type: "success" });
             onClose();
-        } catch (error) {
-            const message = error.response?.data || '에러 발생';
-            showAlert({ message, type: "danger" });
+        } catch {
+            showAlert({ message: '에러 발생', type: "danger" });
         }
     };
 

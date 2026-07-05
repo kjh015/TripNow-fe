@@ -240,9 +240,10 @@ closes #<이슈번호>
   "address": "string*",
   "category": "string*",
   "region": "string*",
-  "images": [{ "imageKey": "string", "sortOrder": integer }]
+  "images": ["imageKey (string)"]
 }
 ```
+> `images`는 `imageKey` 문자열 배열이다 (객체 아님). 정렬 순서는 배열 순서로 결정된다 (응답의 `images[].sortOrder`와는 다른 형태이니 혼동 주의).
 
 **GET `/api/v1/search/posts`** Query Parameters
 ```
@@ -286,6 +287,11 @@ keyword, category, region, sort, direction, page (integer), size (integer)
   "updatedAt": "string",
   "images": [{ "imageKey": "string", "sortOrder": integer }]
 }
+```
+
+**GET `/api/v1/posts/images/presigned-url`** Query Parameters (모두 필수)
+```
+fileName (영문/숫자/./_/- 만 허용, 확장자 포함), contentType (image/jpeg|png|gif|webp)
 ```
 
 **GET `/api/v1/posts/images/presigned-url`** Response (`result`)
@@ -543,5 +549,6 @@ src/
 - SSE (`src/sse/`, `rankingApi.js`) 기능은 `/api/v1/rankings/live` 로 변경, 실시간 연결이므로 신중하게 테스트
 - 댓글 `star` 필드: 별점 기능이 현재 UI에 없으면 백엔드 required이므로 기본값(예: 0) 처리 필요
 - 이미지 업로드: Presigned URL 발급(`GET /api/v1/posts/images/presigned-url`) → S3 업로드 → `imageKey`를 Post 요청에 포함하는 플로우
-- 좋아요 취소(DELETE `/api/v1/likes`)는 body에 `{ "postId": integer }` 를 포함
+- 좋아요 취소(DELETE `/api/v1/likes`)는 `postId`를 쿼리 파라미터로 포함 (`?postId=integer`, body 아님 — 실제 Swagger 기준 확인됨)
+- 게시글/검색 `category`, `region` 필드는 한글 라벨이 아닌 Swagger enum 값(`FESTIVAL`, `SEOUL` 등) 사용. 화면 표시용 한글 라벨 ↔ enum 변환은 `src/constants/categoryRegion.js` 참고
 - Matomo 분석 트래킹 코드(`window.dataLayer`)는 위치 변경 가능하나 제거 금지

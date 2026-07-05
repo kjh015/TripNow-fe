@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { getProcessList } from '../../../api/log/processApi';
+import { getLogProcesses } from '../../../api/log/logProcessApi';
 import InputProcess from './InputProcess';
 import EditProcess from './EditProcess';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -20,8 +20,8 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
 
     const getProcesses = async () => {
         try {
-            const { data } = await getProcessList();
-            setProcessList(data);
+            const { data } = await getLogProcesses({ size: 100 });
+            setProcessList(data.result.content);
         } catch {
             // 에러 시 목록 유지
         }
@@ -116,15 +116,15 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
                             </tr>
                         )}
                         {processList.map(process => (
-                            <React.Fragment key={process.id}>
+                            <React.Fragment key={process.logProcessId}>
                                 <tr>
-                                    <td>{process.id}</td>
+                                    <td>{process.logProcessId}</td>
                                     <td className="text-start">
                                         <span
                                             className="process-name-hover fw-bold"
                                             role="button"
                                             onClick={() => {
-                                                setPID(process.id);
+                                                setPID(process.logProcessId);
                                                 onMenuClick('format');
                                             }}
                                             title="포맷 관리로 이동"
@@ -132,24 +132,24 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
                                             {process.name}
                                         </span>
                                     </td>
-                                    <td>{process.createdTime && processDate(process.createdTime)}</td>
-                                    <td>{process.updatedTime && processDate(process.updatedTime)}</td>
+                                    <td>{process.createdAt && processDate(process.createdAt)}</td>
+                                    <td>{process.updatedAt && processDate(process.updatedAt)}</td>
                                     <td>
                                         <button
                                             className="btn btn-outline-primary btn-sm px-3"
                                             style={{ borderRadius: '0.7rem', fontWeight: 500 }}
-                                            onClick={() => setEditComp(process.id)}
+                                            onClick={() => setEditComp(process.logProcessId)}
                                         >
                                             수정
                                         </button>
                                     </td>
                                 </tr>
-                                {editComp === process.id && (
+                                {editComp === process.logProcessId && (
                                     <tr>
                                         <td colSpan={5} style={{ background: "#f6f8fa", borderBottomLeftRadius: '0.7rem', borderBottomRightRadius: '0.7rem' }}>
                                             <EditProcess
                                                 onClose={handleEditComp}
-                                                processId={process.id}
+                                                processId={process.logProcessId}
                                                 _name={process.name}
                                                 showAlert={showAlert}
                                             />

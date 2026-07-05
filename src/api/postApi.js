@@ -13,5 +13,5 @@ export const deletePost = (postId) =>
   apiClient.delete(`/api/v1/posts/${postId}`);
 
 // 이미지 업로드용 Presigned URL 발급
-export const getPresignedUrl = () =>
-  apiClient.get('/api/v1/posts/images/presigned-url');
+export const getPresignedUrl = (fileName, contentType) =>
+  apiClient.get('/api/v1/posts/images/presigned-url', { params: { fileName, contentType } });

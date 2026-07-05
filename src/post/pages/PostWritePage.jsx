@@ -5,16 +5,25 @@ import { createPost, getPresignedUrl } from '../../api/postApi';
 import { useState, useEffect } from 'react';
 import useAlert from '../../hooks/useAlert';
 import PostForm from '../components/PostForm';
+import { CATEGORY_LABEL_TO_CODE, REGION_LABEL_TO_CODE } from '../../constants/categoryRegion';
 
-const uploadImageToS3 = async (file, sortOrder) => {
-    const { data } = await getPresignedUrl();
+const buildSafeFileName = (originalName) => {
+    const ext = originalName.includes('.') ? originalName.split('.').pop().toLowerCase() : 'jpg';
+    return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${ext}`;
+};
+
+const uploadImageToS3 = async (file) => {
+    const { data } = await getPresignedUrl(buildSafeFileName(file.name), file.type);
     const { url, imageKey } = data.result;
-    await fetch(url, {
+    const res = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': file.type },
         body: file,
     });
-    return { imageKey, sortOrder };
+    if (!res.ok) {
+        throw new Error(`이미지 업로드 실패 (status: ${res.status})`);
+    }
+    return imageKey;
 };
 
 const PostWritePage = () => {
@@ -73,10 +82,13 @@ const PostWritePage = () => {
         }
         setUploading(true);
         try {
-            const uploadedImages = await Promise.all(
-                images.map((file, idx) => uploadImageToS3(file, idx))
-            );
-            await createPost({ ...post, images: uploadedImages });
+            const uploadedImageKeys = await Promise.all(images.map(uploadImageToS3));
+            await createPost({
+                ...post,
+                category: CATEGORY_LABEL_TO_CODE[post.category] ?? post.category,
+                region: REGION_LABEL_TO_CODE[post.region] ?? post.region,
+                images: uploadedImageKeys,
+            });
             showAlert("글 작성이 완료되었습니다.", "success");
             setTimeout(() => navigate('/post/list'), 500);
         } catch {

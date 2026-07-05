@@ -26,6 +26,7 @@ import 체험 from '../../imgs/카테고리별/체험.jpg'
 
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CATEGORY_CODE_TO_LABEL, REGION_CODE_TO_LABEL } from '../../../../constants/categoryRegion';
 
 const images = {
   "서울": 서울,
@@ -72,6 +73,11 @@ const firstRankBadgeStyle = {
 const RankCard = ({ data, type, rank }) => {
     const navigate = useNavigate();
 
+    // data는 Swagger enum 코드(SEOUL, FESTIVAL 등) — 이미지/표시는 한글 라벨 사용
+    const label = type === "region"
+        ? (REGION_CODE_TO_LABEL[data] || data)
+        : (CATEGORY_CODE_TO_LABEL[data] || data);
+
     return (
         <div
             className="w-100 h-100 d-flex align-items-stretch position-relative"
@@ -103,7 +109,7 @@ const RankCard = ({ data, type, rank }) => {
                 <div style={{ position: "relative", width: "100%" }}>
                     {data ? (
                         <img
-                            src={images[data]}
+                            src={images[label]}
                             alt="Main visual"
                             className="card-img-top"
                             style={{
@@ -133,7 +139,7 @@ const RankCard = ({ data, type, rank }) => {
                         alignItems: "center",
                         gap: "0.6rem"
                     }}>
-                        <span style={{ color: "#e0c3fc", fontWeight: 700 }}>{data}</span>
+                        <span style={{ color: "#e0c3fc", fontWeight: 700 }}>{label}</span>
 
                     </div>
                 </div>

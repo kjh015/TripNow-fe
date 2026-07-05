@@ -37,7 +37,7 @@ const PostListPage = () => {
 
   useEffect(() => {
     setSearched(true);
-    getBoardList();
+    getPostList();
   }, [location.search]);
 
   const goToWrite = () => {
@@ -50,7 +50,7 @@ const PostListPage = () => {
 
   const [retryCount, setRetryCount] = useState(0);
 
-  const getBoardList = async () => {
+  const getPostList = async () => {
     setLoading(true);
     setError(null);
     try {
@@ -77,13 +77,13 @@ const PostListPage = () => {
 
   useEffect(() => {
     if (retryCount > 0 && retryCount <= 2) {
-      getBoardList();
+      getPostList();
     }
   }, [retryCount]);
 
   const handleRetry = () => {
     setRetryCount(0);
-    getBoardList();
+    getPostList();
   };
 
   const handleSort = ({ sort, direction }) => {
