@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import ProcessApiClient from '../../service/ProcessApiClient';
+import { getProcessList } from '../../../api/log/processApi';
 import InputProcess from './InputProcess';
 import EditProcess from './EditProcess';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -18,10 +18,13 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
         if (duration > 0) setTimeout(() => setAlert(null), duration);
     }, []);
 
-    const getProcesses = () => {
-        ProcessApiClient.getProcessList().then(res => {
-            if (res.ok) res.json().then(data => setProcessList(data));
-        });
+    const getProcesses = async () => {
+        try {
+            const { data } = await getProcessList();
+            setProcessList(data);
+        } catch {
+            // 에러 시 목록 유지
+        }
     };
 
     useEffect(() => {

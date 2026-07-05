@@ -1,7 +1,6 @@
 import React from 'react';
 import RankCard from './MainPageCard/RankCard';
-import { FaMapMarkedAlt } from 'react-icons/fa';
-// import MainPageCard2 from './MainPageCard/MainPageCard2'; // 필요시 사용
+import LoadingSpinner from '../../../components/LoadingSpinner';
 
 const cardWidth = 240;
 const cardHeight = 200;
@@ -9,31 +8,7 @@ const cardHeight = 200;
 const MainPageCardsLayout2 = ({ top5Data }) => {
     // 데이터 없거나 5개 미만이면 로딩 애니메이션
     if (!top5Data || top5Data.length < 5) {
-        return (
-            <div className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: `${cardHeight + 80}px` }}>
-                {/* 아이콘 + 스피너 */}
-                <div className="mb-3" style={{ position: "relative", width: 100, height: 100 }}>
-                    <FaMapMarkedAlt size={70} color="#6cb4f8" style={{ filter: "drop-shadow(0 4px 12px #aee7ff77)" }} />
-                    <div
-                        className="spinner-border"
-                        style={{
-                            position: "absolute",
-                            top: -10,
-                            left: -15,
-                            width: 100,
-                            height: 100,
-                            borderWidth: "6px",
-                            opacity: 0.5,
-                            color: "#6cb4f8"
-                        }}
-                        role="status"
-                    />
-                </div>
-                <div className="mt-2 fs-5 text-secondary">
-                    순위 데이터를 불러오는 중...
-                </div>
-            </div>
-        );
+        return <LoadingSpinner text="순위 데이터를 불러오는 중..." minHeight={cardHeight + 80} />;
     }
 
     // 데이터 있을 때 카드 렌더링

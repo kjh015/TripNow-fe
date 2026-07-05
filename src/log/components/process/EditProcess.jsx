@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ProcessApiClient from '../../service/ProcessApiClient';
+import { updateProcess as updateProcessApi, removeProcess as removeProcessApi } from '../../../api/log/processApi';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -7,30 +7,24 @@ const EditProcess = ({ onClose, processId, _name, showAlert }) => {
     const [name, setName] = useState(_name);
     // ✅ 추가
 
-    const updateProcess = () => {
-        ProcessApiClient.updateProcess(processId, name).then(
-            res => {
-                if (res.ok) {
-                    showAlert("success", "수정 성공!");
-                    onClose();
-                } else {
-                    showAlert("danger", "프로세스 수정 실패!");
-                }
-            }
-        );
+    const updateProcess = async () => {
+        try {
+            await updateProcessApi(processId, name);
+            showAlert("success", "수정 성공!");
+            onClose();
+        } catch {
+            showAlert("danger", "프로세스 수정 실패!");
+        }
     };
 
-
-
-    const removeProcess = () => {
-        ProcessApiClient.removeProcess(processId).then(res => {
-            if (res.ok) {
-                showAlert("danger", "삭제 성공!");
-                onClose();
-            } else {
-                showAlert("danger", "삭제 실패!");
-            }
-        });
+    const removeProcess = async () => {
+        try {
+            await removeProcessApi(processId);
+            showAlert("danger", "삭제 성공!");
+            onClose();
+        } catch {
+            showAlert("danger", "삭제 실패!");
+        }
     };
 
     return (

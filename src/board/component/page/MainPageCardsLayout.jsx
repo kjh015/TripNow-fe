@@ -2,7 +2,7 @@ import React from 'react';
 import MainPageCard from './MainPageCard/MainPageCard';
 import MainPageCard2 from './MainPageCard/MainPageCard2';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FaMapMarkedAlt } from "react-icons/fa";
+import LoadingSpinner from '../../../components/LoadingSpinner';
 
 
 
@@ -16,31 +16,7 @@ const mainCardHeight = 520;
 const MainPageCardsLayout = ({ top5Board }) => {
     // 데이터가 5개 미만이면 로딩 화면
     if (!top5Board || top5Board.length < 5) {
-        return (
-            <div className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: `${mainCardHeight}px` }}>
-                {/* 아이콘 + 스피너 */}
-                <div className="mb-3" style={{ position: "relative", width: 100, height: 100 }}>
-                    <FaMapMarkedAlt size={70} color="#6cb4f8" style={{ filter: "drop-shadow(0 4px 12px #aee7ff77)" }} />
-                    <div
-                        className="spinner-border"
-                        style={{
-                            position: "absolute",
-                            top: -10,
-                            left: -15,
-                            width: 100,
-                            height: 100,
-                            borderWidth: "6px",
-                            opacity: 0.5,
-                            color: "#6cb4f8"
-                        }}
-                        role="status"
-                    />
-                </div>
-                <div className="mt-2 fs-5 text-secondary">
-                    여행지 인기순위를 불러오는 중...
-                </div>
-            </div>
-        );
+        return <LoadingSpinner text="여행지 인기순위를 불러오는 중..." minHeight={mainCardHeight} />;
     }
 
     // 데이터 있을 때 카드 레이아웃 렌더링

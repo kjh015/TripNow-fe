@@ -1,4 +1,4 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
+﻿import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 서울 from '../../imgs/지역별/서울.jpg'
 import 부산 from '../../imgs/지역별/부산.jpg'
@@ -24,7 +24,6 @@ import 체험 from '../../imgs/카테고리별/체험.jpg'
 
 
 
-import BoardApiClient from '../../../service/BoardApiClient';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -98,7 +97,7 @@ const RankCard = ({ data, type, rank }) => {
                     cursor: "pointer",
                     zIndex: 1, // 왕관보다 낮음 (중요)
                 }}
-                onClick={() => navigate(`/board/list/?${type}=${data}`)}
+                onClick={() => navigate(`/post/list/?${type}=${data}`)}
             >
                 {/* 이미지 */}
                 <div style={{ position: "relative", width: "100%" }}>

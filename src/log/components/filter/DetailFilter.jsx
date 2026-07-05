@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import FilterApiClient from '../../service/FilterApiClient';
+import { viewFilter as viewFilterApi, getFormatKeys, removeFilter as removeFilterApi, updateFilter } from '../../../api/log/filterApi';
 
 const operatorOptions = ['>', '<', '>=', '<=', '==', '!=', 'Equals'];
 
@@ -14,41 +14,35 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
         setAlert({ type, message });
     }, []);
 
-    const viewFilter = () => {
-        FilterApiClient.viewFilter(filterId).then(
-            res => {
-                if (res.ok) {
-                    res.json().then(data => {
-                        setTokens(JSON.parse(data.tokensJson));
-                        setName(data.name);
-                        setActive(data.active);
-                    })
-                }
-                else {
-                    showAlert({ message: '필터 정보를 불러오지 못했습니다.', type: 'danger' });
-                }
-            }
-        )
-    }
-
-    const getFieldList = () => {
-        FilterApiClient.getFormatKeys(processId)
-            .then(res => res.json())
-            .then(data => setFieldList(data));
-    }
-
-    const removeFilter = () => {
-        FilterApiClient.removeFilter(filterId).then(res => {
-            if (res.ok) {
-                showOutAlert({ message: '필터가 삭제되었습니다.', type: 'danger' });
-                onClose();
-            }
-            else {
-                showAlert({ message: '필터 삭제에 실패했습니다.', type: 'danger' });
-            }
+    const viewFilter = async () => {
+        try {
+            const { data } = await viewFilterApi(filterId);
+            setTokens(JSON.parse(data.tokensJson));
+            setName(data.name);
+            setActive(data.active);
+        } catch {
+            showAlert({ message: '필터 정보를 불러오지 못했습니다.', type: 'danger' });
         }
-        )
-    }
+    };
+
+    const getFieldList = async () => {
+        try {
+            const { data } = await getFormatKeys(processId);
+            setFieldList(data);
+        } catch {
+            // 에러 시 목록 유지
+        }
+    };
+
+    const removeFilter = async () => {
+        try {
+            await removeFilterApi(filterId);
+            showOutAlert({ message: '필터가 삭제되었습니다.', type: 'danger' });
+            onClose();
+        } catch {
+            showAlert({ message: '필터 삭제에 실패했습니다.', type: 'danger' });
+        }
+    };
 
     useEffect(() => {
         viewFilter();
@@ -168,18 +162,13 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
         const expr = buildExpression();
         console.log('전송 문자열:', expr);
 
-        FilterApiClient.updateFilter(filterId, name, active, expr, tokensWithType)
-            .then(res => {
-                if (res.ok) {
-                    showOutAlert({ message: '저장되었습니다.', type: 'success' });
-                    onClose();
-                } else {
-                    showAlert({ message: '실패', type: 'danger' });
-                }
-            })
-            .catch(err => {
-                showAlert({ message: '에러가 발생했습니다.', type: 'danger' });
-            });
+        try {
+            await updateFilter(filterId, name, active, expr, tokensWithType);
+            showOutAlert({ message: '저장되었습니다.', type: 'success' });
+            onClose();
+        } catch {
+            showAlert({ message: '에러가 발생했습니다.', type: 'danger' });
+        }
     };
 
     return (
