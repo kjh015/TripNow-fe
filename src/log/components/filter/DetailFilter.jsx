@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { viewFilter as viewFilterApi, getFormatKeys, removeFilter as removeFilterApi, updateFilter } from '../../../api/log/filterApi';
+import { getFilterRule, updateFilterRule, deleteFilterRule } from '../../../api/log/filterApi';
+import { getActiveFormatRuleFields } from '../../../api/log/formatApi';
+import { toApiConditions } from './ConditionBuilder';
 
 const operatorOptions = ['>', '<', '>=', '<=', '==', '!=', 'Equals'];
 
@@ -16,10 +18,11 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
 
     const viewFilter = async () => {
         try {
-            const { data } = await viewFilterApi(filterId);
-            setTokens(JSON.parse(data.tokensJson));
-            setName(data.name);
-            setActive(data.active);
+            const { data } = await getFilterRule(filterId);
+            const result = data.result;
+            setTokens(result.conditions);
+            setName(result.name);
+            setActive(result.isActive);
         } catch {
             showAlert({ message: '필터 정보를 불러오지 못했습니다.', type: 'danger' });
         }
@@ -27,8 +30,8 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
 
     const getFieldList = async () => {
         try {
-            const { data } = await getFormatKeys(processId);
-            setFieldList(data);
+            const { data } = await getActiveFormatRuleFields(processId);
+            setFieldList(data.result.fields);
         } catch {
             // 에러 시 목록 유지
         }
@@ -36,7 +39,7 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
 
     const removeFilter = async () => {
         try {
-            await removeFilterApi(filterId);
+            await deleteFilterRule(filterId);
             showOutAlert({ message: '필터가 삭제되었습니다.', type: 'danger' });
             onClose();
         } catch {
@@ -149,21 +152,10 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
             showAlert({ message: '❌ 조건에 빈 값이 있습니다. 모든 필드, 연산자, 값을 입력해주세요.', type: 'danger' });
             return;
         }
-        const tokensWithType = tokens.map(token => {
-            if (token.type === 'condition') {
-                return {
-                    ...token,
-                    valueType: inferValueType(token.value, token.operator)
-                };
-            }
-            return token;
-        });
-
-        const expr = buildExpression();
-        console.log('전송 문자열:', expr);
+        const conditions = toApiConditions(tokens);
 
         try {
-            await updateFilter(filterId, name, active, expr, tokensWithType);
+            await updateFilterRule(filterId, { name, conditions, isActive: active });
             showOutAlert({ message: '저장되었습니다.', type: 'success' });
             onClose();
         } catch {
@@ -380,22 +372,6 @@ function getGroups(tokens) {
     });
     if (current.length) groups.push(current);
     return groups;
-}
-
-function inferValueType(value, operator) {
-    if (operator === 'Equals') {
-        return 'String';
-    }
-    if (value === 'true' || value === 'false') {
-        return 'boolean';
-    }
-    if (/^-?\d+$/.test(value)) {
-        return 'int';
-    }
-    if (/^-?\d*\.\d+$/.test(value)) {
-        return 'double';
-    }
-    return 'String';
 }
 
 export default DetailFilter;

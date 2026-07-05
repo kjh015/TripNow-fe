@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { addFormat } from '../../../api/log/formatApi';
+import { createFormatRule } from '../../../api/log/formatApi';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -34,11 +34,11 @@ const InputFormat = ({ onClose, processId, showAlert }) => {
             return obj;
         };
 
-        const formatJson = JSON.stringify(toObject(formatEntry));
-        const defaultJson = JSON.stringify(toObject(defaultEntry));
+        const fieldMappings = toObject(formatEntry);
+        const defaultValues = toObject(defaultEntry);
 
         try {
-            await addFormat(processId, name, active, formatJson, defaultJson);
+            await createFormatRule(processId, { name, isActive: active, defaultValues, fieldMappings });
             showAlert("success", "포맷 추가 성공!");
             onClose();
         } catch {

@@ -1,9 +1,9 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { useEffect, useState } from "react";
-import BoardSearch from "./BoardSearch";
+import PostSearch from "../../../post/components/PostSearch";
 import tgd3 from '../imgs/tgd3.jpg';
-
+import { subscribeRankings } from "../../../api/rankingApi";
 
 import MainPageCardsLayout from "./MainPageCardsLayout";
 import MainPageCardsLayout2 from "./MainPageCardsLayout2";
@@ -11,7 +11,7 @@ import Footers from "../../../common/Footers";
 
 
 const MainPage = () => {
-  const [top5Board, setTop5Board] = useState([]);
+  const [top5Posts, setTop5Posts] = useState([]);
   const [top5Region, setTop5Region] = useState([]);
   const [top5Category, setTop5Category] = useState([]);
 
@@ -23,13 +23,19 @@ const MainPage = () => {
       referrer: document.referrer
     });
 
-    const evt = new EventSource(`${process.env.REACT_APP_API_BASE_URL}/realtime-popular/sse`);
-    evt.onmessage = (e) => {
-
-      const data = JSON.parse(e.data);
-      setTop5Board(data.top5Boards);       // 게시글 인기 Top5
-      setTop5Region(data.top5Regions);
-      setTop5Category(data.top5Categories); // 카테고리 인기 Top5
+    const evt = subscribeRankings();
+    evt.addEventListener("ranking-update", (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        setTop5Posts(data.posts || []);
+        setTop5Region(data.regions || []);
+        setTop5Category(data.categories || []);
+      } catch (err) {
+        console.error("랭킹 데이터 파싱 실패:", err);
+      }
+    });
+    evt.onerror = (err) => {
+      console.error("SSE 연결 오류:", err);
     };
 
     return () => {
@@ -154,7 +160,7 @@ const MainPage = () => {
         }}
       >
         <div >
-          <BoardSearch />
+          <PostSearch />
           <div style={{ marginBottom: "32px", marginTop: "5rem" }}>
             <h2 style={{
               textAlign: "start",
@@ -171,7 +177,7 @@ const MainPage = () => {
               실시간 인기 여행지
             </h2>
 
-            <MainPageCardsLayout top5Board={top5Board} />
+            <MainPageCardsLayout top5Posts={top5Posts} />
           </div>
         </div>
       </div>

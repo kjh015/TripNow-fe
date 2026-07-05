@@ -2,7 +2,7 @@ import React from 'react';
 
 const LogTable = ({
     title, data, expandedRowId, setExpandedRowId,
-    sortConfig, setSortConfig, columns, nestedFields, color
+    sortConfig, setSortConfig, columns, color, details
 }) => {
     const handleSort = (key) => {
         const newConfig = sortConfig.key === key
@@ -15,8 +15,8 @@ const LogTable = ({
         const { key, direction } = sortConfig;
         if (!key) return data;
         return [...data].sort((a, b) => {
-            let aValue = nestedFields[key] ? nestedFields[key](a) : a[key];
-            let bValue = nestedFields[key] ? nestedFields[key](b) : b[key];
+            let aValue = a[key];
+            let bValue = b[key];
             if (aValue < bValue) return direction === 'asc' ? -1 : 1;
             if (aValue > bValue) return direction === 'asc' ? 1 : -1;
             return 0;
@@ -63,23 +63,21 @@ const LogTable = ({
                             <tr><td colSpan={columns.length} className="text-muted">데이터가 없습니다.</td></tr>
                         ) : (
                             sortedList.flatMap(row => [
-                                <tr key={row.id} style={{ cursor: 'pointer' }} onClick={() => setExpandedRowId(expandedRowId === row.id ? null : row.id)}>
+                                <tr key={row.historyId} style={{ cursor: 'pointer' }} onClick={() => setExpandedRowId(expandedRowId === row.historyId ? null : row.historyId)}>
                                     {columns.map(col => (
                                         <td key={col.key}>
                                             {col.render ? col.render(row) : (
-                                                col.key === 'createdTime' || col.key === 'updatedTime'
+                                                col.key === 'createdAt'
                                                     ? formatDate(row[col.key])
-                                                    : nestedFields[col.key]
-                                                        ? nestedFields[col.key](row)
-                                                        : row[col.key]
+                                                    : row[col.key]
                                             )}
                                         </td>
                                     ))}
                                 </tr>,
-                                expandedRowId === row.id && (
-                                    <tr key={`${row.id}-expanded`}>
+                                expandedRowId === row.historyId && (
+                                    <tr key={`${row.historyId}-expanded`}>
                                         <td colSpan={columns.length} className="text-start bg-light">
-                                            <strong>Item:</strong>
+                                            <strong>Log Data:</strong>
                                             <pre
                                                 className="mb-0 mt-2"
                                                 style={{
@@ -88,7 +86,7 @@ const LogTable = ({
                                                     overflowX: 'hidden'
                                                 }}
                                             >
-                                                {JSON.stringify(JSON.parse(row.logJson), null, 2)}
+                                                {details?.[row.historyId] ? JSON.stringify(details[row.historyId], null, 2) : '불러오는 중...'}
                                             </pre>
                                         </td>
                                     </tr>

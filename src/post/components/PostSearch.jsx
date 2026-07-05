@@ -32,7 +32,7 @@ const PostSearch = ({ selectedCategory, selectedRegion }) => {
             abortRef.current = controller;
             try {
                 const { data } = await autoCompleteSearch(keyword, controller.signal);
-                setSuggestions(data);
+                setSuggestions(data.result?.titles || []);
                 setShowList(true);
                 setHighlightIdx(-1);
             } catch (e) {

@@ -46,14 +46,14 @@ const CommentPage = ({ no, isLoggedIn, ratingAvg, setCommentFlag, category, regi
                 setModal(prev => ({ ...prev, show: false }));
                 try {
                     await commentApi.deleteComment(commentId);
+                    setCommentList(prev => prev.filter((c) => c.commentId !== commentId));
                     const message = "댓글이 삭제되었습니다.";
                     setAlert({ show: true, message, type: "success" });
                     window.dataLayer = window.dataLayer || [];
                     window.dataLayer.push({ event: "travel_comment_remove", boardId: no, category, region, title });
-                    getCommentList();
                     setCommentFlag?.(prev => !prev);
                 } catch (err) {
-                    const message = err.response?.data || "오류가 발생했습니다.";
+                    const message = err.response?.data?.message || "오류가 발생했습니다.";
                     setAlert({ show: true, message, type: "danger" });
                 }
             }
@@ -65,12 +65,21 @@ const CommentPage = ({ no, isLoggedIn, ratingAvg, setCommentFlag, category, regi
         window.dataLayer.push({ event: "travel_comment_add", boardId: no, category, region, title });
         const payload = { postId: parseInt(no), content: comment, star: rating };
         try {
-            const { data: message } = await commentApi.addComment(payload);
-            setAlert({ show: true, message, type: "success" });
-            getCommentList();
+            const { data } = await commentApi.addComment(payload);
+            // 댓글 조회는 검색엔진 색인을 거치므로 작성 직후 재조회 시 반영이 늦을 수 있어,
+            // 응답으로 받은 commentId로 화면에 즉시 반영한다.
+            const newComment = {
+                commentId: data.result.commentId,
+                postId: payload.postId,
+                memberNickname: localStorage.getItem("nickname") || "",
+                content: payload.content,
+                star: payload.star,
+            };
+            setCommentList(prev => [newComment, ...prev]);
+            setAlert({ show: true, message: "댓글이 등록되었습니다.", type: "success" });
             setCommentFlag?.(prev => !prev);
         } catch (err) {
-            const message = err.response?.data || "오류가 발생했습니다.";
+            const message = err.response?.data?.message || "오류가 발생했습니다.";
             setAlert({ show: true, message, type: "danger" });
         }
     };

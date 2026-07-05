@@ -14,7 +14,6 @@ import MemberManagement from '../sign/component/MemberManagement';
 
 
 import AdmnBoard from '../board/component/page/AdmnBoard';
-import Dashboard from '../log/components/monitoring/Dashboard';
 import { useNavigate } from 'react-router-dom';
 import UserAuthentication from '../sign/service/UserAuthentication';
 import { toast } from 'react-toastify';
@@ -43,9 +42,6 @@ const AdmnPage = () => {
         return <DeduplicationManagement processId={processId} onMenuClick={setActiveMenu} />
       case 'monitoring':
         return <Kibana/>
-      case 'dashboard':
-        return <Dashboard/>;
-
 
       default:
         return <div>선택된 메뉴가 없습니다.</div>;

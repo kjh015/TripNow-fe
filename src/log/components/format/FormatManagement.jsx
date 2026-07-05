@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getFormatList } from '../../../api/log/formatApi';
+import { getFormatRules } from '../../../api/log/formatApi';
 import InputFormat from './InputFormat';
 import DetailFormat from './DetailFormat';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -19,8 +19,8 @@ const FormatManagement = ({ processId, onMenuClick }) => {
 
     const getFormats = useCallback(async () => {
         try {
-            const { data } = await getFormatList(processId);
-            setFormatList(data);
+            const { data } = await getFormatRules(processId, { size: 100 });
+            setFormatList(data.result.content);
         } catch {
             // 에러 시 목록 유지
         }
@@ -95,32 +95,32 @@ const FormatManagement = ({ processId, onMenuClick }) => {
                             </tr>
                         }
                         {formatList.map(format => (
-                            <React.Fragment key={format.id}>
+                            <React.Fragment key={format.formatRuleId}>
                                 <tr>
-                                    <td>{format.id}</td>
+                                    <td>{format.formatRuleId}</td>
                                     <td className="text-start">
                                         <span
                                             className="format-name-hover fw-bold"
                                             role="button"
-                                            onClick={() => setDetailComp(detailComp === format.id ? 0 : format.id)}
+                                            onClick={() => setDetailComp(detailComp === format.formatRuleId ? 0 : format.formatRuleId)}
                                         >
                                             {format.name}
                                         </span>
                                     </td>
-                                    <td>{format.createdTime && formatDate(format.createdTime)}</td>
-                                    <td>{format.updatedTime && formatDate(format.updatedTime)}</td>
+                                    <td>{format.createdAt && formatDate(format.createdAt)}</td>
+                                    <td>{format.updatedAt && formatDate(format.updatedAt)}</td>
                                     <td>
-                                        <button className={`btn btn-sm ${format.active ? 'btn-primary' : 'btn-outline-primary'} me-2`}>
-                                            {format.active ? 'ON' : 'OFF'}
+                                        <button className={`btn btn-sm ${format.isActive ? 'btn-primary' : 'btn-outline-primary'} me-2`}>
+                                            {format.isActive ? 'ON' : 'OFF'}
                                         </button>
                                     </td>
                                 </tr>
-                                {detailComp === format.id && (
+                                {detailComp === format.formatRuleId && (
                                     <tr>
                                         <td colSpan="5" className="text-center bg-light">
                                             <DetailFormat
                                                 onClose={() => setDetailComp(0)}
-                                                formatId={format.id}
+                                                formatId={format.formatRuleId}
                                                 showAlert={showAlert}
                                             />
                                         </td>

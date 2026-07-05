@@ -1,8 +1,11 @@
 import { Tooltip, Card, Badge, OverlayTrigger, Carousel } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { categoryColors, regionColors } from "../../constants/colorMaps";
+import { CATEGORY_CODE_TO_LABEL, REGION_CODE_TO_LABEL } from "../../constants/categoryRegion";
 
 const PostContent = ({ post, liked, onLike, nickname }) => {
+    const categoryLabel = CATEGORY_CODE_TO_LABEL[post.category] ?? post.category;
+    const regionLabel = REGION_CODE_TO_LABEL[post.region] ?? post.region;
     return (
         <Card
             className="shadow-sm flex-fill"
@@ -28,8 +31,8 @@ const PostContent = ({ post, liked, onLike, nickname }) => {
                 )}
                 <div className="d-flex justify-content-between align-items-start mb-1">
                     <h4 className="fw-bold mb-1">{post.title}</h4>
-                    <Badge bg={categoryColors[post.category] || "secondary"} style={{ fontSize: "1rem" }}>
-                        {post.category}
+                    <Badge bg={categoryColors[categoryLabel] || "secondary"} style={{ fontSize: "1rem" }}>
+                        {categoryLabel}
                     </Badge>
                 </div>
                 <div className="mb-2 text-muted small">
@@ -43,7 +46,7 @@ const PostContent = ({ post, liked, onLike, nickname }) => {
                 <div className="mb-2 d-flex align-items-center justify-content-between">
                     <div>
                         <span className="fw-semibold"><i className="bi bi-map-fill"></i> 지역:</span>
-                        <Badge bg={regionColors[post.region] || "secondary"} className="ms-1">{post.region}</Badge>
+                        <Badge bg={regionColors[regionLabel] || "secondary"} className="ms-1">{regionLabel}</Badge>
                     </div>
                     {nickname === post.memberNickname && (
                         <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-edit">수정하기</Tooltip>}>

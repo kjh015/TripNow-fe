@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { addProcess as addProcessApi } from '../../../api/log/processApi';
+import { createLogProcess } from '../../../api/log/logProcessApi';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -8,7 +8,7 @@ const InputProcess = ({ onClose, showAlert }) => {
 
     const addProcess = async () => {
         try {
-            await addProcessApi(name);
+            await createLogProcess({ name });
             showAlert("success", "프로세스가 추가되었습니다!");
             onClose();
         } catch {

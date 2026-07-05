@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { viewFormat as viewFormatApi, updateFormat as updateFormatApi, removeFormat as removeFormatApi } from '../../../api/log/formatApi';
+import { getFormatRule, updateFormatRule, deleteFormatRule } from '../../../api/log/formatApi';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -28,11 +28,12 @@ const
         // 포맷 상세 가져오기
         const viewFormat = async () => {
             try {
-                const { data } = await viewFormatApi(formatId);
-                setFormatEntry(Object.entries(JSON.parse(data.formatJson)).map(([key, value]) => ({ key, value })));
-                setDefaultEntry(Object.entries(JSON.parse(data.defaultJson)).map(([key, value]) => ({ key, value })));
-                setName(data.name);
-                setActive(data.active);
+                const { data } = await getFormatRule(formatId);
+                const result = data.result;
+                setFormatEntry(Object.entries(result.fieldMappings || {}).map(([key, value]) => ({ key, value })));
+                setDefaultEntry(Object.entries(result.defaultValues || {}).map(([key, value]) => ({ key, value })));
+                setName(result.name);
+                setActive(result.isActive);
             } catch {
                 showAlert("danger", "포맷 정보를 불러오지 못했습니다.");
             }
@@ -41,7 +42,7 @@ const
         // 삭제
         const removeFormat = async () => {
             try {
-                await removeFormatApi(formatId);
+                await deleteFormatRule(formatId);
                 showAlert("danger", "포맷 삭제 성공!");
                 onClose();
             } catch {
@@ -60,11 +61,11 @@ const
                 return obj;
             };
 
-            const formatJson = JSON.stringify(toObject(formatEntry));
-            const defaultJson = JSON.stringify(toObject(defaultEntry));
+            const fieldMappings = toObject(formatEntry);
+            const defaultValues = toObject(defaultEntry);
 
             try {
-                await updateFormatApi(formatId, name, active, formatJson, defaultJson);
+                await updateFormatRule(formatId, { name, isActive: active, defaultValues, fieldMappings });
                 showAlert("success", "포맷 수정 성공!");
                 onClose();
             } catch {

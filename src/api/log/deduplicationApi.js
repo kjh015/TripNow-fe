@@ -1,19 +1,21 @@
 import apiClient from '../client';
 
-export const getDeduplicationList = (processId) =>
-  apiClient.get('/api/deduplication/admin/list', { params: { processId } });
+// 중복제거 규칙 목록 조회
+export const getDedupRules = (logProcessId, { page, size, sort } = {}) =>
+  apiClient.get(`/api/v1/admin/log-processes/${logProcessId}/dedup-rules`, { params: { page, size, sort } });
 
-export const viewDeduplication = (deduplicationId) =>
-  apiClient.get('/api/deduplication/admin/view', { params: { deduplicationId } });
+// 중복제거 규칙 생성
+export const createDedupRule = (logProcessId, { name, rules, isActive }) =>
+  apiClient.post(`/api/v1/admin/log-processes/${logProcessId}/dedup-rules`, { name, rules, isActive });
 
-export const addDeduplication = ({ processId, name, active, rows }) =>
-  apiClient.post('/api/deduplication/admin/add', { processId, name, active, rows });
+// 중복제거 규칙 상세 조회
+export const getDedupRule = (dedupRuleId) =>
+  apiClient.get(`/api/v1/admin/dedup-rules/${dedupRuleId}`);
 
-export const updateDeduplication = ({ id, name, active, rows }) =>
-  apiClient.post('/api/deduplication/admin/update', { id, name, active, rows });
+// 중복제거 규칙 수정
+export const updateDedupRule = (dedupRuleId, { name, rules, isActive }) =>
+  apiClient.patch(`/api/v1/admin/dedup-rules/${dedupRuleId}`, { name, rules, isActive });
 
-export const removeDeduplication = (deduplicationId) =>
-  apiClient.post('/api/deduplication/admin/remove', null, { params: { deduplicationId } });
-
-export const getFormatKeys = (processId) =>
-  apiClient.get('/api/deduplication/admin/keys', { params: { processId } });
+// 중복제거 규칙 삭제
+export const deleteDedupRule = (dedupRuleId) =>
+  apiClient.delete(`/api/v1/admin/dedup-rules/${dedupRuleId}`);

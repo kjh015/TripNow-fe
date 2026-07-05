@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getFormatKeys } from '../../../api/log/deduplicationApi';
+import { getActiveFormatRuleFields } from '../../../api/log/formatApi';
 
 // DeduplicationRow는 "포맷-데이터 쌍을 여러 개 입력"할 수 있도록 바뀜
 const DeduplicationRow = ({ processId, index, data, onChange, onRemove }) => {
@@ -8,8 +8,8 @@ const DeduplicationRow = ({ processId, index, data, onChange, onRemove }) => {
     useEffect(() => {
         const load = async () => {
             try {
-                const { data } = await getFormatKeys(processId);
-                setFormatList(data);
+                const { data } = await getActiveFormatRuleFields(processId);
+                setFormatList(data.result.fields);
             } catch {
                 // 에러 시 빈 목록 유지
             }
@@ -17,8 +17,8 @@ const DeduplicationRow = ({ processId, index, data, onChange, onRemove }) => {
         load();
     }, [processId]);
 
-    // 조건(포맷-데이터) 한 줄의 기본값
-    const initialCondition = { format: '', value: '' };
+    // 조건(필드-데이터) 한 줄의 기본값
+    const initialCondition = { field: '', value: '', matchType: 'Exact' };
 
     // 조건 배열 조작 함수들
     const handleConditionChange = (condIdx, field, value) => {
@@ -55,16 +55,16 @@ const DeduplicationRow = ({ processId, index, data, onChange, onRemove }) => {
             style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.03)', position: 'relative' }}
         >
             <div className="row align-items-center mb-3">
-                <label className="form-label d-flex mb-1 fw-bold justify-content-center">포맷/데이터 조건</label>
+                <label className="form-label d-flex mb-1 fw-bold justify-content-center">필드/데이터 조건</label>
                 <div className="col-12">
                     {data.conditions.map((cond, condIdx) => (
                         <div className="d-flex gap-2 mb-2 align-items-center justify-content-center" key={condIdx}>
                             <select
-                                name="format"
+                                name="field"
                                 className="form-select"
                                 style={{ maxWidth: 200 }}
-                                value={cond.format}
-                                onChange={e => handleConditionChange(condIdx, "format", e.target.value)}
+                                value={cond.field}
+                                onChange={e => handleConditionChange(condIdx, "field", e.target.value)}
                             >
                                 <option value="">선택</option>
                                 {formatList.map(f => (
@@ -80,6 +80,16 @@ const DeduplicationRow = ({ processId, index, data, onChange, onRemove }) => {
                                 value={cond.value}
                                 onChange={e => handleConditionChange(condIdx, "value", e.target.value)}
                             />
+                            <select
+                                name="matchType"
+                                className="form-select"
+                                style={{ maxWidth: 120 }}
+                                value={cond.matchType}
+                                onChange={e => handleConditionChange(condIdx, "matchType", e.target.value)}
+                            >
+                                <option value="Exact">Exact</option>
+                                <option value="Any">Any</option>
+                            </select>
                             <button
                                 className="btn btn-outline-danger btn-sm"
                                 type="button"
@@ -93,36 +103,25 @@ const DeduplicationRow = ({ processId, index, data, onChange, onRemove }) => {
                     </button>
                 </div>
             </div>
-            {/* 
-             제거 시간 (2줄 3칸씩) */}
+            {/* 제거 시간 */}
             <label className="form-label d-flex mb-1 fw-bold justify-content-center">중복 제거 시간</label>
             <div className="mb-2 text-center">
                 <div className="p-3 border rounded bg-light d-inline-block">
-                    <div className="d-flex flex-row mb-2 justify-content-center gap-3">
-                        <div className="d-flex align-items-center gap-1">
-                            <input name="year" type="number" min="0" className="form-control" style={inputBoxStyle} value={data.year} onChange={handleTimeChange} />
-                            <span style={labelStyle}>년</span>
-                        </div>
-                        <div className="d-flex align-items-center gap-1">
-                            <input name="month" type="number" min="0" className="form-control" style={inputBoxStyle} value={data.month} onChange={handleTimeChange} />
-                            <span style={labelStyle}>월</span>
-                        </div>
-                        <div className="d-flex align-items-center gap-1">
-                            <input name="day" type="number" min="0" className="form-control" style={inputBoxStyle} value={data.day} onChange={handleTimeChange} />
-                            <span style={labelStyle}>일</span>
-                        </div>
-                    </div>
                     <div className="d-flex flex-row justify-content-center gap-3">
                         <div className="d-flex align-items-center gap-1">
-                            <input name="hour" type="number" min="0" className="form-control" style={inputBoxStyle} value={data.hour} onChange={handleTimeChange} />
+                            <input name="days" type="number" min="0" className="form-control" style={inputBoxStyle} value={data.days} onChange={handleTimeChange} />
+                            <span style={labelStyle}>일</span>
+                        </div>
+                        <div className="d-flex align-items-center gap-1">
+                            <input name="hours" type="number" min="0" className="form-control" style={inputBoxStyle} value={data.hours} onChange={handleTimeChange} />
                             <span style={labelStyle}>시</span>
                         </div>
                         <div className="d-flex align-items-center gap-1">
-                            <input name="minute" type="number" min="0" className="form-control" style={inputBoxStyle} value={data.minute} onChange={handleTimeChange} />
+                            <input name="minutes" type="number" min="0" className="form-control" style={inputBoxStyle} value={data.minutes} onChange={handleTimeChange} />
                             <span style={labelStyle}>분</span>
                         </div>
                         <div className="d-flex align-items-center gap-1">
-                            <input name="second" type="number" min="0" className="form-control" style={inputBoxStyle} value={data.second} onChange={handleTimeChange} />
+                            <input name="seconds" type="number" min="0" className="form-control" style={inputBoxStyle} value={data.seconds} onChange={handleTimeChange} />
                             <span style={labelStyle}>초</span>
                         </div>
                     </div>

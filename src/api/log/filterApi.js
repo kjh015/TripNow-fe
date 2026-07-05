@@ -1,25 +1,21 @@
 import apiClient from '../client';
 
-export const getFilterList = (processId) =>
-  apiClient.get('/api/filter/admin/list', { params: { processId } });
+// 필터 규칙 목록 조회
+export const getFilterRules = (logProcessId, { page, size, sort } = {}) =>
+  apiClient.get(`/api/v1/admin/log-processes/${logProcessId}/filter-rules`, { params: { page, size, sort } });
 
-export const viewFilter = (filterId) =>
-  apiClient.get('/api/filter/admin/view', { params: { filterId } });
+// 필터 규칙 생성
+export const createFilterRule = (logProcessId, { name, conditions, isActive }) =>
+  apiClient.post(`/api/v1/admin/log-processes/${logProcessId}/filter-rules`, { name, conditions, isActive });
 
-export const addFilter = (processId, name, active, conditionStr, tokens) =>
-  apiClient.post('/api/filter/admin/add', {
-    expression: conditionStr,
-    tokens,
-  }, { params: { processId, name, active } });
+// 필터 규칙 상세 조회
+export const getFilterRule = (filterRuleId) =>
+  apiClient.get(`/api/v1/admin/filter-rules/${filterRuleId}`);
 
-export const updateFilter = (filterId, name, active, conditionStr, tokens) =>
-  apiClient.post('/api/filter/admin/update', {
-    expression: conditionStr,
-    tokens,
-  }, { params: { filterId, name, active } });
+// 필터 규칙 수정
+export const updateFilterRule = (filterRuleId, { name, conditions, isActive }) =>
+  apiClient.patch(`/api/v1/admin/filter-rules/${filterRuleId}`, { name, conditions, isActive });
 
-export const removeFilter = (filterId) =>
-  apiClient.post('/api/filter/admin/remove', null, { params: { filterId } });
-
-export const getFormatKeys = (processId) =>
-  apiClient.get('/api/filter/admin/keys', { params: { processId } });
+// 필터 규칙 삭제
+export const deleteFilterRule = (filterRuleId) =>
+  apiClient.delete(`/api/v1/admin/filter-rules/${filterRuleId}`);
