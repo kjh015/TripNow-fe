@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import InputDeduplication from './InputDeduplication';
 import { getDedupRules } from '../../../api/log/deduplicationApi';
 import DetailDeduplication from './DetailDeduplication';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const DeduplicationManagement = ({ processId, onMenuClick }) => {
   const [ddpList, setDdpList] = useState([]);

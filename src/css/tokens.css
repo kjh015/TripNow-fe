@@ -1,0 +1,27 @@
+:root {
+  /* 브랜드 */
+  --brand-gradient: linear-gradient(90deg, #5C6BC0 0%, #283593 100%);
+  --brand-badge-gradient: linear-gradient(90deg, #B794F4 40%, #90CDF4 100%);
+
+  /* 서피스 */
+  --card-bg: #fff;
+  --card-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.04);
+  --card-shadow-lg: 0 8px 32px rgba(60, 60, 100, 0.14);
+
+  /* 라운딩 */
+  --radius-card: 18px;
+  --radius-pill: 2rem;
+  --radius-nav: 0 0 24px 24px;
+  --radius-thumbnail: 14px;
+
+  /* 레이아웃 */
+  --container-form-max-width: 900px;
+  --container-detail-max-width: 1600px;
+  --thumbnail-size: 100px;
+
+  /* z-index */
+  --z-navbar: 1030;
+  --z-alert: 2000;
+  --z-form-alert: 3000;
+  --z-floating: 9999;
+}

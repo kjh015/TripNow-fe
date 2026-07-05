@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { updateLogProcess, deleteLogProcess } from '../../../api/log/logProcessApi';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const EditProcess = ({ onClose, processId, _name, showAlert }) => {
     const [name, setName] = useState(_name);

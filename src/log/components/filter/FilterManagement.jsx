@@ -2,8 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { getFilterRules } from '../../../api/log/filterApi';
 import DetailFilter from './DetailFilter';
 import ConditionBuilder from './ConditionBuilder';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const FilterManagement = ({ processId, onMenuClick }) => {
     const [filterList, setFilterList] = useState([]);

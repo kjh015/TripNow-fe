@@ -1,5 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from 'react-router-dom';
 import { createPost, getPresignedUrl } from '../../api/postApi';
 import { useState, useEffect } from 'react';

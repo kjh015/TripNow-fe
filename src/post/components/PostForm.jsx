@@ -1,4 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
 import CategoryCard from '../../board/component/page/CategoryCard';
 import RegionRadioComp from '../../board/component/page/RegionRadioComp';
 

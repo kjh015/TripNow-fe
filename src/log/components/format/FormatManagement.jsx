@@ -2,8 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { getFormatRules } from '../../../api/log/formatApi';
 import InputFormat from './InputFormat';
 import DetailFormat from './DetailFormat';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const FormatManagement = ({ processId, onMenuClick }) => {
     const [formatList, setFormatList] = useState([]);

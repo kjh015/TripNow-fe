@@ -1,6 +1,5 @@
 import { Offcanvas } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const NavMenu = ({ show, onClose, isLoggedIn, isAdmin, curUser, onLogout, onLogin, onSignup }) => {
     return (

@@ -1,5 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 // 별점만 보여주는 함수 (별 5개 중에 색상표시)
 const renderStarsStatic = (score = 0) => (
