@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { login } from '../../api/authApi';
 import { getMyProfile } from '../../api/memberApi';
 import { useNavigate } from 'react-router-dom';
@@ -42,13 +42,8 @@ const SignInPage = () => {
         }
     };
 
-    useEffect(() => {
-        document.body.classList.add('bg-body-tertiary');
-        return () => document.body.classList.remove('bg-body-tertiary');
-    }, []);
-
     return (
-        <div className="min-vh-100 d-flex flex-column sign-page-bg-full">
+        <div className="min-vh-100 d-flex flex-column sign-page-bg sign-page-bg-full">
             <main className="flex-grow-1 d-flex align-items-center justify-content-center">
                 <div className="col-md-5 col-lg-4">
                     <div className="card shadow-sm">

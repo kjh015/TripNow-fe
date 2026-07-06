@@ -1,7 +1,11 @@
 /* sign 도메인: 로그인/회원가입/마이페이지 */
 
 /* ===== 로그인/회원가입/정보수정/비밀번호변경 ===== */
-/* 페이지 배경은 body의 --page-bg 상속 (페이지별 자체 배경 금지) */
+/* 메인 히어로 톤 그라디언트 — 끝 색이 --page-bg라 푸터와 색이 이어짐 */
+.sign-page-bg {
+  background: var(--page-hero-gradient);
+}
+
 .sign-page-bg-full {
   width: 100vw;
   overflow-x: hidden;
@@ -69,6 +73,12 @@
   margin-top: 12px;
   background: #3f51b5;
   border: none;
+}
+
+/* Bootstrap .btn:disabled의 투명 배경이 덮어써 흰 버튼+흰 글자가 되는 문제 방지 */
+.signup-submit-btn:disabled {
+  background-color: #3f51b5;
+  opacity: 0.5;
 }
 
 /* ===== 회원 관리 (MemberManagement) ===== */
