@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { getFormatRule, updateFormatRule, deleteFormatRule } from '../../../api/log/formatApi';
 
 const
-    DetailFormat = ({ onClose, formatId, showAlert }) => {
+    DetailFormat = ({ onClose, formatId }) => {
         const [defaultEntry, setDefaultEntry] = useState([{ key: '', value: '' }]);
         const [formatEntry, setFormatEntry] = useState([{ key: '', value: '' }]);
         const [name, setName] = useState('');
@@ -33,7 +34,7 @@ const
                 setName(result.name);
                 setActive(result.isActive);
             } catch {
-                showAlert("danger", "포맷 정보를 불러오지 못했습니다.");
+                toast.error("포맷 정보를 불러오지 못했습니다.");
             }
         };
 
@@ -41,10 +42,10 @@ const
         const removeFormat = async () => {
             try {
                 await deleteFormatRule(formatId);
-                showAlert("danger", "포맷 삭제 성공!");
+                toast.success("포맷 삭제 성공!");
                 onClose();
             } catch {
-                showAlert("danger", "포맷 삭제 실패");
+                toast.error("포맷 삭제 실패");
             }
         };
 
@@ -64,10 +65,10 @@ const
 
             try {
                 await updateFormatRule(formatId, { name, isActive: active, defaultValues, fieldMappings });
-                showAlert("success", "포맷 수정 성공!");
+                toast.success("포맷 수정 성공!");
                 onClose();
             } catch {
-                showAlert("danger", "포맷 수정 실패");
+                toast.error("포맷 수정 실패");
             }
         };
 

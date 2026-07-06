@@ -1,25 +1,23 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import { createLogProcess } from '../../../api/log/logProcessApi';
 
-const InputProcess = ({ onClose, showAlert }) => {
+const InputProcess = ({ onClose }) => {
     const [name, setName] = useState("");
 
     const addProcess = async () => {
         try {
             await createLogProcess({ name });
-            showAlert("success", "프로세스가 추가되었습니다!");
+            toast.success("프로세스가 추가되었습니다!");
             onClose();
         } catch {
-            showAlert("danger", "프로세스 추가 실패");
+            toast.error("프로세스 추가 실패");
         }
     };
 
     return (
-        <div className="card mt-4 p-4 mx-auto log-process-card">
+        <div>
             <h4 className="mb-3">프로세스 이름</h4>
-
-
-
             <input
                 type='text'
                 className="form-control mb-3"

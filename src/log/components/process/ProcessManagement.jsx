@@ -1,5 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Modal } from 'react-bootstrap';
 import { getLogProcesses } from '../../../api/log/logProcessApi';
+import { formatDate } from '../../../utils/dateUtils';
+import AdminPageHeader from '../../../common/AdminPageHeader';
 import InputProcess from './InputProcess';
 import EditProcess from './EditProcess';
 
@@ -8,13 +11,6 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
     const [showModal, setShowModal] = useState(false);
     const [selectedProcessId, setSelectedProcessId] = useState(null);
     const [editComp, setEditComp] = useState(0);
-    const [alert, setAlert] = useState(null);
-
-    // 공통 경고창 함수 (자동 사라짐)
-    const showAlert = useCallback((type, message, duration = 1800) => {
-        setAlert({ type, message });
-        if (duration > 0) setTimeout(() => setAlert(null), duration);
-    }, []);
 
     const getProcesses = async () => {
         try {
@@ -29,45 +25,19 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
         getProcesses();
     }, [showModal, editComp]);
 
-    // 모달 body 스크롤 방지
-    useEffect(() => {
-        if (showModal) document.body.style.overflow = 'hidden';
-        else document.body.style.overflow = '';
-        return () => { document.body.style.overflow = ''; };
-    }, [showModal]);
-
     const handleCloseModal = () => {
         setShowModal(false);
         setSelectedProcessId(null);
     };
     const handleEditComp = () => setEditComp(0);
 
-    const processDate = (isoString) => {
-        if (!isoString) return "-";
-        return isoString.substring(0, 16).replace("T", " ");
-    };
-
     return (
         <div className="log-page-spacer">
-            <div className="d-flex align-items-center mb-4 process-header-row">
-                <h2 className="fw-bold process-status-dot">●</h2>
-                <h2 className="fw-bold process-header-title">프로세스 관리</h2>
-            </div>
-            <div className="d-flex justify-content-end  mb-3">
-                <button
-                    className="btn btn-success shadow-sm log-btn-rounded"
-                    onClick={() => setShowModal(true)}
-                >
+            <AdminPageHeader title="프로세스 관리">
+                <button className="btn btn-success shadow-sm log-btn-rounded" onClick={() => setShowModal(true)}>
                     + 프로세스 추가
                 </button>
-            </div>
-
-            {/* 중앙 상단 고정 경고창 */}
-            {alert && (
-                <div className={`alert alert-${alert.type} fw-semibold py-2 px-3 mb-0 d-inline-block text-center custom-alert-center`}>
-                    {alert.message}
-                </div>
-            )}
+            </AdminPageHeader>
 
             <div className="card shadow-sm rounded-4 mb-4 log-card-noborder">
                 <table className="table table-hover table-bordered align-middle text-center mb-0">
@@ -103,8 +73,8 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
                                             {process.name}
                                         </span>
                                     </td>
-                                    <td>{process.createdAt && processDate(process.createdAt)}</td>
-                                    <td>{process.updatedAt && processDate(process.updatedAt)}</td>
+                                    <td>{process.createdAt && formatDate(process.createdAt)}</td>
+                                    <td>{process.updatedAt && formatDate(process.updatedAt)}</td>
                                     <td>
                                         <button
                                             className="btn btn-outline-primary btn-sm px-3 log-btn-rounded-sm"
@@ -121,7 +91,6 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
                                                 onClose={handleEditComp}
                                                 processId={process.logProcessId}
                                                 _name={process.name}
-                                                showAlert={showAlert}
                                             />
                                         </td>
                                     </tr>
@@ -132,34 +101,14 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
                 </table>
             </div>
 
-
-            {/* 모달 구조 */}
-            {showModal && (
-                <div
-                    className="modal fade show log-modal-backdrop-30"
-                    tabIndex="-1"
-                    onClick={handleCloseModal}
-                >
-                    <div
-                        className="modal-dialog modal-dialog-centered log-modal-dialog-sm"
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <div className="modal-content rounded-4" >
-                            <div className="modal-header" >
-                                <h5 className="modal-title fw-bold">프로세스 추가</h5>
-                                <button type="button" className="btn-close" onClick={handleCloseModal}></button>
-                            </div>
-                            <div className="modal-body">
-                                <InputProcess
-                                    onClose={handleCloseModal}
-                                    processId={selectedProcessId}
-                                    showAlert={showAlert}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <Modal show={showModal} onHide={handleCloseModal} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title className="fw-bold">프로세스 추가</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <InputProcess onClose={handleCloseModal} processId={selectedProcessId} />
+                </Modal.Body>
+            </Modal>
         </div>
     );
 };

@@ -1,38 +1,33 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import { updateLogProcess, deleteLogProcess } from '../../../api/log/logProcessApi';
 
-const EditProcess = ({ onClose, processId, _name, showAlert }) => {
+const EditProcess = ({ onClose, processId, _name }) => {
     const [name, setName] = useState(_name);
-    // ✅ 추가
 
     const updateProcess = async () => {
         try {
             await updateLogProcess(processId, { name });
-            showAlert("success", "수정 성공!");
+            toast.success("수정 성공!");
             onClose();
         } catch {
-            showAlert("danger", "프로세스 수정 실패!");
+            toast.error("프로세스 수정 실패!");
         }
     };
 
     const removeProcess = async () => {
         try {
             await deleteLogProcess(processId);
-            showAlert("danger", "삭제 성공!");
+            toast.success("삭제 성공!");
             onClose();
         } catch {
-            showAlert("danger", "삭제 실패!");
+            toast.error("삭제 실패!");
         }
     };
 
     return (
-
         <div className="card mt-4 p-4 mx-auto log-process-card">
             <h4 className="mb-3">Process 수정</h4>
-
-
-
-
             <input
                 type='text'
                 className="form-control mb-3"

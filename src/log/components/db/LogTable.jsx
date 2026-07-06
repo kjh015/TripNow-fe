@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatDate } from '../../../utils/dateUtils';
 
 const LogTable = ({
     title, data, expandedRowId, setExpandedRowId,
@@ -31,12 +32,6 @@ const LogTable = ({
             </span>
         );
     };
-
-    const formatDate = (isoString) => {
-        if (!isoString) return "-";
-        return isoString.substring(0, 16).replace("T", " ");
-    };
-
 
     const sortedList = getSortedList();
 

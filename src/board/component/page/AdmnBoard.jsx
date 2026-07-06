@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { Badge } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { CATEGORY_CODE_TO_LABEL, REGION_CODE_TO_LABEL } from "../../../constants/categoryRegion";
+import { formatDate } from "../../../utils/dateUtils";
+import AdminPageHeader from "../../../common/AdminPageHeader";
 
 const Pagination = ({ total, page, onChange, pageSize = 10 }) => {
     const pageCount = Math.ceil(total / pageSize);
@@ -108,11 +110,6 @@ const AdmnBoard = () => {
         대구: "secondary", 인천: "dark", 전남: "secondary"
     };
 
-    const formatDate = (isoString) => {
-        if (!isoString) return "";
-        return isoString.substring(0, 16).replace("T", " ");
-    };
-
     const handleRemove = ({ no }) => {
         setRemoveTarget(no);
         setShowConfirm(true);
@@ -183,7 +180,7 @@ const AdmnBoard = () => {
                 </div>
             )}
             <div className="container admin-board-container">
-                <h2 className="fw-bold">여행지 관리</h2>
+                <AdminPageHeader title="여행지 관리" />
                 <div className="row g-4">
                     <div className="col-12">
                         <div className="panel-bg p-4 rounded-4 h-100 shadow-sm admin-board-panel">

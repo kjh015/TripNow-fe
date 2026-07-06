@@ -16,22 +16,6 @@
   text-decoration: underline;
 }
 
-/* 중앙 상단 고정 경고창 (로그 관리 화면 공통) */
-.custom-alert-center {
-  position: fixed;
-  top: 64px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: var(--z-form-alert);
-  min-width: 220px;
-  max-width: 380px;
-  border-radius: 0.95rem;
-  box-shadow: 0 3px 12px 0 rgba(0, 0, 0, 0.14);
-  font-size: 1.06rem;
-  padding: 0.7rem 2rem;
-  pointer-events: none;
-}
-
 /* ===== 관리 화면 공통 (Process/Filter/Format/Deduplication/Log Management) ===== */
 .log-page-spacer {
   margin-top: 80px;
@@ -55,20 +39,6 @@
   font-weight: 500;
 }
 
-.log-modal-backdrop-30 {
-  display: block;
-  background: rgba(0, 0, 0, 0.3);
-  z-index: 1050;
-}
-
-.log-modal-backdrop-50 {
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-.log-modal-dialog-sm {
-  max-width: 480px;
-}
-
 /* 테이블 헤더 열 너비 (Process/Filter/Format/Deduplication 공통) */
 .log-col-10 { width: 10%; }
 .log-col-15 { width: 15%; }
@@ -77,19 +47,6 @@
 .log-col-30 { width: 30%; }
 
 /* ===== 프로세스 관리 (ProcessManagement) ===== */
-.process-header-row {
-  min-height: 40px;
-}
-
-.process-status-dot {
-  color: #34a853;
-  padding-bottom: 2px;
-}
-
-.process-header-title {
-  margin-left: 7px;
-}
-
 .process-edit-row {
   background: #f6f8fa;
   border-bottom-left-radius: var(--radius-btn);

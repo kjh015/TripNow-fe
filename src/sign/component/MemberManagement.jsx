@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { getAdminMembers, updateMemberRole } from '../../api/memberApi';
 import { FaTrash, FaUserShield } from 'react-icons/fa';
+import AdminPageHeader from '../../common/AdminPageHeader';
 
 const MemberManagement = () => {
     const [memberList, setMemberList] = useState([]);
-    const [alert, setAlert] = useState({ show: false, message: '', type: '' }); // alert 상태 추가
 
     const getMemberList = async () => {
         try {
             const { data } = await getAdminMembers();
             setMemberList(data.result.content);
         } catch {
-            setAlert({ show: true, message: "회원 조회 오류", type: "danger" });
+            toast.error("회원 조회 오류");
         }
     };
 
     const delegateAdmin = async ({ memberId }) => {
         try {
             await updateMemberRole(memberId);
-            setAlert({ show: true, message: "관리자 권한이 부여되었습니다.", type: "success" });
+            toast.success("관리자 권한이 부여되었습니다.");
             getMemberList();
         } catch (error) {
-            const msg = error.response?.data || "오류가 발생했습니다.";
-            setAlert({ show: true, message: msg, type: "danger" });
+            toast.error(error.response?.data || "오류가 발생했습니다.");
         }
     };
     useEffect(() => {
@@ -31,16 +31,7 @@ const MemberManagement = () => {
 
     return (
         <div className="container sign-page-spacer">
-            {/* Alert 메시지 */}
-            {alert.show && (
-                <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">
-                    {alert.message}
-                    <button type="button" className="btn-close" aria-label="Close"
-                        onClick={() => setAlert({ ...alert, show: false })}></button>
-                </div>
-            )}
-
-            <h2 className="fw-bold member-mgmt-title">회원 관리</h2>
+            <AdminPageHeader title="회원 관리" />
             <div className="table-responsive">
                 <table className="table table-hover align-middle">
                     <thead className="table-light">

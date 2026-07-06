@@ -1,20 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { getFilterRule, updateFilterRule, deleteFilterRule } from '../../../api/log/filterApi';
 import { getActiveFormatRuleFields } from '../../../api/log/formatApi';
 import { toApiConditions } from './ConditionBuilder';
 
 const operatorOptions = ['>', '<', '>=', '<=', '==', '!=', 'Equals'];
 
-const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
+const DetailFilter = ({ onClose, processId, filterId }) => {
     const [fieldList, setFieldList] = useState([]);
     const [name, setName] = useState('');
     const [active, setActive] = useState(false);
     const [tokens, setTokens] = useState([]);
-    const [alert, setAlert] = useState(null);
-
-    const showAlert = useCallback(({ type, message }) => {
-        setAlert({ type, message });
-    }, []);
 
     const viewFilter = async () => {
         try {
@@ -24,7 +20,7 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
             setName(result.name);
             setActive(result.isActive);
         } catch {
-            showAlert({ message: '필터 정보를 불러오지 못했습니다.', type: 'danger' });
+            toast.error('필터 정보를 불러오지 못했습니다.');
         }
     };
 
@@ -40,10 +36,10 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
     const removeFilter = async () => {
         try {
             await deleteFilterRule(filterId);
-            showOutAlert({ message: '필터가 삭제되었습니다.', type: 'danger' });
+            toast.success('필터가 삭제되었습니다.');
             onClose();
         } catch {
-            showAlert({ message: '필터 삭제에 실패했습니다.', type: 'danger' });
+            toast.error('필터 삭제에 실패했습니다.');
         }
     };
 
@@ -140,7 +136,7 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
     const handleSubmit = async (e) => {
 
         if (!validateParentheses()) {
-            showAlert({ message: '❌ 괄호 짝이 맞지 않습니다.', type: 'danger' });
+            toast.error('❌ 괄호 짝이 맞지 않습니다.');
             return;
         }
 
@@ -149,29 +145,22 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
             (token.field === '' || token.operator === '' || token.value === '')
         );
         if (hasInvalid) {
-            showAlert({ message: '❌ 조건에 빈 값이 있습니다. 모든 필드, 연산자, 값을 입력해주세요.', type: 'danger' });
+            toast.error('❌ 조건에 빈 값이 있습니다. 모든 필드, 연산자, 값을 입력해주세요.');
             return;
         }
         const conditions = toApiConditions(tokens);
 
         try {
             await updateFilterRule(filterId, { name, conditions, isActive: active });
-            showOutAlert({ message: '저장되었습니다.', type: 'success' });
+            toast.success('저장되었습니다.');
             onClose();
         } catch {
-            showAlert({ message: '에러가 발생했습니다.', type: 'danger' });
+            toast.error('에러가 발생했습니다.');
         }
     };
 
     return (
         <div className="container mt-5 log-filter-detail-container">
-            {/* Alert 메시지 */}
-            {alert && (
-                <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">
-                    {alert.message}
-                </div>
-            )}
-
             <div className="mb-2">
                 <h4 className="fw-bold text-primary">필터 수정</h4>
                 <hr />

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { getHistories, getHistory } from '../../../api/log/historyApi';
+import AdminPageHeader from '../../../common/AdminPageHeader';
 import LogTable from './LogTable';
 
 const LogManagement = ({ onMenuClick }) => {
@@ -19,28 +21,25 @@ const LogManagement = ({ onMenuClick }) => {
     const [failFilterSortConfig, setFailFilterSortConfig] = useState({ key: 'historyId', direction: 'desc' });
     const [failDedupSortConfig, setFailDedupSortConfig] = useState({ key: 'historyId', direction: 'desc' });
 
-    // alert 상태
-    const [alert, setAlert] = useState({ show: false, message: '', type: '' });
-
     useEffect(() => {
         const load = async () => {
             try {
                 const { data } = await getHistories({ status: 'SUCCESS', size: 100 });
                 setSuccessList(data.result.content);
             } catch {
-                setAlert({ show: true, message: "성공 기록을 불러오지 못했습니다.", type: "danger" });
+                toast.error("성공 기록을 불러오지 못했습니다.");
             }
             try {
                 const { data } = await getHistories({ status: 'FAIL', stage: 'FILTER', size: 100 });
                 setFailFilterList(data.result.content);
             } catch {
-                setAlert({ show: true, message: "필터 실패 기록을 불러오지 못했습니다.", type: "danger" });
+                toast.error("필터 실패 기록을 불러오지 못했습니다.");
             }
             try {
                 const { data } = await getHistories({ status: 'FAIL', stage: 'DEDUP', size: 100 });
                 setFailDedupList(data.result.content);
             } catch {
-                setAlert({ show: true, message: "중복제거 실패 기록을 불러오지 못했습니다.", type: "danger" });
+                toast.error("중복제거 실패 기록을 불러오지 못했습니다.");
             }
         };
         load();
@@ -93,16 +92,7 @@ const LogManagement = ({ onMenuClick }) => {
 
     return (
         <div className="container log-page-padding">
-            {/* Alert 메시지 */}
-            {alert.show && (
-                <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">
-                    {alert.message}
-                    <button type="button" className="btn-close" aria-label="Close"
-                        onClick={() => setAlert({ ...alert, show: false })}></button>
-                </div>
-            )}
-
-            <h2 className="fw-bold mb-4">처리 기록</h2>
+            <AdminPageHeader title="처리 기록" />
 
             <div className="row">
                 <div className="col-12 mb-4">
