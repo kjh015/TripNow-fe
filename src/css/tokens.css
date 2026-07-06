@@ -45,4 +45,15 @@
   /* 타이포그래피 */
   --font-display: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Malgun Gothic', sans-serif;
   --page-title-color: #6c45e0;
+
+  /* 관리자 (Admin) */
+  --brand-tint: #EEF0FB;
+  --admin-border: #E4E7F5;
+  --admin-row-hover: #F7F8FE;
+  --admin-muted: #7A819E;
+  --admin-muted-border: #CDD3E6;
+  --danger-soft-bg: #FCE9ED;
+  --danger-strong: #D23B5E;
+  --admin-btn-shadow: 0 2px 10px rgba(40, 53, 147, 0.20);
+  --admin-btn-shadow-hover: 0 4px 16px rgba(40, 53, 147, 0.30);
 }
