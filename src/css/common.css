@@ -62,7 +62,7 @@
 }
 
 .nav-toggler {
-  border-radius: 16px;
+  border-radius: var(--radius-card-md);
   transition: box-shadow 0.2s;
 }
 
@@ -94,7 +94,7 @@
   position: relative;
   transition: background 0.2s, box-shadow 0.16s;
   font-weight: 500;
-  border-radius: 18px;
+  border-radius: var(--radius-card);
   letter-spacing: 0.01em;
 }
 

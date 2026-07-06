@@ -7,12 +7,19 @@
   --card-bg: #fff;
   --card-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.04);
   --card-shadow-lg: 0 8px 32px rgba(60, 60, 100, 0.14);
+  --shadow-badge: 0 2px 8px rgba(0, 0, 0, 0.07);
 
   /* 라운딩 */
   --radius-card: 18px;
+  --radius-card-sm: 12px;
+  --radius-card-md: 16px;
+  --radius-card-lg: 1.3rem;
   --radius-pill: 2rem;
   --radius-nav: 0 0 24px 24px;
   --radius-thumbnail: 14px;
+  --radius-modal: 1.5rem;
+  --radius-badge: 1.2rem;
+  --radius-btn: 0.7rem;
 
   /* 레이아웃 */
   --container-form-max-width: 900px;
@@ -35,6 +42,6 @@
   --radius-menu: 28px;
 
   /* 타이포그래피 */
-  --font-display: 'Montserrat', 'Gowun Dodum', sans-serif;
+  --font-display: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Malgun Gothic', sans-serif;
   --page-title-color: #6c45e0;
 }

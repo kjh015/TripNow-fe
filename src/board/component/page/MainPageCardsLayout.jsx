@@ -1,6 +1,5 @@
 import React from 'react';
 import MainPageCard from './MainPageCard/MainPageCard';
-import MainPageCard2 from './MainPageCard/MainPageCard2';
 import { AnimatePresence, motion } from 'framer-motion';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 
@@ -67,7 +66,7 @@ const MainPageCardsLayout = ({ top5Posts }) => {
 
 
                         {/* 카드 본문 */}
-                        <MainPageCard postId={top5Posts[0].postId} score={top5Posts[0].score} rank={1} />
+                        <MainPageCard variant="primary" postId={top5Posts[0].postId} score={top5Posts[0].score} rank={1} />
                     </motion.div>
                 </AnimatePresence>
             </div>
@@ -81,7 +80,7 @@ const MainPageCardsLayout = ({ top5Posts }) => {
                         className="mainpage-layout-secondary-item"
                         transition={{ type: "spring", stiffness: 350, damping: 34 }}
                     >
-                        <MainPageCard2 postId={board.postId} score={board.score} rank={idx + 2} />
+                        <MainPageCard variant="secondary" postId={board.postId} score={board.score} rank={idx + 2} />
                     </motion.div>
                 ))}
 
