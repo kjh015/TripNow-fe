@@ -1,0 +1,27 @@
+/* post 도메인: 여행지 목록/상세 */
+
+/* 여행지 목록 카드 hover (PostListPage / LikeListPage / CheckMyArt 공통) */
+.post-list-card {
+  transition: box-shadow 0.18s, transform 0.16s, background 0.16s, border 0.13s;
+}
+
+.post-list-card:hover,
+.post-list-card:focus {
+  box-shadow: 0 6px 24px 0 rgba(123, 82, 255, 0.14), 0 1.5px 10px rgba(60, 0, 128, 0.04);
+  border-color: #a084ee;
+  background: #faf8ff;
+  transform: translateY(-2px) scale(1.012);
+  cursor: pointer;
+}
+
+/* 찜(하트) 버튼 (PostDetailPage) */
+.heart-btn {
+  font-size: 1.7rem;
+  color: #b0b0b0;
+  transition: color 0.15s;
+}
+
+.heart-btn.liked,
+.heart-btn:hover {
+  color: #e64980 !important;
+}

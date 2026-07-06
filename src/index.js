@@ -5,6 +5,10 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './css/tokens.css';
 import './css/index.css';
+import './css/common.css';
+import './css/post.css';
+import './css/main.css';
+import './css/log.css';
 
 import App from './App';
 import { getUserIdForMatomo } from './utils/tokenUtils';

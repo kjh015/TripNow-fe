@@ -36,8 +36,7 @@ const CheckMyArt = () => {
             <div className="container py-3" style={{ maxWidth: 850 }}>
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <h3 className="fw-bold mb-1"
-                            style={{ color: "#6c45e0", fontFamily: "'Montserrat', 'Gowun Dodum', sans-serif", fontSize: "2rem" }}>
+                        <h3 className="fw-bold mb-1 page-title">
                             나의 여행지 목록
                         </h3>
                     </div>
@@ -56,20 +55,6 @@ const CheckMyArt = () => {
                     </div>
                 )}
             </div>
-            <style>
-                {`
-.post-list-card {
-  transition: box-shadow 0.18s, transform 0.16s, background 0.16s, border 0.13s;
-}
-.post-list-card:hover, .post-list-card:focus {
-  box-shadow: 0 6px 24px 0 rgba(123,82,255,0.14), 0 1.5px 10px rgba(60,0,128,0.04);
-  border-color: #a084ee;
-  background: #faf8ff;
-  transform: translateY(-2px) scale(1.012);
-  cursor: pointer;
-}
-        `}
-            </style>
         </div>
     );
 };

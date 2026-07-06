@@ -56,33 +56,6 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
 
   return (
     <div style={{ marginTop: '80px' }}>
-      {/* 인라인 스타일 또는 App.css로 분리 가능 */}
-      <style>{`
-        .dedup-name-hover {
-          font-weight: bold;
-          cursor: pointer;
-          text-decoration: none;
-          transition: text-decoration 0.13s;
-        }
-        .dedup-name-hover:hover {
-          text-decoration: underline;
-        }
-          .custom-alert-center {
-                  position: fixed;
-                  top: 64px;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  z-index: 3000;
-                  min-width: 220px;
-                  max-width: 380px;
-                  border-radius: 0.95rem;
-                  box-shadow: 0 3px 12px 0 rgba(0,0,0,0.14);
-                  font-size: 1.06rem;
-                  padding: 0.7rem 2rem;
-                  pointer-events: none;
-                }
-      `}</style>
-
       <h2 className="fw-bold mb-4">중복 제거 관리</h2>
 
       {/* 중앙 상단 고정 경고창 */}

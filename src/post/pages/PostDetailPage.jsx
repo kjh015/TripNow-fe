@@ -107,19 +107,6 @@ const PostDetailPage = () => {
 
   return (
     <>
-      <style>
-        {`
-        .heart-btn {
-          font-size: 1.7rem;
-          color: #b0b0b0;
-          transition: color 0.15s;
-        }
-        .heart-btn.liked,
-        .heart-btn:hover {
-          color: #e64980 !important;
-        }
-        `}
-      </style>
       {alert.show && (
         <div
           className={`alert alert-${alert.type} alert-dismissible`}

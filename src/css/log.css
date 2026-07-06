@@ -1,0 +1,33 @@
+/* 로그 관리 Admin 도메인 */
+
+/* 이름 클릭 hover (프로세스/포맷/필터/중복제거 공통) */
+.process-name-hover,
+.format-name-hover,
+.dedup-name-hover {
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  transition: text-decoration 0.13s;
+}
+
+.process-name-hover:hover,
+.format-name-hover:hover,
+.dedup-name-hover:hover {
+  text-decoration: underline;
+}
+
+/* 중앙 상단 고정 경고창 (로그 관리 화면 공통) */
+.custom-alert-center {
+  position: fixed;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-form-alert);
+  min-width: 220px;
+  max-width: 380px;
+  border-radius: 0.95rem;
+  box-shadow: 0 3px 12px 0 rgba(0, 0, 0, 0.14);
+  font-size: 1.06rem;
+  padding: 0.7rem 2rem;
+  pointer-events: none;
+}

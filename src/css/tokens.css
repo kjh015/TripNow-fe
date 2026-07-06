@@ -24,4 +24,17 @@
   --z-alert: 2000;
   --z-form-alert: 3000;
   --z-floating: 9999;
+
+  /* 네비게이션 */
+  --nav-height: 68px;
+  --nav-shadow: 0 4px 32px rgba(40, 53, 147, 0.18);
+  --nav-brand-shadow: 0 2px 12px rgba(136, 97, 255, 0.13);
+  --nav-toggler-bg: rgba(44, 62, 160, 0.88);
+  --nav-menu-gradient: linear-gradient(135deg, #283593D9 60%, #6F8AE7DD 100%);
+  --nav-menu-shadow: 0 0 32px 0 rgba(40, 53, 147, 0.13);
+  --radius-menu: 28px;
+
+  /* 타이포그래피 */
+  --font-display: 'Montserrat', 'Gowun Dodum', sans-serif;
+  --page-title-color: #6c45e0;
 }
