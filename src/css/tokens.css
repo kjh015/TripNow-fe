@@ -4,6 +4,7 @@
   --brand-badge-gradient: linear-gradient(90deg, #B794F4 40%, #90CDF4 100%);
 
   /* 서피스 */
+  --page-bg: #F5F6FF;
   --card-bg: #fff;
   --card-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.04);
   --card-shadow-lg: 0 8px 32px rgba(60, 60, 100, 0.14);

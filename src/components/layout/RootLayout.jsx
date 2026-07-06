@@ -4,13 +4,13 @@ import GlobalNavigator from "../../common/GlobalNavigator";
 
 const RootLayout = ({ children }) => {
   return (
-    <>
+    <div className="app-shell">
       <GlobalNavigator />
       <Navbar />
       <div style={{ paddingTop: 25 }} />
-      <main>{children}</main>
+      <main className="app-main">{children}</main>
       <Footers />
-    </>
+    </div>
   );
 };
 
