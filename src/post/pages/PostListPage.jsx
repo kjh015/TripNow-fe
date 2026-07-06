@@ -98,23 +98,17 @@ const PostListPage = () => {
   };
 
   return (
-    <div className="bg-light min-vh-100 py-4" style={{ overflowX: "hidden" }}>
-      <div style={{ marginTop: "3rem" }} />
+    <div className="bg-light min-vh-100 py-4 post-list-page">
+      <div className="mt-5" />
       <PostSearch selectedCategory={category} selectedRegion={region} />
-      <div
-        style={{
-          height: "3.5px", width: "60px", margin: "0.7rem auto 1.1rem auto",
-          borderRadius: "2rem", background: "linear-gradient(90deg,#bdaafc 20%, #92e0f6 90%)",
-          opacity: 0.88, marginTop: "1rem", marginBottom: "5rem"
-        }}
-      />
-      <div className="container py-3" style={{ maxWidth: 850 }}>
+      <div className="post-list-divider" />
+      <div className="container py-3 post-list-container">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div>
             <h3 className="fw-bold mb-1 page-title">
               여행지 목록
             </h3>
-            <div className="text-secondary" style={{ fontSize: "1.07rem" }}>
+            <div className="text-secondary post-subtitle">
               인기 여행지의 다양한 후기를 만나보세요!
             </div>
           </div>
@@ -135,8 +129,7 @@ const PostListPage = () => {
             </div>
             {isLoggedIn && (
               <button
-                className="btn fw-bold px-4"
-                style={{ background: "linear-gradient(90deg, #a084ee 30%, #7c3aed 100%)", color: "#fff", border: "none" }}
+                className="btn fw-bold px-4 post-write-btn"
                 onClick={goToWrite}
               >글쓰기</button>
             )}
@@ -183,9 +176,8 @@ const PostListPage = () => {
           {Array.from({ length: pagination.totalPages }, (_, i) => i).map(num => (
             <button
               key={num}
-              className={`btn mx-1 px-3 ${page === num ? 'btn-primary' : 'btn-outline-primary'}`}
+              className={`btn mx-1 px-3 ${page === num ? 'btn-primary fw-bold' : 'btn-outline-primary'}`}
               onClick={() => handlePage(num)}
-              style={{ fontWeight: page === num ? 'bold' : undefined }}
             >
               {num + 1}
             </button>

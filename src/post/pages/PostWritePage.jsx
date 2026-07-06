@@ -99,20 +99,19 @@ const PostWritePage = () => {
     const imageSection = (
         <div className="mb-4">
             <label className="form-label fw-semibold">
-                사진 첨부 <span className="text-secondary" style={{ fontSize: "0.95em" }}>(필수)</span>
+                사진 첨부 <span className="text-secondary post-image-hint">(필수)</span>
             </label>
             <div className="bg-light rounded-4 p-3 px-4 border">
                 <input type="file" accept="image/*" multiple onChange={handleImageChange} className="form-control mb-3" />
                 <div className="d-flex flex-wrap gap-3">
                     {imagePreviews.map((src, idx) => (
-                        <div key={idx} style={{ position: 'relative' }}>
+                        <div key={idx} className="position-relative">
                             <img
                                 src={src} alt={`preview-${idx}`}
-                                style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 14, border: '1px solid #eee', boxShadow: "0 2px 6px rgba(0,0,0,0.06)" }}
+                                className="post-image-preview"
                             />
                             <button
-                                type="button" className="btn btn-danger btn-sm"
-                                style={{ position: 'absolute', top: 5, right: 5, borderRadius: '50%', padding: '2px 7px', fontSize: "1.05rem" }}
+                                type="button" className="btn btn-danger btn-sm post-image-remove-btn"
                                 onClick={() => handleImageRemove(idx)}
                             >×</button>
                         </div>

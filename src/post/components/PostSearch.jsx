@@ -113,7 +113,7 @@ const PostSearch = ({ selectedCategory, selectedRegion }) => {
         return (
             <>
                 {text.slice(0, idx)}
-                <mark style={{ background: "#ffe066", padding: 0 }}>{text.slice(idx, idx + keyword.length)}</mark>
+                <mark className="post-search-highlight">{text.slice(idx, idx + keyword.length)}</mark>
                 {text.slice(idx + keyword.length)}
             </>
         );
@@ -121,7 +121,7 @@ const PostSearch = ({ selectedCategory, selectedRegion }) => {
 
     return (
         <div>
-            <Card className="shadow-sm rounded-4 mx-auto" style={{ maxWidth: 700, padding: '32px 36px', background: '#fff' }}>
+            <Card className="shadow-sm rounded-4 mx-auto post-search-card">
                 <Row className="g-3">
                     <Col md={6}>
                         <div className="bg-light rounded-4 p-2 px-3 border">
@@ -136,7 +136,7 @@ const PostSearch = ({ selectedCategory, selectedRegion }) => {
                 </Row>
                 <Form className="mb-4" onSubmit={handleSubmit}>
                     <div className="text-center mb-3"></div>
-                    <div className="d-flex" style={{ gap: 8, position: "relative" }}>
+                    <div className="d-flex gap-2 position-relative">
                         <Form.Control
                             ref={inputRef}
                             type="search"
@@ -148,21 +148,12 @@ const PostSearch = ({ selectedCategory, selectedRegion }) => {
                             onFocus={() => setShowList(true)}
                             onBlur={handleBlur}
                             onKeyDown={handleKeyDown}
-                            style={{ height: "40px", flexGrow: 1, zIndex: 11 }}
+                            className="post-search-input"
                         />
                         {showList && (
-                            <ul
-                                ref={listRef}
-                                style={{
-                                    position: "absolute", top: 44, left: 0, right: 0, zIndex: 10,
-                                    margin: 0, padding: 0, background: "white",
-                                    border: "1px solid #eee", borderRadius: "0 0 12px 12px",
-                                    boxShadow: "0 6px 20px rgba(0,0,0,0.08)", listStyle: "none",
-                                    maxHeight: 260, overflowY: "auto", minWidth: 200, transition: "box-shadow 0.2s"
-                                }}
-                            >
+                            <ul ref={listRef} className="post-search-suggestions">
                                 {suggestions.length === 0 && (
-                                    <li style={{ padding: "12px 16px", color: "#bbb", fontStyle: "italic" }}>
+                                    <li className="post-search-suggestion-empty">
                                         검색 결과가 없습니다
                                     </li>
                                 )}
@@ -170,14 +161,7 @@ const PostSearch = ({ selectedCategory, selectedRegion }) => {
                                     <li
                                         key={idx}
                                         onMouseDown={() => handleSuggestionClick(item)}
-                                        style={{
-                                            padding: "12px 16px", cursor: "pointer",
-                                            background: idx === highlightIdx ? "#f8f9fa" : "transparent",
-                                            fontWeight: idx === highlightIdx ? "bold" : "normal",
-                                            color: "#333",
-                                            borderBottom: idx < suggestions.length - 1 ? "1px solid #f5f5f5" : "none",
-                                            fontSize: 17, transition: "background 0.1s"
-                                        }}
+                                        className={`post-search-suggestion${idx === highlightIdx ? " active" : ""}`}
                                         onMouseEnter={() => setHighlightIdx(idx)}
                                     >
                                         {highlightText(item)}
@@ -185,8 +169,7 @@ const PostSearch = ({ selectedCategory, selectedRegion }) => {
                                 ))}
                             </ul>
                         )}
-                        <Button variant="dark btn-sm" type="submit"
-                            style={{ whiteSpace: 'nowrap', padding: '0.2rem 0.35rem', height: "40px" }}>
+                        <Button variant="dark btn-sm" type="submit" className="post-search-btn">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="mx-3" role="img" viewBox="0 0 24 24"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"></circle><path d="M21 21l-5.2-5.2"></path></svg>
                         </Button>
                     </div>
