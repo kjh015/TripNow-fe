@@ -21,24 +21,9 @@ const MainPageCardsLayout = ({ top5Posts }) => {
 
     // 데이터 있을 때 카드 레이아웃 렌더링
     return (
-        <div
-            className="d-flex justify-content-center align-items-stretch"
-            style={{
-                minHeight: `${mainCardHeight}px`,
-                gap: '36px',
-                width: "100%",
-                marginTop: "48px"
-            }}
-        >
+        <div className="d-flex justify-content-center align-items-stretch mainpage-layout-row">
             {/* 왼쪽 큰 카드 (1위) */}
-            <div
-                style={{
-                    width: "720px",
-                    height: `${mainCardHeight}px`,
-                    display: 'flex',
-                    alignItems: 'stretch'
-                }}
-            >
+            <div className="mainpage-layout-primary">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={top5Posts[0].postId}
@@ -46,30 +31,10 @@ const MainPageCardsLayout = ({ top5Posts }) => {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.93, y: -18 }}
                         transition={{ type: "spring", stiffness: 360, damping: 30 }}
-                        style={{ width: "100%", height: "100%", position: 'relative' }}
+                        className="mainpage-layout-primary-motion"
                     >
                         <AnimatePresence mode="wait">
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    top: 22,
-                                    left: 22,
-                                    zIndex: 99,
-                                    pointerEvents: "none",
-                                    width: 54,
-                                    height: 54,
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    background: 'linear-gradient(135deg, #ffd700 70%, #fff9c4 100%)',
-                                    color: "#725b10",
-                                    fontWeight: 900,
-                                    borderRadius: "50%",
-                                    fontSize: "2rem",
-                                    border: "3px solid #fffbe8",
-                                    boxShadow: "0 4px 12px rgba(180,140,20,0.13)"
-                                }}
-                            >
+                            <div className="main-rank-crown">
                                 <motion.div
                                     key={top5Posts[0].postId}
                                     initial={{ opacity: 0.6, scale: 1.1, boxShadow: "0 0 14px 8px #ffd70044" }}
@@ -91,26 +56,9 @@ const MainPageCardsLayout = ({ top5Posts }) => {
                                         ease: "easeInOut",
                                         exit: { duration: 1.5, ease: "easeInOut" }
                                     }}
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        width: "100%",
-                                        height: "100%",
-                                        borderRadius: "50%",
-                                        background: "none",
-                                        boxShadow: "none"
-                                    }}
+                                    className="mainpage-layout-crown-glow"
                                 >
-                                    <span
-                                        role="img"
-                                        aria-label="king-crown"
-                                        style={{
-                                            fontSize: "2.2rem",
-                                            marginTop: "-4px",
-                                            pointerEvents: "none"
-                                        }}
-                                    >
+                                    <span role="img" aria-label="king-crown">
                                         👑
                                     </span>
                                 </motion.div>
@@ -125,25 +73,12 @@ const MainPageCardsLayout = ({ top5Posts }) => {
             </div>
 
             {/* 오른쪽 2~5위 카드 */}
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    height: `${mainCardHeight}px`,
-                    width: "360px",
-                    gap: "18px"
-                }}
-            >
+            <div className="mainpage-layout-secondary">
                 {top5Posts.slice(1, 5).map((board, idx) => (
                     <motion.div
                         key={board.postId}
                         layout
-                        style={{
-                            height: `calc((100% - 54px) / 4)`,
-                            minHeight: "0",
-                            display: 'flex'
-                        }}
+                        className="mainpage-layout-secondary-item"
                         transition={{ type: "spring", stiffness: 350, damping: 34 }}
                     >
                         <MainPageCard2 postId={board.postId} score={board.score} rank={idx + 2} />

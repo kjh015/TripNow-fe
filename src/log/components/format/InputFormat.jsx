@@ -45,7 +45,7 @@ const InputFormat = ({ onClose, processId, showAlert }) => {
     };
 
     return (
-        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+        <div className="modal show d-block log-modal-backdrop-50" tabIndex="-1">
             <div className="modal-dialog modal-lg">
                 <div className="modal-content">
                     <div className="modal-header">
@@ -63,8 +63,7 @@ const InputFormat = ({ onClose, processId, showAlert }) => {
                                 <label className="form-label w-100 text-center">포맷 이름</label>
                                 <input
                                     type="text"
-                                    className="form-control"
-                                    style={{ width: "360px", textAlign: "center" }}
+                                    className="form-control log-format-input-name-input"
                                     value={name}
                                     onChange={e => setName(e.target.value)}
                                 />

@@ -13,14 +13,8 @@ const WriteComment = ({ onAddComment }) => {
             {[1, 2, 3, 4, 5].map(star => (
                 <i
                     key={star}
-                    className={star <= rating ? "bi bi-star-fill" : "bi bi-star"}
-                    style={{
-                        color: star <= rating ? "#ffc107" : "#dee2e6",
-                        fontSize: "1.25rem",
-                        cursor: "pointer",
-                        marginLeft: 3,
-                        marginRight: 1
-                    }}
+                    className={`${star <= rating ? "bi bi-star-fill" : "bi bi-star"} comment-write-star`}
+                    style={{ color: star <= rating ? "#ffc107" : "#dee2e6" }}
                     onClick={() => setRating(star)}
                 />
             ))}
@@ -49,22 +43,21 @@ const WriteComment = ({ onAddComment }) => {
     };
 
     return (
-        <div className="card shadow-sm rounded-4 px-4 py-3 mx-auto" style={{ maxWidth: 520, margin: "0 auto" }}>
+        <div className="card shadow-sm rounded-4 px-4 py-3 mx-auto comment-write-card">
             <form onSubmit={handleSubmit}>
                 <div className="d-flex justify-content-between align-items-center mb-2">
-                    <label className="form-label mb-0" htmlFor="comment" style={{ fontWeight: 500 }}>
+                    <label className="form-label mb-0 comment-write-label" htmlFor="comment">
                         댓글
                     </label>
                     {renderStars()}
                 </div>
                 <textarea
                     id="comment"
-                    className="form-control mb-3"
+                    className="form-control mb-3 comment-write-textarea"
                     rows={3}
                     value={comment}
                     onChange={e => setComment(e.target.value)}
                     placeholder="댓글을 입력하세요"
-                    style={{ resize: "none" }}
                 />
                 <div className="d-flex justify-content-end">
 

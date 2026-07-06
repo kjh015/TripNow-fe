@@ -39,7 +39,7 @@ const FilterManagement = ({ processId, onMenuClick }) => {
     };
 
     return (
-        <div style={{ marginTop: '80px' }}>
+        <div className="log-page-spacer">
             {/* 화면 중앙 위 고정 알림 */}
             {alert && (
                 <div className={`alert alert-${alert.type} fw-semibold mb-0 text-center custom-alert-center`}>
@@ -61,15 +61,15 @@ const FilterManagement = ({ processId, onMenuClick }) => {
                 </button>
             </div>
 
-            <div className="card shadow-sm rounded-4 mb-4" style={{ border: 0 }}>
+            <div className="card shadow-sm rounded-4 mb-4 log-card-noborder">
                 <table className="table table-bordered text-center align-middle mb-0">
                     <thead className="table-light">
                         <tr>
-                            <th style={{ width: '10%' }}>ID</th>
-                            <th className="text-start" style={{ width: '30%' }}>이름</th>
+                            <th className="log-col-10">ID</th>
+                            <th className="text-start log-col-30">이름</th>
                             <th>생성 날짜</th>
                             <th>수정 날짜</th>
-                            <th style={{ width: '10%' }}>활성화</th>
+                            <th className="log-col-10">활성화</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -120,7 +120,7 @@ const FilterManagement = ({ processId, onMenuClick }) => {
             </div>
 
             {builderComp && (
-                <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                <div className="modal show d-block log-modal-backdrop-50" tabIndex="-1">
                     <div className="modal-dialog modal-lg" role="document">
                         <div className="modal-content rounded-4">
                             <div className="modal-header">

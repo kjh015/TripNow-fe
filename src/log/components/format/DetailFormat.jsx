@@ -77,14 +77,7 @@ const
         }, []);
 
         return (
-            <div style={{
-                padding: '24px',
-                borderRadius: '12px',
-                maxWidth: '900px',
-                margin: '30px auto',
-                background: '#fff',
-                boxShadow: '0 2px 10px #eee'
-            }}>
+            <div className="log-format-detail-container">
                 <h2 className="mb-4">포맷 상세 화면</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
@@ -93,8 +86,7 @@ const
                     <div>
                         <input
                             type="text"
-                            style={{ width: "415px", transform: "translateY(-28px)" }}
-                            className="form-control-center"
+                            className="form-control-center log-format-detail-name-input"
                             placeholder="format name"
                             value={name}
                             onChange={e => setName(e.target.value)}
@@ -115,8 +107,7 @@ const
                                             onChange={e =>
                                                 handleEntryChange(setDefaultEntry, defaultEntry, index, 'key', e.target.value)
                                             }
-                                            className="form-control me-2"
-                                            style={{ flex: '1' }}
+                                            className="form-control me-2 log-format-flex-1"
                                         />
                                         <input
                                             type="text"
@@ -125,8 +116,7 @@ const
                                             onChange={e =>
                                                 handleEntryChange(setDefaultEntry, defaultEntry, index, 'value', e.target.value)
                                             }
-                                            className="form-control me-2"
-                                            style={{ flex: '2' }}
+                                            className="form-control me-2 log-format-flex-2"
                                         />
                                         <button
                                             type="button"
@@ -155,8 +145,7 @@ const
                                             onChange={e =>
                                                 handleEntryChange(setFormatEntry, formatEntry, index, 'key', e.target.value)
                                             }
-                                            className="form-control me-2"
-                                            style={{ flex: '1' }}
+                                            className="form-control me-2 log-format-flex-1"
                                         />
                                         <span className="mx-1">⬅</span>
                                         <input
@@ -166,8 +155,7 @@ const
                                             onChange={e =>
                                                 handleEntryChange(setFormatEntry, formatEntry, index, 'value', e.target.value)
                                             }
-                                            className="form-control me-2"
-                                            style={{ flex: '2' }}
+                                            className="form-control me-2 log-format-flex-2"
                                         />
                                         <button
                                             type="button"

@@ -32,8 +32,8 @@ const CheckMyArt = () => {
     }, []);
 
     return (
-        <div className="bg-light min-vh-100 py-4" style={{ overflowX: "hidden" }}>
-            <div className="container py-3" style={{ maxWidth: 850 }}>
+        <div className="bg-light min-vh-100 py-4 mypage-list-page">
+            <div className="container py-3 mypage-list-container">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h3 className="fw-bold mb-1 page-title">

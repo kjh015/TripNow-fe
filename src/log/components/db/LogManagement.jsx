@@ -92,7 +92,7 @@ const LogManagement = ({ onMenuClick }) => {
     ];
 
     return (
-        <div className="container" style={{ paddingTop: '80px' }}>
+        <div className="container log-page-padding">
             {/* Alert 메시지 */}
             {alert.show && (
                 <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">

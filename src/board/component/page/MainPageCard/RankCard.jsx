@@ -56,10 +56,7 @@ const RankCard = ({ data, type, rank }) => {
         : (CATEGORY_CODE_TO_LABEL[data] || data);
 
     return (
-        <div
-            className="w-100 h-100 d-flex align-items-stretch position-relative"
-            style={{ position: 'relative' }} // 반드시 필요!
-        >
+        <div className="w-100 h-100 d-flex align-items-stretch position-relative">
             {/* 1등 왕관 배지 (hover와 무관, 항상 위) */}
             {(rank === 1 || rank === undefined) && (
                 <div className="main-rank-crown">
@@ -69,55 +66,22 @@ const RankCard = ({ data, type, rank }) => {
 
             {/* 카드 본문 */}
             <div
-                className="mainpage-card-hover card border-0 shadow-lg rounded-4 overflow-hidden w-100"
-                style={{
-                    background: "rgba(250,250,255,0.96)",
-                    boxShadow: "0 8px 32px rgba(60,60,100,0.14)",
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    transition: "transform 0.25s cubic-bezier(.19,1,.22,1), box-shadow 0.22s",
-                    cursor: "pointer",
-                    zIndex: 1, // 왕관보다 낮음 (중요)
-                }}
+                className="mainpage-card-hover mainpage-card-body card border-0 shadow-lg rounded-4 overflow-hidden w-100"
                 onClick={() => navigate(`/post/list/?${type}=${data}`)}
             >
                 {/* 이미지 */}
-                <div style={{ position: "relative", width: "100%" }}>
+                <div className="mainpage-card-image-wrap">
                     {data ? (
                         <img
                             src={images[label]}
                             alt="Main visual"
-                            className="card-img-top"
-                            style={{
-                                height: '200px',
-                                width: '100%',
-                                objectFit: 'cover',
-                                filter: "brightness(98%)",
-                                display: 'block'
-                            }}
+                            className="card-img-top rank-card-image"
                         />
                     ) : (
-                        <div style={{ height: '200px', background: "#f3f3f8" }} />
+                        <div className="rank-card-image-placeholder" />
                     )}
-                    <div style={{
-                        position: "absolute",
-                        bottom: "18px",
-                        left: "20px",
-                        background: "rgba(30,30,55,0.56)",
-                        color: "#fff",
-                        padding: "0.75rem 1.25rem",
-                        borderRadius: "1.2rem",
-                        fontWeight: 600,
-                        fontSize: "1.2rem",
-                        letterSpacing: "-0.01em",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.6rem"
-                    }}>
-                        <span style={{ color: "#e0c3fc", fontWeight: 700 }}>{label}</span>
-
+                    <div className="mainpage-card-overlay-badge">
+                        <span className="mainpage-card-overlay-label">{label}</span>
                     </div>
                 </div>
             </div>

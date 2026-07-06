@@ -48,15 +48,14 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
     };
 
     return (
-        <div style={{ marginTop: '80px' }}>
-            <div className="d-flex align-items-center mb-4" style={{ minHeight: 40 }}>
-                <h2 className="fw-bold" style={{ color: "#34a853", paddingBottom: "2px" }}>●</h2>
-                <h2 className="fw-bold" style={{ marginLeft: "7px" }}>프로세스 관리</h2>
+        <div className="log-page-spacer">
+            <div className="d-flex align-items-center mb-4 process-header-row">
+                <h2 className="fw-bold process-status-dot">●</h2>
+                <h2 className="fw-bold process-header-title">프로세스 관리</h2>
             </div>
             <div className="d-flex justify-content-end  mb-3">
                 <button
-                    className="btn btn-success shadow-sm"
-                    style={{ borderRadius: "0.7rem", fontWeight: 600 }}
+                    className="btn btn-success shadow-sm log-btn-rounded"
                     onClick={() => setShowModal(true)}
                 >
                     + 프로세스 추가
@@ -70,15 +69,15 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
                 </div>
             )}
 
-            <div className="card shadow-sm rounded-4 mb-4" style={{ border: 0 }}>
+            <div className="card shadow-sm rounded-4 mb-4 log-card-noborder">
                 <table className="table table-hover table-bordered align-middle text-center mb-0">
                     <thead className="table-light">
                         <tr>
-                            <th style={{ width: '15%' }}>ID</th>
+                            <th className="log-col-15">ID</th>
                             <th className="text-start">이름</th>
                             <th>생성 날짜</th>
                             <th>수정 날짜</th>
-                            <th style={{ width: '15%' }}>수정</th>
+                            <th className="log-col-15">수정</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -108,8 +107,7 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
                                     <td>{process.updatedAt && processDate(process.updatedAt)}</td>
                                     <td>
                                         <button
-                                            className="btn btn-outline-primary btn-sm px-3"
-                                            style={{ borderRadius: '0.7rem', fontWeight: 500 }}
+                                            className="btn btn-outline-primary btn-sm px-3 log-btn-rounded-sm"
                                             onClick={() => setEditComp(process.logProcessId)}
                                         >
                                             수정
@@ -118,7 +116,7 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
                                 </tr>
                                 {editComp === process.logProcessId && (
                                     <tr>
-                                        <td colSpan={5} style={{ background: "#f6f8fa", borderBottomLeftRadius: '0.7rem', borderBottomRightRadius: '0.7rem' }}>
+                                        <td colSpan={5} className="process-edit-row">
                                             <EditProcess
                                                 onClose={handleEditComp}
                                                 processId={process.logProcessId}
@@ -138,18 +136,12 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
             {/* 모달 구조 */}
             {showModal && (
                 <div
-                    className="modal fade show"
+                    className="modal fade show log-modal-backdrop-30"
                     tabIndex="-1"
-                    style={{
-                        display: 'block',
-                        background: 'rgba(0,0,0,0.3)',
-                        zIndex: 1050,
-                    }}
                     onClick={handleCloseModal}
                 >
                     <div
-                        className="modal-dialog modal-dialog-centered"
-                        style={{ maxWidth: 480 }}
+                        className="modal-dialog modal-dialog-centered log-modal-dialog-sm"
                         onClick={e => e.stopPropagation()}
                     >
                         <div className="modal-content rounded-4" >

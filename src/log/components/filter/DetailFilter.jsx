@@ -164,7 +164,7 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
     };
 
     return (
-        <div className="container mt-5" style={{ maxWidth: 950 }}>
+        <div className="container mt-5 log-filter-detail-container">
             {/* Alert 메시지 */}
             {alert && (
                 <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">
@@ -179,9 +179,9 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
 
 
             {/* 현재 표현식 */}
-            <div className="bg-light rounded-4 shadow-sm p-3 mb-4" style={{ fontSize: 17 }}>
+            <div className="bg-light rounded-4 shadow-sm p-3 mb-4 log-expression-box">
                 <strong className="me-2">현재 표현식:</strong>
-                <code className="text-break" style={{ fontSize: 16 }}>
+                <code className="text-break log-expression-code">
                     {buildExpression()}
                 </code>
             </div>
@@ -261,24 +261,22 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
                                                 if (nextToken?.type === 'condition') {
                                                     const condIndex = tokens.findIndex(tok => tok === nextToken);
                                                     return (
-                                                        <div className="d-flex align-items-center justify-content-center py-2 border-bottom" key={i}
-                                                            style={{ background: '#f8f9fa', borderRadius: 8, marginBottom: 6 }}>
+                                                        <div className="d-flex align-items-center justify-content-center py-2 border-bottom log-condition-row" key={i}>
                                                             <span className="fs-4 fw-bold text-primary me-2">(</span>
-                                                            <select className="form-select me-2" style={{ width: 150 }}
+                                                            <select className="form-select me-2 log-select-field-lg"
                                                                 value={nextToken.field}
                                                                 onChange={(e) => updateToken(condIndex, 'field', e.target.value)}>
                                                                 <option value="">필드 선택</option>
                                                                 {fieldList.map((f) => <option key={f} value={f}>{f}</option>)}
                                                             </select>
-                                                            <select className="form-select me-2" style={{ width: 100 }}
+                                                            <select className="form-select me-2 log-select-operator-lg"
                                                                 value={nextToken.operator}
                                                                 onChange={(e) => updateToken(condIndex, 'operator', e.target.value)}>
                                                                 {operatorOptions.map((op) => <option key={op} value={op}>{op}</option>)}
                                                             </select>
                                                             <input
                                                                 type="text"
-                                                                className="form-control me-2"
-                                                                style={{ width: 130 }}
+                                                                className="form-control me-2 log-input-value-lg"
                                                                 value={nextToken.value}
                                                                 onChange={(e) => updateToken(condIndex, 'value', e.target.value)}
                                                             />
@@ -298,21 +296,19 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
 
                                             if (t.type === 'condition' && group[i - 1]?.type !== 'left-paren') {
                                                 return (
-                                                    <div className="d-flex align-items-center justify-content-center py-2 border-bottom" key={i}
-                                                        style={{ background: '#f8f9fa', borderRadius: 8, marginBottom: 6 }}>
-                                                        <select className="form-select me-2" style={{ width: 150 }}
+                                                    <div className="d-flex align-items-center justify-content-center py-2 border-bottom log-condition-row" key={i}>
+                                                        <select className="form-select me-2 log-select-field-lg"
                                                             value={t.field}
                                                             onChange={(e) => updateToken(tokenIndex, 'field', e.target.value)}>
                                                             <option value="">필드 선택</option>
                                                             {fieldList.map((f) => <option key={f} value={f}>{f}</option>)}
                                                         </select>
-                                                        <select className="form-select me-2" style={{ width: 100 }}
+                                                        <select className="form-select me-2 log-select-operator-lg"
                                                             value={t.operator}
                                                             onChange={(e) => updateToken(tokenIndex, 'operator', e.target.value)}>
                                                             {operatorOptions.map((op) => <option key={op} value={op}>{op}</option>)}
                                                         </select>
-                                                        <input type="text" className="form-control me-2"
-                                                            style={{ width: 130 }}
+                                                        <input type="text" className="form-control me-2 log-input-value-lg"
                                                             value={t.value}
                                                             onChange={(e) => updateToken(tokenIndex, 'value', e.target.value)} />
                                                         {groupId !== 0 && (
@@ -330,8 +326,7 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
 
                                             if (t.type === 'right-paren') {
                                                 return (
-                                                    <div className="d-flex align-items-center justify-content-center py-2 border-bottom" key={i}
-                                                        style={{ background: '#f8f9fa', borderRadius: 8, marginBottom: 6 }}>
+                                                    <div className="d-flex align-items-center justify-content-center py-2 border-bottom log-condition-row" key={i}>
                                                         <span className="fs-4 fw-bold text-primary me-2">)</span>
                                                         {groupId !== 0 && (
                                                             <>

@@ -45,14 +45,9 @@ const DeduplicationRow = ({ processId, index, data, onChange, onRemove }) => {
         onChange(index, { ...data, [name]: value });
     };
 
-    // 스타일 유틸
-    const inputBoxStyle = { width: 90, textAlign: 'right', display: 'inline-block' };
-    const labelStyle = { minWidth: 28, textAlign: 'center', display: 'inline-block' };
-
     return (
         <div
-            className="border rounded bg-white p-3 mb-3"
-            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.03)', position: 'relative' }}
+            className="border rounded bg-white p-3 mb-3 dedup-row-card"
         >
             <div className="row align-items-center mb-3">
                 <label className="form-label d-flex mb-1 fw-bold justify-content-center">필드/데이터 조건</label>
@@ -61,8 +56,7 @@ const DeduplicationRow = ({ processId, index, data, onChange, onRemove }) => {
                         <div className="d-flex gap-2 mb-2 align-items-center justify-content-center" key={condIdx}>
                             <select
                                 name="field"
-                                className="form-select"
-                                style={{ maxWidth: 200 }}
+                                className="form-select dedup-field-select"
                                 value={cond.field}
                                 onChange={e => handleConditionChange(condIdx, "field", e.target.value)}
                             >
@@ -74,16 +68,14 @@ const DeduplicationRow = ({ processId, index, data, onChange, onRemove }) => {
                             <input
                                 name="value"
                                 type="text"
-                                className="form-control"
+                                className="form-control dedup-field-select"
                                 placeholder="문자열 입력"
-                                style={{ maxWidth: 200 }}
                                 value={cond.value}
                                 onChange={e => handleConditionChange(condIdx, "value", e.target.value)}
                             />
                             <select
                                 name="matchType"
-                                className="form-select"
-                                style={{ maxWidth: 120 }}
+                                className="form-select dedup-matchtype-select"
                                 value={cond.matchType}
                                 onChange={e => handleConditionChange(condIdx, "matchType", e.target.value)}
                             >
@@ -109,20 +101,20 @@ const DeduplicationRow = ({ processId, index, data, onChange, onRemove }) => {
                 <div className="p-3 border rounded bg-light d-inline-block">
                     <div className="d-flex flex-row justify-content-center gap-3">
                         <div className="d-flex align-items-center gap-1">
-                            <input name="days" type="number" min="0" className="form-control" style={inputBoxStyle} value={data.days} onChange={handleTimeChange} />
-                            <span style={labelStyle}>일</span>
+                            <input name="days" type="number" min="0" className="form-control dedup-time-input" value={data.days} onChange={handleTimeChange} />
+                            <span className="dedup-time-label">일</span>
                         </div>
                         <div className="d-flex align-items-center gap-1">
-                            <input name="hours" type="number" min="0" className="form-control" style={inputBoxStyle} value={data.hours} onChange={handleTimeChange} />
-                            <span style={labelStyle}>시</span>
+                            <input name="hours" type="number" min="0" className="form-control dedup-time-input" value={data.hours} onChange={handleTimeChange} />
+                            <span className="dedup-time-label">시</span>
                         </div>
                         <div className="d-flex align-items-center gap-1">
-                            <input name="minutes" type="number" min="0" className="form-control" style={inputBoxStyle} value={data.minutes} onChange={handleTimeChange} />
-                            <span style={labelStyle}>분</span>
+                            <input name="minutes" type="number" min="0" className="form-control dedup-time-input" value={data.minutes} onChange={handleTimeChange} />
+                            <span className="dedup-time-label">분</span>
                         </div>
                         <div className="d-flex align-items-center gap-1">
-                            <input name="seconds" type="number" min="0" className="form-control" style={inputBoxStyle} value={data.seconds} onChange={handleTimeChange} />
-                            <span style={labelStyle}>초</span>
+                            <input name="seconds" type="number" min="0" className="form-control dedup-time-input" value={data.seconds} onChange={handleTimeChange} />
+                            <span className="dedup-time-label">초</span>
                         </div>
                     </div>
                 </div>

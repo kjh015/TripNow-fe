@@ -2,38 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMyProfile, updateMyProfile } from '../../api/memberApi';
 
-const inputBoxStyle = {
-    width: "100%",
-    marginBottom: "22px",
-};
-
-const cardStyle = {
-    maxWidth: "420px",
-    width: "95%",
-    margin: "40px auto",
-    padding: "40px 34px 32px 34px",
-    background: "rgba(255,255,255,0.97)",
-    borderRadius: "1.5rem",
-    boxShadow: "0 6px 36px 0 rgba(54,69,79,0.13)",
-};
-
-const titleGradient = {
-    fontWeight: "bold",
-    fontSize: "2rem",
-    background: "#000000",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    marginBottom: "30px"
-};
-
-const btnStyle = {
-    fontWeight: "bold",
-    fontSize: "1.07rem",
-    letterSpacing: "0.03em",
-    borderRadius: "2rem",
-    marginTop: "18px"
-};
-
 const SignUpdatePage = () => {
     const [formData, setFormData] = useState({
         loginId: '',
@@ -84,15 +52,10 @@ const SignUpdatePage = () => {
     }, []);
 
     return (
-        <div style={{
-            minHeight: "100vh",
-            background: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
-            display: "flex",
-            flexDirection: "column",
-        }}>
+        <div className="min-vh-100 d-flex flex-column sign-page-bg">
             <main className="flex-grow-1 d-flex align-items-center justify-content-center">
-                <div style={cardStyle}>
-                    <div style={titleGradient} className="text-center mb-4">회원 정보 수정</div>
+                <div className="sign-card">
+                    <div className="sign-card-title text-center mb-4">회원 정보 수정</div>
                     {/* Alert 메시지 */}
                     {alert.show && (
                         <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">
@@ -107,7 +70,7 @@ const SignUpdatePage = () => {
                     )}
                     <form className="needs-validation" noValidate onSubmit={handleSubmit}>
                         {/* 닉네임 */}
-                        <div style={inputBoxStyle}>
+                        <div className="sign-card-input-box">
                             <label htmlFor="nickname" className="form-label fw-semibold">닉네임</label>
                             <input
                                 type="text"
@@ -121,7 +84,7 @@ const SignUpdatePage = () => {
                             <div className="invalid-feedback">닉네임을 입력해주세요.</div>
                         </div>
                         {/* 아이디 */}
-                        <div style={inputBoxStyle}>
+                        <div className="sign-card-input-box">
                             <label htmlFor="loginId" className="form-label fw-semibold">아이디</label>
                             <input
                                 type="text"
@@ -136,7 +99,7 @@ const SignUpdatePage = () => {
                             <div className="invalid-feedback">아이디를 입력해주세요.</div>
                         </div>
                         {/* 이메일 */}
-                        <div style={inputBoxStyle}>
+                        <div className="sign-card-input-box">
                             <label htmlFor="email" className="form-label fw-semibold">
                                 이메일
                             </label>
@@ -154,16 +117,14 @@ const SignUpdatePage = () => {
                         <div className="d-flex gap-2">
                             <button
                                 type="button"
-                                className="btn btn-outline-secondary flex-fill"
-                                style={{ ...btnStyle, marginTop: 0 }}
+                                className="btn btn-outline-secondary flex-fill sign-card-btn"
                                 onClick={() => navigate('/sign/update/password')}
                             >
                                 비밀번호 변경
                             </button>
                             <button
                                 type="submit"
-                                className="btn btn-primary flex-fill"
-                                style={{ ...btnStyle, marginTop: 0 }}>
+                                className="btn btn-primary flex-fill sign-card-btn">
                                 수정 완료
                             </button>
                         </div>

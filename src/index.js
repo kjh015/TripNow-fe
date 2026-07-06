@@ -8,6 +8,8 @@ import './css/index.css';
 import './css/common.css';
 import './css/post.css';
 import './css/main.css';
+import './css/sign.css';
+import './css/comment.css';
 import './css/log.css';
 
 import App from './App';

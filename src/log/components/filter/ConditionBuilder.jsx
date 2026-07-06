@@ -144,7 +144,7 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
     };
 
     return (
-        <div className="container mt-4 text-center" style={{ maxWidth: '400px', margin: '0 auto' }}>
+        <div className="container mt-4 text-center log-condition-container">
             {/* Alert 메시지 */}
             {alert && (
                 <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">
@@ -168,7 +168,7 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
 
             <div className="mt-4">
                 <strong>현재 표현식: </strong>
-                <div style={{ marginTop: '10px' }}></div>
+                <div className="log-expression-spacer"></div>
                 <code>{buildExpression()}</code>
             </div>
 
@@ -202,18 +202,18 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
                                         return (
                                             <div className="d-flex align-items-center" key={i}>
                                                 <h2 className="me-2">(</h2>
-                                                <select className="form-select me-2" style={{ width: '120px' }}
+                                                <select className="form-select me-2 log-select-field"
                                                     value={nextToken.field}
                                                     onChange={(e) => updateToken(condIndex, 'field', e.target.value)}>
                                                     <option value="">필드 선택</option>
                                                     {fieldList.map((f) => <option key={f} value={f}>{f}</option>)}
                                                 </select>
-                                                <select className="form-select me-2" style={{ width: '80px' }}
+                                                <select className="form-select me-2 log-select-operator"
                                                     value={nextToken.operator}
                                                     onChange={(e) => updateToken(condIndex, 'operator', e.target.value)}>
                                                     {operatorOptions.map((op) => <option key={op} value={op}>{op}</option>)}
                                                 </select>
-                                                <input type="text" className="form-control me-2" style={{ width: '100px' }}
+                                                <input type="text" className="form-control me-2 log-input-value"
                                                     value={nextToken.value}
                                                     onChange={(e) => updateToken(condIndex, 'value', e.target.value)} />
                                                 {groupId !== 0 && (
@@ -231,18 +231,18 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
                                 if (t.type === 'condition' && group[i - 1]?.type !== 'left-paren') {
                                     return (
                                         <div className="d-flex align-items-center" key={i}>
-                                            <select className="form-select me-2" style={{ width: '120px' }}
+                                            <select className="form-select me-2 log-select-field"
                                                 value={t.field}
                                                 onChange={(e) => updateToken(tokenIndex, 'field', e.target.value)}>
                                                 <option value="">필드 선택</option>
                                                 {fieldList.map((f) => <option key={f} value={f}>{f}</option>)}
                                             </select>
-                                            <select className="form-select me-2" style={{ width: '80px' }}
+                                            <select className="form-select me-2 log-select-operator"
                                                 value={t.operator}
                                                 onChange={(e) => updateToken(tokenIndex, 'operator', e.target.value)}>
                                                 {operatorOptions.map((op) => <option key={op} value={op}>{op}</option>)}
                                             </select>
-                                            <input type="text" className="form-control me-2" style={{ width: '100px' }}
+                                            <input type="text" className="form-control me-2 log-input-value"
                                                 value={t.value}
                                                 onChange={(e) => updateToken(tokenIndex, 'value', e.target.value)} />
                                             {groupId !== 0 && (

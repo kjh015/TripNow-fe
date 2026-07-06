@@ -55,7 +55,7 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
   }, [showDetail, showInput]);
 
   return (
-    <div style={{ marginTop: '80px' }}>
+    <div className="log-page-spacer">
       <h2 className="fw-bold mb-4">중복 제거 관리</h2>
 
       {/* 중앙 상단 고정 경고창 */}
@@ -82,11 +82,11 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
       <table className="table table-bordered text-center align-middle">
         <thead className="table-light">
           <tr>
-            <th style={{ width: '10%' }}>ID</th>
-            <th className="text-start" style={{ width: '30%' }}>이름</th>
+            <th className="log-col-10">ID</th>
+            <th className="text-start log-col-30">이름</th>
             <th>생성 날짜</th>
             <th>수정 날짜</th>
-            <th style={{ width: '10%' }}>활성화</th>
+            <th className="log-col-10">활성화</th>
           </tr>
         </thead>
         <tbody>
@@ -142,9 +142,8 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
       {/* 추가 입력 모달 */}
       {showInput && (
         <div
-          className="modal show d-block"
+          className="modal show d-block log-modal-backdrop-50"
           tabIndex="-1"
-          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
         >
           <div className="modal-dialog modal-lg" role="document">
             <div className="modal-content">
