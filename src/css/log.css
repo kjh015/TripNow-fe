@@ -59,15 +59,6 @@
 }
 
 /* ===== 필터 조건 빌더 (ConditionBuilder) ===== */
-.log-condition-container {
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.log-expression-spacer {
-  margin-top: 10px;
-}
-
 .log-select-field {
   width: 120px;
 }
@@ -123,11 +114,6 @@
 
 .log-format-detail-name-input {
   max-width: 415px;
-}
-
-.log-format-input-name-input {
-  width: 360px;
-  text-align: center;
 }
 
 .log-format-flex-1 {

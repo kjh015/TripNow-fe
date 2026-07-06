@@ -47,55 +47,65 @@ const InputFormat = ({ onClose, processId }) => {
 
     return (
         <form onSubmit={handleSubmit}>
-            <div className="mb-3 d-flex flex-column align-items-center">
-                <label className="form-label w-100 text-center">포맷 이름</label>
+            <div className="mb-4 text-start">
+                <label className="form-label fw-semibold">포맷 이름</label>
                 <input
                     type="text"
-                    className="form-control log-format-input-name-input"
+                    className="form-control log-format-detail-name-input"
+                    placeholder="format name"
                     value={name}
                     onChange={e => setName(e.target.value)}
                 />
             </div>
 
-            <h5>기본 정보</h5>
-            {defaultEntry.map((entry, index) => (
-                <div key={`default-${index}`} className="d-flex mb-2">
-                    <input type="text" className="form-control me-2" placeholder="Key"
-                        value={entry.key}
-                        onChange={e => handleEntryChange(setDefaultEntry, defaultEntry, index, 'key', e.target.value)} />
-                    <input type="text" className="form-control me-2" placeholder="Value"
-                        value={entry.value}
-                        onChange={e => handleEntryChange(setDefaultEntry, defaultEntry, index, 'value', e.target.value)} />
-                    <button type="button" className="btn admin-btn-icon admin-btn-danger"
-                        onClick={() => removeEntry(setDefaultEntry, defaultEntry, index)}>✕</button>
+            <div className="row">
+                <div className="col-md-6 mb-3">
+                    <div className="admin-section-box p-3 h-100">
+                        <h5 className="mb-3">기본 정보</h5>
+                        {defaultEntry.map((entry, index) => (
+                            <div key={`default-${index}`} className="d-flex align-items-center mb-2">
+                                <input type="text" className="form-control me-2 log-format-flex-1" placeholder="Key"
+                                    value={entry.key}
+                                    onChange={e => handleEntryChange(setDefaultEntry, defaultEntry, index, 'key', e.target.value)} />
+                                <input type="text" className="form-control me-2 log-format-flex-2" placeholder="Value"
+                                    value={entry.value}
+                                    onChange={e => handleEntryChange(setDefaultEntry, defaultEntry, index, 'value', e.target.value)} />
+                                <button type="button" className="btn admin-btn-icon admin-btn-danger"
+                                    onClick={() => removeEntry(setDefaultEntry, defaultEntry, index)}>✕</button>
+                            </div>
+                        ))}
+                        <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm mt-2"
+                            onClick={() => addEntry(setDefaultEntry, defaultEntry)}>+ 항목 추가</button>
+                    </div>
                 </div>
-            ))}
-            <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm mb-3"
-                onClick={() => addEntry(setDefaultEntry, defaultEntry)}>+ 추가</button>
-
-            <h5>포맷 정보</h5>
-            {formatEntry.map((entry, index) => (
-                <div key={`format-${index}`} className="d-flex mb-2">
-                    <input type="text" className="form-control me-2" placeholder="Key"
-                        value={entry.key}
-                        onChange={e => handleEntryChange(setFormatEntry, formatEntry, index, 'key', e.target.value)} />
-                    <span className="mx-1">⬅</span>
-                    <input type="text" className="form-control me-2" placeholder="Value"
-                        value={entry.value}
-                        onChange={e => handleEntryChange(setFormatEntry, formatEntry, index, 'value', e.target.value)} />
-                    <button type="button" className="btn admin-btn-icon admin-btn-danger"
-                        onClick={() => removeEntry(setFormatEntry, formatEntry, index)}>✕</button>
+                <div className="col-md-6 mb-3">
+                    <div className="admin-section-box p-3 h-100">
+                        <h5 className="mb-3">포맷 정보</h5>
+                        {formatEntry.map((entry, index) => (
+                            <div key={`format-${index}`} className="d-flex align-items-center mb-2">
+                                <input type="text" className="form-control me-2 log-format-flex-1" placeholder="Key"
+                                    value={entry.key}
+                                    onChange={e => handleEntryChange(setFormatEntry, formatEntry, index, 'key', e.target.value)} />
+                                <span className="mx-1">⬅</span>
+                                <input type="text" className="form-control me-2 log-format-flex-2" placeholder="Value"
+                                    value={entry.value}
+                                    onChange={e => handleEntryChange(setFormatEntry, formatEntry, index, 'value', e.target.value)} />
+                                <button type="button" className="btn admin-btn-icon admin-btn-danger"
+                                    onClick={() => removeEntry(setFormatEntry, formatEntry, index)}>✕</button>
+                            </div>
+                        ))}
+                        <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm mt-2"
+                            onClick={() => addEntry(setFormatEntry, formatEntry)}>+ 항목 추가</button>
+                    </div>
                 </div>
-            ))}
-            <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm mb-3"
-                onClick={() => addEntry(setFormatEntry, formatEntry)}>+ 추가</button>
+            </div>
 
-            <div className="d-flex justify-content-between mt-4">
-                <button type="button" className={`btn admin-toggle ${active ? 'admin-toggle-on' : 'admin-toggle-off'}`}
+            <div className="admin-form-footer">
+                <button type="button" className={`btn btn-sm admin-toggle ${active ? 'admin-toggle-on' : 'admin-toggle-off'}`}
                     onClick={() => setActive(prev => !prev)}>
                     활성화: {active ? "ON" : "OFF"}
                 </button>
-                <div className="d-flex gap-2">
+                <div className="admin-form-footer-actions">
                     <button type="button" className="btn admin-btn admin-btn-outline" onClick={onClose}>닫기</button>
                     <button type="submit" className="btn admin-btn admin-btn-primary">추가</button>
                 </div>

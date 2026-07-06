@@ -81,11 +81,11 @@ const
             <div className="log-format-detail-container">
                 <h4 className="mb-4 admin-detail-title">포맷 상세</h4>
                 <form onSubmit={handleSubmit}>
-                    <div className="mb-4 text-center">
-                        <label className="fw-bold mb-2 d-block">포맷 이름</label>
+                    <div className="mb-4 text-start">
+                        <label className="form-label fw-semibold">포맷 이름</label>
                         <input
                             type="text"
-                            className="form-control log-format-detail-name-input mx-auto"
+                            className="form-control log-format-detail-name-input"
                             placeholder="format name"
                             value={name}
                             onChange={e => setName(e.target.value)}
@@ -172,17 +172,15 @@ const
                         </div>
                     </div>
                     {/* 하단 버튼 */}
-                    <div className="mt-4 d-flex justify-content-between align-items-center">
-                        <div className="d-flex align-items-center">
-                            <button
-                                className={`btn btn-sm admin-toggle ${active ? 'admin-toggle-on' : 'admin-toggle-off'}`}
-                                onClick={() => setActive(!active)}
-                                type="button"
-                            >
-                                활성화: {active ? "ON" : "OFF"}
-                            </button>
-                        </div>
-                        <div className="d-flex gap-2">
+                    <div className="admin-form-footer">
+                        <button
+                            className={`btn btn-sm admin-toggle ${active ? 'admin-toggle-on' : 'admin-toggle-off'}`}
+                            onClick={() => setActive(!active)}
+                            type="button"
+                        >
+                            활성화: {active ? "ON" : "OFF"}
+                        </button>
+                        <div className="admin-form-footer-actions">
                             <button type="submit" className="btn admin-btn admin-btn-primary">수정</button>
                             <button type="button" onClick={removeFormat} className="btn admin-btn admin-btn-danger">삭제</button>
                             <button type="button" onClick={onClose} className="btn admin-btn admin-btn-outline">닫기</button>
