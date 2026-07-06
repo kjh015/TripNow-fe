@@ -5,6 +5,8 @@
 
   /* 서피스 */
   --page-bg: #F5F6FF;
+  /* 상단 브랜드 연보라 → --page-bg 페이드 (메인 히어로 톤과 통일, 푸터 색 연속) */
+  --page-hero-gradient: linear-gradient(180deg, #DDE4FC 0%, #ECEFFD 45%, #F5F6FF 100%);
   --card-bg: #fff;
   --card-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.04);
   --card-shadow-lg: 0 8px 32px rgba(60, 60, 100, 0.14);

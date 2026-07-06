@@ -48,7 +48,7 @@ const SignInPage = () => {
     }, []);
 
     return (
-        <div className="min-vh-100 d-flex flex-column sign-page-bg-full">
+        <div className="min-vh-100 d-flex flex-column sign-page-bg sign-page-bg-full">
             <main className="flex-grow-1 d-flex align-items-center justify-content-center">
                 <div className="col-md-5 col-lg-4">
                     <div className="card shadow-sm">
