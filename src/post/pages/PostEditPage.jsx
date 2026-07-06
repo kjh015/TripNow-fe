@@ -142,35 +142,33 @@ const PostEditPage = () => {
     const imageSection = (
         <div className="mb-4">
             <label className="form-label fw-semibold">
-                사진 첨부 <span className="text-secondary" style={{ fontSize: "0.95em" }}>(여러 장 첨부 가능)</span>
+                사진 첨부 <span className="text-secondary post-image-hint">(여러 장 첨부 가능)</span>
             </label>
             <div className="bg-light rounded-4 p-3 px-4 border">
                 <input type="file" accept="image/*" multiple onChange={handleNewImageChange} className="form-control mb-3" />
                 <div className="d-flex flex-wrap gap-3">
                     {existingImages.map((img, idx) => (
-                        <div key={`exist-${idx}`} style={{ position: 'relative' }}>
+                        <div key={`exist-${idx}`} className="position-relative">
                             <img
                                 src={`${IMAGE_BASE_URL}/${img.imageKey}`}
                                 alt={`existing-${idx}`}
-                                style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 14, border: '1px solid #eee', boxShadow: "0 2px 6px rgba(0,0,0,0.06)" }}
+                                className="post-image-preview"
                             />
                             <button
-                                type="button" className="btn btn-danger btn-sm"
-                                style={{ position: 'absolute', top: 5, right: 5, borderRadius: '50%', padding: '2px 7px', fontSize: "1.05rem" }}
+                                type="button" className="btn btn-danger btn-sm post-image-remove-btn"
                                 onClick={() => handleExistingImageRemove(idx)}
                             >×</button>
                         </div>
                     ))}
                     {newImagePreviews.map((src, idx) => (
-                        <div key={`new-${idx}`} style={{ position: 'relative' }}>
+                        <div key={`new-${idx}`} className="position-relative">
                             <img
                                 src={src}
                                 alt={`new-${idx}`}
-                                style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 14, border: '1px solid #eee', boxShadow: "0 2px 6px rgba(0,0,0,0.06)" }}
+                                className="post-image-preview"
                             />
                             <button
-                                type="button" className="btn btn-danger btn-sm"
-                                style={{ position: 'absolute', top: 5, right: 5, borderRadius: '50%', padding: '2px 7px', fontSize: "1.05rem" }}
+                                type="button" className="btn btn-danger btn-sm post-image-remove-btn"
                                 onClick={() => handleNewImageRemove(idx)}
                             >×</button>
                         </div>

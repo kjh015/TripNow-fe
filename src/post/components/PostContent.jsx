@@ -7,23 +7,20 @@ const PostContent = ({ post, liked, onLike, nickname }) => {
     const categoryLabel = CATEGORY_CODE_TO_LABEL[post.category] ?? post.category;
     const regionLabel = REGION_CODE_TO_LABEL[post.region] ?? post.region;
     return (
-        <Card
-            className="shadow-sm flex-fill"
-            style={{ borderRadius: "18px", width: "100%", minWidth: "0", background: "#fff", display: "flex", flexDirection: "column" }}
-        >
-            <Card.Body className="pb-2 pt-4 d-flex flex-column" style={{ flex: 1 }}>
+        <Card className="shadow-sm flex-fill post-content-card">
+            <Card.Body className="pb-2 pt-4 d-flex flex-column post-content-body">
                 {post.images && post.images.length > 0 && (
                     <Carousel
                         interval={null}
                         indicators={post.images.length > 1}
-                        style={{ maxWidth: 800, margin: "0 auto 24px auto", borderRadius: 16, overflow: "hidden", boxShadow: "0 6px 18px #0001" }}
+                        className="post-content-carousel"
                     >
                         {post.images.map(img => (
                             <Carousel.Item key={img.imageKey}>
                                 <img
                                     src={`${process.env.REACT_APP_IMAGE_BASE_URL}/${img.imageKey}`}
                                     alt="uploaded"
-                                    style={{ width: "100%", height: 400, objectFit: "cover", display: "block", background: "#eee" }}
+                                    className="post-content-image"
                                 />
                             </Carousel.Item>
                         ))}
@@ -31,7 +28,7 @@ const PostContent = ({ post, liked, onLike, nickname }) => {
                 )}
                 <div className="d-flex justify-content-between align-items-start mb-1">
                     <h4 className="fw-bold mb-1">{post.title}</h4>
-                    <Badge bg={categoryColors[categoryLabel] || "secondary"} style={{ fontSize: "1rem" }}>
+                    <Badge bg={categoryColors[categoryLabel] || "secondary"} className="post-content-badge">
                         {categoryLabel}
                     </Badge>
                 </div>
@@ -52,16 +49,15 @@ const PostContent = ({ post, liked, onLike, nickname }) => {
                         <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-edit">수정하기</Tooltip>}>
                             <Link
                                 to={`/post/edit?no=${post.postId}`}
-                                className="btn btn-outline-primary btn-sm ms-2"
-                                style={{ whiteSpace: "nowrap" }}
+                                className="btn btn-outline-primary btn-sm ms-2 text-nowrap"
                             >
                                 🖊
                             </Link>
                         </OverlayTrigger>
                     )}
                 </div>
-                <Card className="mb-0" style={{ background: "#f7fafc", border: "none" }}>
-                    <Card.Body className="py-2 px-3" style={{ minHeight: "50px", fontSize: "1.08rem", whiteSpace: "pre-line" }}>
+                <Card className="mb-0 post-content-body-card">
+                    <Card.Body className="py-2 px-3 post-content-body-text">
                         {post.content}
                     </Card.Body>
                 </Card>

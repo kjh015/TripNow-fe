@@ -108,23 +108,17 @@ const PostDetailPage = () => {
   return (
     <>
       {alert.show && (
-        <div
-          className={`alert alert-${alert.type} alert-dismissible`}
-          style={{ position: "fixed", top: 80, right: 24, zIndex: 9999, minWidth: 260 }}
-        >
+        <div className={`alert alert-${alert.type} alert-dismissible post-detail-alert`}>
           {alert.message}
         </div>
       )}
-      <div style={{ minHeight: "100vh", width: "100vw", overflowX: "hidden", position: "relative" }}>
-        <div className="container py-5 mt-5" style={{ minHeight: "100vh", maxWidth: "1600px" }}>
-          <div style={{ display: "flex", gap: "32px", width: "95%", margin: "0 auto", alignItems: "stretch" }}>
+      <div className="post-viewport">
+        <div className="container py-5 mt-5 post-detail-container">
+          <div className="post-detail-row">
             <PostContent post={post} liked={liked} onLike={handleLike} nickname={nickname} />
-            <Card
-              className="shadow-sm flex-fill"
-              style={{ borderRadius: "18px", width: "70%", minWidth: "0", background: "#fff", display: "flex", flexDirection: "column" }}
-            >
+            <Card className="shadow-sm flex-fill post-detail-comment-card">
               {post.postId && (
-                <Card.Body className="d-flex flex-column py-4" style={{ flex: 1 }}>
+                <Card.Body className="d-flex flex-column py-4 post-detail-comment-body">
                   <CommentPage
                     no={post.postId}
                     isLoggedIn={isLoggedIn}
@@ -141,13 +135,7 @@ const PostDetailPage = () => {
         </div>
         <button
           onClick={goToList}
-          className="btn btn-lg btn-primary"
-          style={{
-            position: "fixed", bottom: "36px", right: "48px", zIndex: 9999,
-            borderRadius: "50%", width: "64px", height: "64px",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: "0 6px 16px #0002", fontSize: "2rem",
-          }}
+          className="btn btn-lg btn-primary post-detail-fab"
           title="목록으로 이동"
         >
           <i className="bi bi-list"></i>
