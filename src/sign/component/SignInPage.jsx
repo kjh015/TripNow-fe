@@ -48,16 +48,7 @@ const SignInPage = () => {
     }, []);
 
     return (
-        <div
-            style={{
-                minHeight: "100vh",
-                width: "100vw",
-                overflowX: "hidden",
-                background: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
-                position: "relative"
-            }}
-            className="min-vh-100 d-flex flex-column"
-        >
+        <div className="min-vh-100 d-flex flex-column sign-page-bg sign-page-bg-full">
             <main className="flex-grow-1 d-flex align-items-center justify-content-center">
                 <div className="col-md-5 col-lg-4">
                     <div className="card shadow-sm">

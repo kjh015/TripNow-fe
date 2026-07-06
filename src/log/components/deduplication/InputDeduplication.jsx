@@ -54,16 +54,7 @@ const InputDeduplication = ({ processId, onClose,  showOutAlert}) => {
     };
 
     return (
-        <div
-            style={{
-                background: '#fff',
-                borderRadius: 12,
-                padding: '28px 24px 24px 24px',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.09)',
-                maxWidth: 600,
-                margin: '0 auto'
-            }}
-        >
+        <div className="dedup-input-container">
             {/* Modal 안에만 표시되는 alert */}
             {alert.show && (
                 <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">

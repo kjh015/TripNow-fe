@@ -28,7 +28,7 @@ const MainPageCard2 = ({ postId, score, rank }) => {
   }, [postId]);
 
   return (
-    <div className="w-100 h-100 d-flex align-items-stretch position-relative" style={{ minHeight: 112, position: 'relative' }}>
+    <div className="w-100 h-100 d-flex align-items-stretch position-relative mainpage-card2-wrap">
       {/* --- 순위 뱃지 (배경색은 rank별 런타임 값이라 인라인 유지) --- */}
       {rank &&
         <div className="main-rank-badge" style={{ background: rankColors[(rank - 1) % 5] }}>
@@ -37,60 +37,26 @@ const MainPageCard2 = ({ postId, score, rank }) => {
       }
 
       <div
-        className="mainpage-card2-hover card border-0 shadow rounded-4 overflow-hidden w-100"
-        style={{
-          height: '100%',
-          width: "100%",
-          borderRadius: "1.3rem",
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          transition: "transform 0.22s cubic-bezier(.19,1,.22,1), box-shadow 0.18s",
-          cursor: "pointer",
-          zIndex: 1, // 뱃지보다 낮게!
-        }}
+        className="mainpage-card2-hover mainpage-card2-body card border-0 shadow rounded-4 overflow-hidden w-100"
         onClick={() => { navigate(`/post/detail/?no=${board.postId}`); }}
       >
         {/* 이미지 or 배경 */}
-        <div style={{ width: "40%", height: "100%" }}>
+        <div className="mainpage-card2-image-wrap">
           {board.images && board.images.length > 0 ? (
             <img
               src={`${process.env.REACT_APP_IMAGE_BASE_URL}/${board.images[0].imageKey}`}
               alt="preview"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                borderTopLeftRadius: "1.3rem",
-                borderBottomLeftRadius: "1.3rem"
-              }}
+              className="mainpage-card2-image"
             />
           ) : (
-            <div style={{
-              width: "100%",
-              height: "100%",
-              background: "#e9e5fa"
-            }} />
+            <div className="mainpage-card2-image-placeholder" />
           )}
         </div>
-        <div className="card-body py-3 px-4 d-flex flex-column justify-content-center" style={{ width: "60%" }}>
-          <h6 className="fw-bold" style={{
-            color: "#6247aa",
-            fontSize: "1.09rem",
-            marginBottom: 6,
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis"
-          }}>
+        <div className="card-body py-3 px-4 d-flex flex-column justify-content-center mainpage-card2-content">
+          <h6 className="fw-bold mainpage-card2-title">
             {board.title}
           </h6>
-          <div style={{
-            color: "#555",
-            fontSize: "0.97rem",
-            height: "2.3em",
-            overflow: "hidden",
-            textOverflow: "ellipsis"
-          }}>
+          <div className="mainpage-card2-score">
             score:&nbsp;
             {/* start prop을 주면 react-countup이 렌더 중 ref가 붙기 전 인스턴스를 생성해 크래시 — preserveValue가 이전 값 유지를 담당 */}
             <CountUp
@@ -102,8 +68,8 @@ const MainPageCard2 = ({ postId, score, rank }) => {
           </div>
           <div className="d-flex justify-content-between align-items-center mt-2">
             {/* 닉네임 한줄로 보이게 수정 */}
-            <small className="text-muted" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', maxWidth: 220 }}>
-              by <b style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', verticalAlign: 'bottom', maxWidth: 90, display: 'inline-block' }}>{board.memberNickname}</b>
+            <small className="text-muted mainpage-card-nickname">
+              by <b className="mainpage-card-nickname-name">{board.memberNickname}</b>
             </small>
           </div>
         </div>

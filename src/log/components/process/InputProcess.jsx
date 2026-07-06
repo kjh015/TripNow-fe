@@ -15,7 +15,7 @@ const InputProcess = ({ onClose, showAlert }) => {
     };
 
     return (
-        <div className="card mt-4 p-4 mx-auto" style={{ maxWidth: '400px' }}>
+        <div className="card mt-4 p-4 mx-auto log-process-card">
             <h4 className="mb-3">프로세스 이름</h4>
 
 

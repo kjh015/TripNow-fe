@@ -6,7 +6,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 const renderStarsStatic = (score = 0) => (
     <span>
         {[1, 2, 3, 4, 5].map(star => (
-            <span key={star} style={{ fontSize: "1.15rem", color: star <= score ? "#ffc107" : "#e4e5e9" }}>★</span>
+            <span key={star} className="mypage-comment-star" style={{ color: star <= score ? "#ffc107" : "#e4e5e9" }}>★</span>
         ))}
     </span>
 );
@@ -34,17 +34,17 @@ const ChckMyCom = () => {
     }, []);
 
     if (loading) {
-        return <div style={{ marginTop: "100px" }}><LoadingSpinner minHeight={140} /></div>;
+        return <div className="mypage-comment-loading"><LoadingSpinner minHeight={140} /></div>;
     }
 
     return (
-        <div className="container" style={{ marginTop: "70px" }}>
-            <div className="card shadow-sm border-1 rounded-4 mx-auto" style={{ maxWidth: 520, background: "#fafdffcc" }}>
+        <div className="container mypage-comment-page">
+            <div className="card shadow-sm border-1 rounded-4 mx-auto mypage-comment-card">
                 <div className="card-body p-4">
                     <div className="d-flex align-items-center mb-4 justify-content-between">
                         <h5 className="mb-0 fw-bold">작성 댓글 목록</h5>
-                        <div className="d-flex align-items-center" style={{ gap: "1.1rem" }}>
-                            <span className="text-secondary" style={{ fontSize: "1rem" }}>
+                        <div className="d-flex align-items-center mypage-comment-header-gap">
+                            <span className="text-secondary mypage-comment-count">
                                 작성 댓글 수 <span className="fw-semibold">{commentList.length}</span>
                             </span>
                         </div>

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 function ConfirmModal({ show, type = "danger", message, onConfirm, onCancel }) {
     if (!show) return null;
     return (
-        <div className="modal show fade" tabIndex="-1" style={{ display: "block", background: "rgba(0,0,0,0.23)", zIndex: 1060 }}>
+        <div className="modal show fade comment-modal-backdrop" tabIndex="-1">
             <div className="modal-dialog modal-dialog-centered">
                 <div className={`modal-content border-${type}`}>
                     <div className={`modal-header bg-${type} bg-opacity-10`}>
@@ -97,8 +97,7 @@ const CommentPage = ({ no, isLoggedIn, ratingAvg, setCommentFlag, category, regi
     return (
         <div>
             {alert.show && (
-                <div className={`alert alert-${alert.type} text-center`} role="alert"
-                    style={{ position: "fixed", top: 80, left: "50%", transform: "translateX(-50%)", minWidth: 220, zIndex: 2000 }}>
+                <div className={`alert alert-${alert.type} text-center comment-alert`} role="alert">
                     {alert.message}
                 </div>
             )}

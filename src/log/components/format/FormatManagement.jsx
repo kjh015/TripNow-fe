@@ -32,7 +32,7 @@ const FormatManagement = ({ processId, onMenuClick }) => {
     };
 
     return (
-        <div style={{ marginTop: '80px' }}>
+        <div className="log-page-spacer">
             <h2 className="fw-bold mb-4">포맷 관리</h2>
 
             {/* 중앙 상단 고정 경고창 */}
@@ -49,15 +49,15 @@ const FormatManagement = ({ processId, onMenuClick }) => {
                 <button className="btn btn-secondary" onClick={() => onMenuClick('filter')}>필터링 관리 ➡</button>
             </div>
 
-            <div className="card shadow-sm rounded-4 mb-4" style={{ border: 0 }}>
+            <div className="card shadow-sm rounded-4 mb-4 log-card-noborder">
                 <table className="table table-bordered text-center align-middle mb-0">
                     <thead className="table-light">
                         <tr>
-                            <th style={{ width: '10%' }}>ID</th>
-                            <th className="text-start" style={{ width: '25%' }}>이름</th>
+                            <th className="log-col-10">ID</th>
+                            <th className="text-start log-col-25">이름</th>
                             <th>생성 날짜</th>
                             <th>수정 날짜</th>
-                            <th style={{ width: '18%' }}>관리</th>
+                            <th className="log-col-18">관리</th>
                         </tr>
                     </thead>
                     <tbody>

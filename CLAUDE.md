@@ -101,7 +101,7 @@ src/css/
 - [ ] JSX 내 `<style>` 태그 13곳을 CSS 파일로 이동
 - [ ] Navbar/Footer/NavMenu 인라인 스타일 → `common.css`
 
-### Phase 3 — 화면 단위 인라인 스타일 제거 (화면당 1 PR)
+### Phase 3 — 화면 단위 인라인 스타일 제거
 - [ ] post 화면 (`src/post/`) → `post.css`
 - [ ] 메인/랭킹 화면 (`src/board/`) → `main.css`
 - [ ] sign/마이페이지 (`src/sign/`, `src/common/MyPage` 등) → `sign.css`

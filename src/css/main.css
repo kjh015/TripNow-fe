@@ -63,8 +63,11 @@
 .board-list-card {
   transition: box-shadow 0.18s, transform 0.16s, background 0.16s, border 0.13s;
   border: 1.5px solid #f0f0f7;
-  background: #f9faff;
+  background: var(--card-bg);
   border-radius: 1.1rem;
+  min-height: 88px;
+  box-shadow: var(--card-shadow);
+  position: relative;
 }
 
 .board-list-card:hover,
@@ -74,4 +77,494 @@
   background: #f6f3ff;
   transform: translateY(-2px) scale(1.012);
   cursor: pointer;
+}
+
+.board-list-card-title-row {
+  font-size: 1.12rem;
+  margin-bottom: 6px;
+}
+
+.board-list-card-title {
+  max-width: 75%;
+}
+
+.board-list-card-title-text {
+  color: #222;
+  font-weight: bold;
+  font-family: var(--font-display);
+}
+
+.board-list-card-date {
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.board-list-card-meta {
+  font-size: 0.97rem;
+  min-height: 36px;
+}
+
+.board-list-card-author {
+  color: #222;
+}
+
+.board-list-card-stat {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.board-list-card-star {
+  color: #ffc107;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* ===== 관리자 페이지 공통 (AdmnPage / AdmnBoard) ===== */
+.admin-page-spacer {
+  margin-top: 80px;
+}
+
+.admin-board-container {
+  max-width: 1500px;
+  padding-bottom: 40px;
+}
+
+.admin-board-panel {
+  background: rgba(250, 251, 255, 0.97);
+  min-height: 540px;
+}
+
+.admin-modal-backdrop {
+  background: rgba(22, 22, 37, 0.40);
+  backdrop-filter: blur(2px);
+  z-index: 1050;
+}
+
+.admin-modal-content {
+  border-radius: 1.3rem;
+  box-shadow: 0 6px 32px 0 rgba(80, 55, 255, 0.08);
+}
+
+.admin-modal-close-icon {
+  filter: invert(0.5);
+}
+
+/* ===== 지역/카테고리 선택 위젯 (RegionRadioComp / CategoryCard) ===== */
+.selector-panel {
+  min-width: 240px;
+  max-width: 350px;
+}
+
+.selector-heading {
+  color: #1565c0;
+  font-size: 1.18rem;
+}
+
+.selector-icon-gradient {
+  font-size: 1.3rem;
+  background: linear-gradient(90deg, #42a5f5 10%, #7e57c2 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.region-card-btn,
+.category-card-btn {
+  border-radius: 18px;
+  cursor: pointer;
+  padding: 14px 0;
+  outline: none;
+  font-weight: 500;
+  color: #7b8da3;
+  transition: all 0.16s cubic-bezier(.5, 1.7, .76, 1.18);
+}
+
+.region-card-btn {
+  background: #fff;
+  box-shadow: 0 2px 7px 0 rgba(90, 120, 180, 0.08);
+}
+
+.category-card-btn {
+  background: #f7fafd;
+  box-shadow: 0 2px 7px 0 rgba(90, 120, 180, 0.06);
+}
+
+.region-card-active,
+.category-card-active {
+  background: linear-gradient(90deg, #e3f2fd 70%, #ede7f6 100%);
+  color: #1760c6;
+  font-weight: 700;
+  transform: scale(1.07);
+}
+
+.region-card-active {
+  box-shadow: 0 4px 16px 0 rgba(33, 150, 243, 0.12);
+}
+
+.category-card-active {
+  box-shadow: 0 4px 16px 0 rgba(33, 150, 243, 0.10);
+}
+
+/* ===== 랭킹 카드 본문 (MainPageCard / RankCard 공통) ===== */
+.mainpage-card-body {
+  background: rgba(250, 250, 255, 0.96);
+  box-shadow: var(--card-shadow-lg);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s cubic-bezier(.19, 1, .22, 1), box-shadow 0.22s;
+  cursor: pointer;
+  z-index: 1; /* 왕관보다 낮음 */
+}
+
+.mainpage-card-image-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.mainpage-card-image {
+  height: 390px;
+  width: 100%;
+  object-fit: cover;
+  filter: brightness(98%);
+  display: block;
+}
+
+.mainpage-card-image-placeholder {
+  height: 390px;
+  background: #f3f3f8;
+}
+
+.rank-card-image {
+  height: 200px;
+  width: 100%;
+  object-fit: cover;
+  filter: brightness(98%);
+  display: block;
+}
+
+.rank-card-image-placeholder {
+  height: 200px;
+  background: #f3f3f8;
+}
+
+.mainpage-card-overlay-badge {
+  position: absolute;
+  bottom: 18px;
+  left: 20px;
+  background: rgba(30, 30, 55, 0.56);
+  color: #fff;
+  padding: 0.75rem 1.25rem;
+  border-radius: 1.2rem;
+  font-weight: 600;
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.mainpage-card-overlay-label {
+  color: #e0c3fc;
+  font-weight: 700;
+}
+
+.mainpage-card-title {
+  font-size: 1.09rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.mainpage-card-nickname {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 220px;
+}
+
+.mainpage-card-nickname-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+  max-width: 90px;
+  display: inline-block;
+}
+
+/* ===== 랭킹 리스트 카드 (MainPageCard2) ===== */
+.mainpage-card2-wrap {
+  min-height: 112px;
+}
+
+.mainpage-card2-body {
+  height: 100%;
+  width: 100%;
+  border-radius: 1.3rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  transition: transform 0.22s cubic-bezier(.19, 1, .22, 1), box-shadow 0.18s;
+  cursor: pointer;
+  z-index: 1; /* 뱃지보다 낮게 */
+}
+
+.mainpage-card2-image-wrap {
+  width: 40%;
+  height: 100%;
+}
+
+.mainpage-card2-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-top-left-radius: 1.3rem;
+  border-bottom-left-radius: 1.3rem;
+}
+
+.mainpage-card2-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #e9e5fa;
+}
+
+.mainpage-card2-content {
+  width: 60%;
+}
+
+.mainpage-card2-title {
+  color: #6247aa;
+  font-size: 1.09rem;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mainpage-card2-score {
+  color: #555;
+  font-size: 0.97rem;
+  height: 2.3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== 인기 랭킹 레이아웃 (MainPageCardsLayout) ===== */
+.mainpage-layout-row {
+  min-height: 520px;
+  gap: 36px;
+  width: 100%;
+  margin-top: 48px;
+}
+
+.mainpage-layout-primary {
+  width: 720px;
+  height: 520px;
+  display: flex;
+  align-items: stretch;
+}
+
+.mainpage-layout-primary-motion {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.mainpage-layout-crown-glow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: none;
+  box-shadow: none;
+}
+
+.mainpage-layout-secondary {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 520px;
+  width: 360px;
+  gap: 18px;
+}
+
+.mainpage-layout-secondary-item {
+  height: calc((100% - 54px) / 4);
+  min-height: 0;
+  display: flex;
+}
+
+/* ===== 인기 카테고리/지역 레이아웃 (MainPageCardsLayout2) ===== */
+.mainpage-layout2-row {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: 24px;
+  overflow-x: auto;
+  padding: 8px 0;
+}
+
+.mainpage-layout2-card {
+  width: 240px;
+  height: 200px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--card-bg);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.09);
+  display: flex;
+  align-items: stretch;
+}
+
+.mainpage-layout2-badge {
+  background: rgba(30, 30, 55, 0.56);
+  color: #fff;
+  padding: 1.75rem 0 0.2rem 4.75rem;
+  border-radius: 1.2rem;
+  font-weight: 600;
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: -25px;
+}
+
+.mainpage-layout2-badge span {
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ===== 메인 히어로/섹션 (MainPage) ===== */
+.mainpage-root {
+  min-height: 100vh;
+  background: #F5F6FF;
+  width: 100%;
+  overflow-x: hidden;
+  margin-top: -1px;
+}
+
+.mainpage-hero {
+  width: 100%;
+  min-height: 500px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.mainpage-hero-content {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.mainpage-hero-panel {
+  text-align: center;
+  position: relative;
+  display: inline-block;
+  padding: 1rem 4.5rem 10rem 4.5rem;
+  background: rgba(255, 255, 255, 0.65);
+  box-shadow: 0 6px 36px rgba(80, 60, 180, 0.08);
+  backdrop-filter: blur(4px);
+  border: 1.5px solid rgba(190, 180, 255, 0.13);
+  z-index: 3;
+  min-width: 320px;
+  max-width: 94vw;
+}
+
+.mainpage-hero-title {
+  font-size: 3.42rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  background: var(--brand-badge-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 1px 10px rgba(160, 160, 220, 0.09);
+  margin: 0;
+  font-family: var(--font-display);
+}
+
+.mainpage-hero-divider {
+  height: 3.5px;
+  width: 60px;
+  margin: 0.7rem auto 1.1rem auto;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, #bdaafc 20%, #92e0f6 90%);
+  opacity: 0.88;
+}
+
+.mainpage-hero-subtext {
+  color: #5B4B9A;
+  font-weight: 500;
+  font-size: 1.16rem;
+  margin: 0.7rem 0 0 0;
+  text-shadow: 0 2px 8px rgba(255, 255, 255, 0.09);
+}
+
+.mainpage-hero-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100px;
+  background: linear-gradient(180deg, rgba(245, 245, 255, 0) 0%, rgba(245, 245, 255, 0.84) 100%);
+  z-index: 2;
+}
+
+.mainpage-body-container {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1020px;
+  z-index: 2;
+  padding: 0 16px;
+  margin-top: -265px;
+}
+
+.mainpage-section-title {
+  text-align: start;
+  width: 100%;
+  font-family: var(--font-display);
+  color: #a68eff;
+  font-weight: 900;
+  font-size: 2.35rem;
+  margin: 0 0 26px 0;
+  letter-spacing: -0.03em;
+  text-shadow: 0 2px 16px rgba(92, 67, 226, 0.08);
+  transform: translateY(28px);
+}
+
+.mainpage-top5-section {
+  margin-bottom: 32px;
+  margin-top: 5rem;
+}
+
+.mainpage-category-section {
+  margin-top: 8rem;
+}
+
+.mainpage-region-section {
+  margin-top: 6rem;
+}
+
+.mainpage-subsection-title {
+  padding-left: 19rem;
+  text-align: left;
+  font-family: var(--font-display);
+  color: #b7aaff;
+  font-weight: 700;
+  font-size: 1.55rem;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.4rem;
 }

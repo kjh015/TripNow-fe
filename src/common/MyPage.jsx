@@ -51,16 +51,15 @@ const MyPage = () => {
   }, []);
 
   return (
-    <div style={{ background: 'linear-gradient(135deg,#eaf4fc 60%,#fff 100%)', minHeight: '100vh', paddingTop: 110, paddingBottom: 36 }}>
+    <div className="mypage-root">
       {alert.show && (
-        <div className={`alert alert-${alert.type} text-center`}
-          style={{ position: "fixed", top: 60, left: "50%", transform: "translateX(-50%)", minWidth: 200, zIndex: 2000 }}
+        <div className={`alert alert-${alert.type} text-center mypage-alert`}
           role="alert">
           {alert.message}
         </div>
       )}
       {showConfirm && (
-        <div className="modal show fade d-block" tabIndex={-1} style={{ background: 'rgba(0,0,0,0.28)' }}>
+        <div className="modal show fade d-block mypage-modal-backdrop" tabIndex={-1}>
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
@@ -79,10 +78,9 @@ const MyPage = () => {
       <div className="container mb-3">
         <div className="row justify-content-center">
           <div className="col-12 col-md-7 col-lg-5">
-            <div className="card shadow rounded-4 p-4 text-center border-0" style={{ background: "#fffdfcf2" }}>
-              <img src={myPageImage} alt="프로필" className="rounded-circle shadow-sm mx-auto d-block"
-                style={{ width: 108, height: 108, objectFit: 'cover', background: '#f4f6fa', border: '4px solid #e3e8ee' }} />
-              <h3 className="fw-bold mt-3 mb-1" style={{ color: "#274071", letterSpacing: "1px" }}>
+            <div className="card shadow rounded-4 p-4 text-center border-0 mypage-card">
+              <img src={myPageImage} alt="프로필" className="rounded-circle shadow-sm mx-auto d-block mypage-avatar" />
+              <h3 className="fw-bold mt-3 mb-1 mypage-nickname">
                 {member.nickname || "-"}
               </h3>
               <div>
@@ -98,8 +96,7 @@ const MyPage = () => {
                     <div className="d-flex align-items-center bg-light rounded-3 px-3 py-2 shadow-sm mb-2">
                       <i className="bi bi-envelope-fill text-primary me-2" />
                       <span className="text-secondary small fw-semibold me-2">이메일</span>
-                      <span className="fw-bold ms-auto text-dark"
-                        style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', display: 'block', textAlign: 'right' }}
+                      <span className="fw-bold ms-auto text-dark mypage-email-value"
                         title={member.email}>{member.email || '-'}</span>
                     </div>
                   </div>
@@ -144,7 +141,7 @@ const MyPage = () => {
                   <i className="bi bi-chat-text me-1" /> 작성 댓글
                 </Link>
               </div>
-              <hr style={{ marginTop: "2rem" }} />
+              <hr className="mypage-divider" />
               <div className="gap-2 mt-3">
                 <Link to="/sign/update" className="btn btn-outline-primary rounded-pill px-3 shadow-sm me-2">
                   <i className="bi bi-pencil-square me-1" /> 정보수정

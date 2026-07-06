@@ -1,0 +1,75 @@
+/* comment 도메인: 댓글 목록/작성 */
+
+/* ===== 삭제 확인 모달 / 알림 (CommentPage) ===== */
+.comment-modal-backdrop {
+  display: block;
+  background: rgba(0, 0, 0, 0.23);
+  z-index: 1060;
+}
+
+.comment-alert {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 220px;
+  z-index: var(--z-alert);
+}
+
+/* ===== 댓글 목록 (CommentList) ===== */
+.comment-list-card {
+  max-width: 520px;
+  background: #fafdffcc;
+}
+
+.comment-header-gap {
+  gap: 1.1rem;
+}
+
+.comment-count-text {
+  font-size: 1rem;
+}
+
+.comment-rating-star {
+  font-size: 1.15rem;
+  color: #ffc107;
+}
+
+.comment-star {
+  font-size: 1.15rem;
+}
+
+.comment-item-meta {
+  font-size: 0.96rem;
+  color: #aaa;
+}
+
+.comment-delete-btn {
+  top: 8px;
+  right: 10px;
+  border: none;
+  font-size: 1.25rem;
+  color: #bbb;
+  background: transparent;
+  z-index: 10;
+}
+
+/* ===== 댓글 작성 (WriteComment) ===== */
+.comment-write-card {
+  max-width: 520px;
+}
+
+.comment-write-label {
+  font-weight: 500;
+}
+
+.comment-write-textarea {
+  resize: none;
+}
+
+.comment-write-star {
+  font-size: 1.25rem;
+  cursor: pointer;
+  margin-left: 3px;
+  margin-right: 1px;
+}

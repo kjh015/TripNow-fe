@@ -26,7 +26,7 @@ const LogTable = ({
     const renderSortIcon = (key) => {
         if (sortConfig.key !== key) return null;
         return (
-            <span style={{ fontSize: '0.75em', marginLeft: '4px', verticalAlign: 'middle' }}>
+            <span className="log-table-sort-icon">
                 {sortConfig.direction === 'asc' ? '▲' : '▼'}
             </span>
         );
@@ -43,14 +43,15 @@ const LogTable = ({
     return (
         <div>
             <h3 className="mb-3">{title}</h3>
-            <div className="table-responsive" style={{ maxHeight: '500px', overflowY: 'auto' }}>
+            <div className="table-responsive log-table-scroll">
                 <table className={`table table-bordered table-hover align-middle`}>
                     <thead className={`text-center table-${color}`}>
                         <tr>
                             {columns.map(col =>
                                 <th
                                     key={col.key}
-                                    style={{ cursor: col.sortable ? 'pointer' : undefined, width: col.width || undefined }}
+                                    className={col.sortable ? "log-table-sortable-th" : undefined}
+                                    style={{ width: col.width || undefined }}
                                     onClick={col.sortable ? () => handleSort(col.key) : undefined}
                                 >
                                     {col.label}{col.sortable && renderSortIcon(col.key)}
@@ -63,7 +64,7 @@ const LogTable = ({
                             <tr><td colSpan={columns.length} className="text-muted">데이터가 없습니다.</td></tr>
                         ) : (
                             sortedList.flatMap(row => [
-                                <tr key={row.historyId} style={{ cursor: 'pointer' }} onClick={() => setExpandedRowId(expandedRowId === row.historyId ? null : row.historyId)}>
+                                <tr key={row.historyId} className="log-table-row-clickable" onClick={() => setExpandedRowId(expandedRowId === row.historyId ? null : row.historyId)}>
                                     {columns.map(col => (
                                         <td key={col.key}>
                                             {col.render ? col.render(row) : (
@@ -79,12 +80,7 @@ const LogTable = ({
                                         <td colSpan={columns.length} className="text-start bg-light">
                                             <strong>Log Data:</strong>
                                             <pre
-                                                className="mb-0 mt-2"
-                                                style={{
-                                                    whiteSpace: 'pre-wrap',
-                                                    wordBreak: 'break-word',
-                                                    overflowX: 'hidden'
-                                                }}
+                                                className="mb-0 mt-2 log-table-detail-pre"
                                             >
                                                 {details?.[row.historyId] ? JSON.stringify(details[row.historyId], null, 2) : '불러오는 중...'}
                                             </pre>

@@ -24,27 +24,11 @@ const SignUpPage = () => {
     }, []);
 
     return (
-        <div className="min-vh-100 d-flex flex-column" style={{
-            background: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)"
-        }}>
+        <div className="min-vh-100 d-flex flex-column sign-page-bg">
             <main className="flex-grow-1 d-flex align-items-center justify-content-center">
-                <div style={{
-                    maxWidth: "410px",
-                    width: "95%",
-                    margin: "3rem auto",
-                    borderRadius: "1.5rem",
-                    boxShadow: "0 6px 32px 0 rgba(54,69,79,0.13)",
-                    border: "none"
-                }} className="card shadow-sm">
+                <div className="card shadow-sm signup-card">
                     <div className="card-body p-4">
-                        <div className="text-center" style={{
-                            fontWeight: "bold",
-                            fontSize: "2.05rem",
-                            background: "#000000",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            marginBottom: "24px"
-                        }}>회원가입</div>
+                        <div className="text-center signup-card-title">회원가입</div>
                         {alert.show && (
                             <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">
                                 {alert.message}
@@ -196,17 +180,7 @@ const SignUpPage = () => {
 
                             <div className="d-grid">
                                 <button type="submit"
-                                    className="btn text-white shadow"
-                                    style={{
-                                        fontWeight: "bold",
-                                        fontSize: "1.08rem",
-                                        letterSpacing: "0.03em",
-                                        borderRadius: "2rem",
-                                        padding: "0.75rem",
-                                        marginTop: "12px",
-                                        background: "#3f51b5",
-                                        border: "none"
-                                    }}
+                                    className="btn text-white shadow signup-submit-btn"
                                     disabled={!isFormValid}>
                                     {isSubmitting ? (
                                         <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>

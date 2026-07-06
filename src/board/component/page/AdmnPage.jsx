@@ -8,7 +8,7 @@ const AdmnPage = () => {
 
     <div>
 
-      <header style={{ marginTop: '80px' }}>        {/* 간격조정 */}
+      <header className="admin-page-spacer">        {/* 간격조정 */}
 
       </header>
 

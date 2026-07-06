@@ -2,25 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { changePassword } from '../../api/memberApi';
 
-const cardStyle = {
-    maxWidth: "420px",
-    width: "95%",
-    margin: "40px auto",
-    padding: "40px 34px 32px 34px",
-    background: "rgba(255,255,255,0.97)",
-    borderRadius: "1.5rem",
-    boxShadow: "0 6px 36px 0 rgba(54,69,79,0.13)",
-};
-
-const titleGradient = {
-    fontWeight: "bold",
-    fontSize: "2rem",
-    background: "#000000",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    marginBottom: "30px"
-};
-
 // 비밀번호 보안 패턴 (8자 이상, 영문/숫자/특수문자)
 const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
 
@@ -81,15 +62,10 @@ const PasswordChangePage = () => {
     };
 
     return (
-        <div style={{
-            minHeight: "100vh",
-            background: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
-            display: "flex",
-            flexDirection: "column",
-        }}>
+        <div className="min-vh-100 d-flex flex-column sign-page-bg">
             <main className="flex-grow-1 d-flex align-items-center justify-content-center">
-                <div style={cardStyle}>
-                    <div style={titleGradient} className="text-center mb-4">비밀번호 변경</div>
+                <div className="sign-card">
+                    <div className="sign-card-title text-center mb-4">비밀번호 변경</div>
                     {/* Alert */}
                     {alert.show && (
                         <div className={`alert alert-${alert.type} py-2 alert-dismissible fade show`} role="alert">

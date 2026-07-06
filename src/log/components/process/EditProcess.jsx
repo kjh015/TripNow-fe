@@ -27,7 +27,7 @@ const EditProcess = ({ onClose, processId, _name, showAlert }) => {
 
     return (
 
-        <div className="card mt-4 p-4 mx-auto" style={{ maxWidth: '400px' }}>
+        <div className="card mt-4 p-4 mx-auto log-process-card">
             <h4 className="mb-3">Process 수정</h4>
 
 

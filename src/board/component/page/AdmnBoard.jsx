@@ -46,32 +46,31 @@ const BoardList = ({ title, boards, loading, error, categoryColors, regionColors
                     <div
                         key={board.postId}
                         className="p-3 rounded-3 border board-list-card"
-                        style={{ background: "#fff", minHeight: "88px", boxShadow: "0 2px 10px 0 rgba(0,0,0,0.04)", position: "relative" }}
                         tabIndex={0}
                         onClick={() => onClickCard(board)}
                         onKeyDown={e => { if (e.key === "Enter" || e.key === " ") onClickCard(board); }}
                     >
-                        <div className="d-flex justify-content-between align-items-start fw-bold" style={{ fontSize: "1.12rem", marginBottom: 6 }}>
-                            <div className="text-truncate" style={{ maxWidth: "75%" }}>
-                                <span style={{ color: "#222", fontWeight: "bold", fontFamily: "'Montserrat', 'Gowun Dodum', sans-serif" }} title={board.title}>
+                        <div className="d-flex justify-content-between align-items-start fw-bold board-list-card-title-row">
+                            <div className="text-truncate board-list-card-title">
+                                <span className="board-list-card-title-text" title={board.title}>
                                     {board.title}
                                 </span>
                             </div>
-                            <span className="text-secondary ms-2" style={{ fontSize: "0.95rem", whiteSpace: "nowrap" }}>
+                            <span className="text-secondary ms-2 board-list-card-date">
                                 {formatDate(board.updatedAt)}
                             </span>
                         </div>
-                        <div className="d-flex align-items-center flex-wrap gap-2 justify-content-between" style={{ fontSize: "0.97rem", minHeight: "36px" }}>
+                        <div className="d-flex align-items-center flex-wrap gap-2 justify-content-between board-list-card-meta">
                             <div>
                                 <Badge bg={categoryColors[CATEGORY_CODE_TO_LABEL[board.category] ?? board.category]} className="me-1">{CATEGORY_CODE_TO_LABEL[board.category] ?? board.category}</Badge>
                                 <Badge bg={regionColors[REGION_CODE_TO_LABEL[board.region] ?? board.region]} className="me-2">{REGION_CODE_TO_LABEL[board.region] ?? board.region}</Badge>
-                                <span style={{ color: "#222" }}>by {board.memberNickname}</span>
+                                <span className="board-list-card-author">by {board.memberNickname}</span>
                             </div>
                             <div className="d-flex align-items-center">
-                                <span className="badge text-dark d-flex align-items-center" style={{ fontSize: "1rem", fontWeight: 500 }}>
+                                <span className="badge text-dark d-flex align-items-center board-list-card-stat">
                                     <i className="bi bi-eye me-1" />{board.viewCount || 0}
                                 </span>
-                                <span className="badge" style={{ color: "#ffc107", fontSize: "1rem", fontWeight: 500 }}>
+                                <span className="badge board-list-card-star">
                                     <i className="bi bi-star-fill me-1" />{board.starAvg ? board.starAvg.toFixed(1) : 0}
                                 </span>
                                 {onRemove &&
@@ -158,18 +157,17 @@ const AdmnBoard = () => {
     };
 
     return (
-        <div style={{ marginTop: 80 }}>
+        <div className="admin-page-spacer">
             {showConfirm && (
-                <div className="modal show fade d-block" tabIndex={-1}
-                    style={{ background: 'rgba(22, 22, 37, 0.40)', backdropFilter: "blur(2px)", zIndex: 1050 }}>
+                <div className="modal show fade d-block admin-modal-backdrop" tabIndex={-1}>
                     <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content" style={{ borderRadius: "1.3rem", boxShadow: "0 6px 32px 0 rgba(80,55,255,0.08)" }}>
+                        <div className="modal-content admin-modal-content">
                             <div className="modal-header border-0">
                                 <h5 className="modal-title text-danger fw-semibold">
                                     <i className="bi bi-trash3 me-2"></i>게시글 삭제
                                 </h5>
-                                <button type="button" className="btn-close" aria-label="닫기"
-                                    style={{ filter: "invert(0.5)" }} onClick={() => setShowConfirm(false)} />
+                                <button type="button" className="btn-close admin-modal-close-icon" aria-label="닫기"
+                                    onClick={() => setShowConfirm(false)} />
                             </div>
                             <div className="modal-body text-center">
                                 <p className="fs-5 mb-3 text-dark">정말 <span className="fw-bold text-danger">삭제</span>하시겠습니까?</p>
@@ -184,11 +182,11 @@ const AdmnBoard = () => {
                     </div>
                 </div>
             )}
-            <div className="container" style={{ maxWidth: 1500, paddingBottom: 40 }}>
+            <div className="container admin-board-container">
                 <h2 className="fw-bold">여행지 관리</h2>
                 <div className="row g-4">
                     <div className="col-12">
-                        <div className="panel-bg p-4 rounded-4 h-100 shadow-sm" style={{ background: "rgba(250,251,255,0.97)", minHeight: 540 }}>
+                        <div className="panel-bg p-4 rounded-4 h-100 shadow-sm admin-board-panel">
                             <BoardList
                                 title={<span className="text-info"><i className="bi bi-search me-1"></i>게시글 목록</span>}
                                 boards={esBoards} loading={esLoading} error={esError}
