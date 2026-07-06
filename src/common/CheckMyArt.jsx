@@ -32,7 +32,7 @@ const CheckMyArt = () => {
     }, []);
 
     return (
-        <div className="bg-light min-vh-100 py-4 mypage-list-page">
+        <div className="min-vh-100 py-4 mypage-list-page">
             <div className="container py-3 mypage-list-container">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <div>
