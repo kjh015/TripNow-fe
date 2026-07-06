@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { getAdminMembers, updateMemberRole } from '../../api/memberApi';
 import { FaTrash, FaUserShield } from 'react-icons/fa';
 import AdminPageHeader from '../../common/AdminPageHeader';
+import { genderLabels } from '../../constants/colorMaps';
 
 const MemberManagement = () => {
     const [memberList, setMemberList] = useState([]);
@@ -62,7 +63,7 @@ const MemberManagement = () => {
                                     <td>{member.loginId}</td>
                                     <td>{member.nickname}</td>
                                     <td>{member.email}</td>
-                                    <td>{member.gender}</td>
+                                    <td>{genderLabels[member.gender] || member.gender}</td>
                                     <td>-</td>
                                     <td>{member.roles?.includes("ROLE_ADMIN") ? "관리자" : "회원"}</td>
                                     <td className='text-center'>

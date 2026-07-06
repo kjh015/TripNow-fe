@@ -142,8 +142,8 @@ const SignUpPage = () => {
                                         type="radio"
                                         name="gender"
                                         id="genderMale"
-                                        value="남"
-                                        checked={formData.gender === '남'}
+                                        value="MALE"
+                                        checked={formData.gender === 'MALE'}
                                         onChange={handleChange}
                                         required
                                     />
@@ -154,8 +154,8 @@ const SignUpPage = () => {
                                         type="radio"
                                         name="gender"
                                         id="genderFemale"
-                                        value="여"
-                                        checked={formData.gender === '여'}
+                                        value="FEMALE"
+                                        checked={formData.gender === 'FEMALE'}
                                         onChange={handleChange}
                                         required
                                     />
