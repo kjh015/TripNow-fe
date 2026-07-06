@@ -17,23 +17,26 @@ const InputProcess = ({ onClose }) => {
 
     return (
         <div>
-            <h4 className="mb-3">프로세스 이름</h4>
+            <label className="form-label fw-semibold">프로세스 이름</label>
             <input
                 type='text'
-                className="form-control mb-3"
+                className="form-control"
                 placeholder="프로세스 이름 입력"
                 value={name}
                 onChange={e => setName(e.target.value)}
             />
-            <div className="d-flex justify-content-end gap-2">
-                <button className="btn admin-btn admin-btn-outline" onClick={onClose}>닫기</button>
-                <button
-                    className="btn admin-btn admin-btn-primary"
-                    onClick={addProcess}
-                    disabled={!name.trim()} // 이름 없으면 비활성화(UX 개선)
-                >
-                    추가
-                </button>
+            <div className="admin-form-footer justify-content-end">
+                <div className="admin-form-footer-actions">
+                    <button type="button" className="btn admin-btn admin-btn-outline" onClick={onClose}>닫기</button>
+                    <button
+                        type="button"
+                        className="btn admin-btn admin-btn-primary"
+                        onClick={addProcess}
+                        disabled={!name.trim()} // 이름 없으면 비활성화(UX 개선)
+                    >
+                        추가
+                    </button>
+                </div>
             </div>
         </div>
     );

@@ -87,8 +87,8 @@ const DetailDeduplication = ({ processId, id, onClose }) => {
     return (
         <div className="container mt-5">
             <h4 className="mb-4 admin-detail-title">중복 제거 설정 수정</h4>
-            <div className="mb-3">
-                <label className="form-label">중복 이름</label>
+            <div className="mb-4 text-start">
+                <label className="form-label fw-semibold">중복 이름</label>
                 <input type="text" className="form-control"
                     value={name} onChange={e => setName(e.target.value)} />
             </div>
@@ -104,8 +104,11 @@ const DetailDeduplication = ({ processId, id, onClose }) => {
                 />
             ))}
 
-            <div className="d-flex justify-content-between align-items-center mt-3">
-                <button className="btn admin-btn admin-btn-outline" onClick={handleAddRow}>+ 규칙 추가</button>
+            <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm" onClick={handleAddRow}>
+                + 규칙 추가
+            </button>
+
+            <div className="admin-form-footer">
                 <button
                     className={`btn btn-sm admin-toggle ${active ? 'admin-toggle-on' : 'admin-toggle-off'}`}
                     onClick={() => setActive(!active)}
@@ -113,9 +116,10 @@ const DetailDeduplication = ({ processId, id, onClose }) => {
                 >
                     활성화: {active ? "ON" : "OFF"}
                 </button>
-                <div className="d-flex justify-content-end gap-2">
-                    <button className="btn admin-btn admin-btn-primary" onClick={handleSubmit}>수정</button>
-                    <button className="btn admin-btn admin-btn-danger" onClick={handleRemove}>삭제</button>
+                <div className="admin-form-footer-actions">
+                    <button type="button" className="btn admin-btn admin-btn-primary" onClick={handleSubmit}>수정</button>
+                    <button type="button" className="btn admin-btn admin-btn-danger" onClick={handleRemove}>삭제</button>
+                    <button type="button" className="btn admin-btn admin-btn-outline" onClick={() => onClose(false)}>닫기</button>
                 </div>
             </div>
         </div>

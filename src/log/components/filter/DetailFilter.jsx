@@ -188,26 +188,15 @@ const DetailFilter = ({ onClose, processId, filterId }) => {
                                 onChange={e => setName(e.target.value)}
                             />
                         </div>
-                        <div className="mb-4">
+                        <div>
                             <label className="form-label fw-semibold">조건 추가</label>
                             <div className="d-flex gap-2">
-                                <button className="btn admin-btn admin-btn-outline" onClick={addParenAndConditionWithAnd}>
+                                <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm" onClick={addParenAndConditionWithAnd}>
                                     ( + 조건
                                 </button>
-                                <button className="btn admin-btn admin-btn-outline" onClick={addRightParen}>)</button>
-                                <button className="btn admin-btn admin-btn-outline" onClick={addCondition}>조건</button>
+                                <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm" onClick={addRightParen}>)</button>
+                                <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm" onClick={addCondition}>조건</button>
                             </div>
-                        </div>
-                        <div className="mb-3">
-                            <button className={`btn admin-toggle ${active ? "admin-toggle-on" : "admin-toggle-off"} w-100`}
-                                onClick={() => setActive(!active)}>
-                                <span className="fw-bold">활성화: {active ? "ON" : "OFF"}</span>
-                            </button>
-                        </div>
-                        <div className="d-flex gap-2">
-                            <button className="btn admin-btn admin-btn-primary flex-fill" onClick={handleSubmit}>수정</button>
-                            <button className="btn admin-btn admin-btn-danger flex-fill" onClick={removeFilter}>삭제</button>
-                            <button className="btn admin-btn admin-btn-outline flex-fill" onClick={onClose}>닫기</button>
                         </div>
                     </div>
                 </div>
@@ -337,6 +326,21 @@ const DetailFilter = ({ onClose, processId, filterId }) => {
                             })}
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div className="admin-form-footer">
+                <button
+                    className={`btn btn-sm admin-toggle ${active ? "admin-toggle-on" : "admin-toggle-off"}`}
+                    onClick={() => setActive(!active)}
+                    type="button"
+                >
+                    활성화: {active ? "ON" : "OFF"}
+                </button>
+                <div className="admin-form-footer-actions">
+                    <button type="button" className="btn admin-btn admin-btn-primary" onClick={handleSubmit}>수정</button>
+                    <button type="button" className="btn admin-btn admin-btn-danger" onClick={removeFilter}>삭제</button>
+                    <button type="button" className="btn admin-btn admin-btn-outline" onClick={onClose}>닫기</button>
                 </div>
             </div>
         </div>

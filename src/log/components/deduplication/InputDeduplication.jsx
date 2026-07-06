@@ -51,8 +51,8 @@ const InputDeduplication = ({ processId, onClose }) => {
 
     return (
         <div className="dedup-input-container">
-            <div className="mb-3">
-                <label className="form-label fw-bold">중복 이름</label>
+            <div className="mb-4 text-start">
+                <label className="form-label fw-semibold">중복 이름</label>
                 <input
                     type="text"
                     className="form-control"
@@ -60,16 +60,6 @@ const InputDeduplication = ({ processId, onClose }) => {
                     onChange={e => setName(e.target.value)}
                     autoFocus
                 />
-            </div>
-
-            <div className="mb-3 d-flex justify-content-end">
-                <button
-                    className={`btn btn-sm admin-toggle ${active ? 'admin-toggle-on' : 'admin-toggle-off'}`}
-                    onClick={() => setActive(!active)}
-                    type="button"
-                >
-                    활성화: {active ? "ON" : "OFF"}
-                </button>
             </div>
 
             <div>
@@ -85,13 +75,22 @@ const InputDeduplication = ({ processId, onClose }) => {
                 ))}
             </div>
 
-            <div className="d-flex justify-content-between align-items-center mt-3">
-                <button className="btn admin-btn admin-btn-outline" onClick={handleAddRow}>
-                    + 규칙 추가
+            <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm" onClick={handleAddRow}>
+                + 규칙 추가
+            </button>
+
+            <div className="admin-form-footer">
+                <button
+                    className={`btn btn-sm admin-toggle ${active ? 'admin-toggle-on' : 'admin-toggle-off'}`}
+                    onClick={() => setActive(!active)}
+                    type="button"
+                >
+                    활성화: {active ? "ON" : "OFF"}
                 </button>
-                <button className="btn admin-btn admin-btn-primary" onClick={handleSubmit}>
-                    추가
-                </button>
+                <div className="admin-form-footer-actions">
+                    <button type="button" className="btn admin-btn admin-btn-outline" onClick={() => onClose(false)}>닫기</button>
+                    <button type="button" className="btn admin-btn admin-btn-primary" onClick={handleSubmit}>추가</button>
+                </div>
             </div>
         </div>
     );
