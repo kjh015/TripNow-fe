@@ -24,7 +24,7 @@ const SignUpPage = () => {
     }, []);
 
     return (
-        <div className="min-vh-100 d-flex flex-column sign-page-bg">
+        <div className="min-vh-100 d-flex flex-column">
             <main className="flex-grow-1 d-flex align-items-center justify-content-center">
                 <div className="card shadow-sm signup-card">
                     <div className="card-body p-4">

@@ -1,10 +1,7 @@
 /* sign 도메인: 로그인/회원가입/마이페이지 */
 
-/* ===== 로그인/회원가입/정보수정/비밀번호변경 공통 배경 ===== */
-.sign-page-bg {
-  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-}
-
+/* ===== 로그인/회원가입/정보수정/비밀번호변경 ===== */
+/* 페이지 배경은 body의 --page-bg 상속 (페이지별 자체 배경 금지) */
 .sign-page-bg-full {
   width: 100vw;
   overflow-x: hidden;
@@ -81,7 +78,6 @@
 
 /* ===== 마이페이지 (MyPage) ===== */
 .mypage-root {
-  background: linear-gradient(135deg, #eaf4fc 60%, #fff 100%);
   min-height: 100vh;
   padding-top: 110px;
   padding-bottom: 36px;

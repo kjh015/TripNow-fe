@@ -98,7 +98,7 @@ const PostListPage = () => {
   };
 
   return (
-    <div className="bg-light min-vh-100 py-4 post-list-page">
+    <div className="min-vh-100 py-4 post-list-page">
       <div className="mt-5" />
       <PostSearch selectedCategory={category} selectedRegion={region} />
       <div className="post-list-divider" />
