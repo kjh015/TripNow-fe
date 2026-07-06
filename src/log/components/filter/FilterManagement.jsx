@@ -26,14 +26,14 @@ const FilterManagement = ({ processId, onMenuClick }) => {
     return (
         <div className="log-page-spacer">
             <AdminPageHeader title="필터링 관리">
-                <button className="btn btn-primary" onClick={() => setBuilderComp(true)}>필터 추가</button>
+                <button className="btn admin-btn admin-btn-primary" onClick={() => setBuilderComp(true)}>+ 필터 추가</button>
             </AdminPageHeader>
 
             <AdminPipelineNav active="filter" onNavigate={onMenuClick} />
 
-            <div className="card shadow-sm rounded-4 mb-4 log-card-noborder">
-                <table className="table table-bordered text-center align-middle mb-0">
-                    <thead className="table-light">
+            <div className="admin-table-card mb-4">
+                <table className="table admin-table text-center align-middle mb-0">
+                    <thead>
                         <tr>
                             <th className="log-col-10">ID</th>
                             <th className="text-start log-col-30">이름</th>
@@ -65,15 +65,15 @@ const FilterManagement = ({ processId, onMenuClick }) => {
                                     <td>{formatDate(filter.updatedAt)}</td>
                                     <td>
                                         <button
-                                            className={`btn btn-sm ${filter.isActive ? 'btn-success' : 'btn-outline-success'}`}
+                                            className={`btn btn-sm admin-toggle ${filter.isActive ? 'admin-toggle-on' : 'admin-toggle-off'}`}
                                         >
                                             {filter.isActive ? 'ON' : 'OFF'}
                                         </button>
                                     </td>
                                 </tr>
                                 {detailComp === filter.filterRuleId && (
-                                    <tr>
-                                        <td colSpan="5" className="text-center bg-light">
+                                    <tr className="admin-table-detail-row">
+                                        <td colSpan="5" className="text-center">
                                             <DetailFilter
                                                 onClose={() => setDetailComp(0)}
                                                 filterId={filter.filterRuleId}

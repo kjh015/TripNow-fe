@@ -48,13 +48,14 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
   return (
     <div className="log-page-spacer">
       <AdminPageHeader title="중복 제거 관리">
-        <button className="btn btn-primary" onClick={() => setShowInput(true)}>중복 제거 추가</button>
+        <button className="btn admin-btn admin-btn-primary" onClick={() => setShowInput(true)}>+ 중복 제거 추가</button>
       </AdminPageHeader>
 
       <AdminPipelineNav active="deduplication" onNavigate={onMenuClick} />
 
-      <table className="table table-bordered text-center align-middle">
-        <thead className="table-light">
+      <div className="admin-table-card mb-4">
+      <table className="table admin-table text-center align-middle mb-0">
+        <thead>
           <tr>
             <th className="log-col-10">ID</th>
             <th className="text-start log-col-30">이름</th>
@@ -88,7 +89,7 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
                   <td>
 
                     <button
-                      className={`btn btn-sm ${ddp.isActive ? "btn-success" : "btn-outline-secondary"}`}
+                      className={`btn btn-sm admin-toggle ${ddp.isActive ? "admin-toggle-on" : "admin-toggle-off"}`}
                       onClick={() => handleToggleActive(ddp.dedupRuleId, ddp.isActive)}
                     >
                       {ddp.isActive ? "ON" : "OFF"}
@@ -96,8 +97,8 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
                   </td>
                 </tr>
                 {showDetail === ddp.dedupRuleId && (
-                  <tr>
-                    <td colSpan="5" className="text-center bg-light">
+                  <tr className="admin-table-detail-row">
+                    <td colSpan="5" className="text-center">
                       <DetailDeduplication
                         processId={processId}
                         id={ddp.dedupRuleId}
@@ -111,6 +112,7 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
           )}
         </tbody>
       </table>
+      </div>
 
       <Modal show={showInput} onHide={() => handleInputClose(false)} size="lg" centered>
         <Modal.Header closeButton>

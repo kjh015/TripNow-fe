@@ -26,14 +26,14 @@ const FormatManagement = ({ processId, onMenuClick }) => {
     return (
         <div className="log-page-spacer">
             <AdminPageHeader title="포맷 관리">
-                <button className="btn btn-primary" onClick={() => setInputComp(true)}>포맷 추가</button>
+                <button className="btn admin-btn admin-btn-primary" onClick={() => setInputComp(true)}>+ 포맷 추가</button>
             </AdminPageHeader>
 
             <AdminPipelineNav active="format" onNavigate={onMenuClick} />
 
-            <div className="card shadow-sm rounded-4 mb-4 log-card-noborder">
-                <table className="table table-bordered text-center align-middle mb-0">
-                    <thead className="table-light">
+            <div className="admin-table-card mb-4">
+                <table className="table admin-table text-center align-middle mb-0">
+                    <thead>
                         <tr>
                             <th className="log-col-10">ID</th>
                             <th className="text-start log-col-25">이름</th>
@@ -64,14 +64,14 @@ const FormatManagement = ({ processId, onMenuClick }) => {
                                     <td>{format.createdAt && formatDate(format.createdAt)}</td>
                                     <td>{format.updatedAt && formatDate(format.updatedAt)}</td>
                                     <td>
-                                        <button className={`btn btn-sm ${format.isActive ? 'btn-primary' : 'btn-outline-primary'} me-2`}>
+                                        <button className={`btn btn-sm admin-toggle ${format.isActive ? 'admin-toggle-on' : 'admin-toggle-off'}`}>
                                             {format.isActive ? 'ON' : 'OFF'}
                                         </button>
                                     </td>
                                 </tr>
                                 {detailComp === format.formatRuleId && (
-                                    <tr>
-                                        <td colSpan="5" className="text-center bg-light">
+                                    <tr className="admin-table-detail-row">
+                                        <td colSpan="5" className="text-center">
                                             <DetailFormat
                                                 onClose={() => setDetailComp(0)}
                                                 formatId={format.formatRuleId}

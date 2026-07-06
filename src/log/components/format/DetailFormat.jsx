@@ -79,15 +79,13 @@ const
 
         return (
             <div className="log-format-detail-container">
-                <h2 className="mb-4">포맷 상세 화면</h2>
+                <h4 className="mb-4 admin-detail-title">포맷 상세</h4>
                 <form onSubmit={handleSubmit}>
-                    <div className="mb-4">
-                        <label className="fw-bold mb-2">포맷 이름</label>
-                    </div>
-                    <div>
+                    <div className="mb-4 text-center">
+                        <label className="fw-bold mb-2 d-block">포맷 이름</label>
                         <input
                             type="text"
-                            className="form-control-center log-format-detail-name-input"
+                            className="form-control log-format-detail-name-input mx-auto"
                             placeholder="format name"
                             value={name}
                             onChange={e => setName(e.target.value)}
@@ -97,7 +95,7 @@ const
                     <div className="row">
                         {/* Default Entry */}
                         <div className="col-md-6 mb-3">
-                            <div className="border rounded p-3 h-100">
+                            <div className="admin-section-box p-3 h-100">
                                 <h5 className="mb-3">기본 정보</h5>
                                 {defaultEntry.map((entry, index) => (
                                     <div key={`default-${index}`} className="d-flex align-items-center mb-2">
@@ -121,7 +119,7 @@ const
                                         />
                                         <button
                                             type="button"
-                                            className="btn btn-danger"
+                                            className="btn admin-btn-icon admin-btn-danger"
                                             onClick={() => removeEntry(setDefaultEntry, defaultEntry, index)}
                                         >✕</button>
                                     </div>
@@ -129,13 +127,13 @@ const
                                 <button
                                     type="button"
                                     onClick={() => addEntry(setDefaultEntry, defaultEntry)}
-                                    className="btn btn-outline-success mt-2"
+                                    className="btn admin-btn admin-btn-outline admin-btn-sm mt-2"
                                 >+ 항목 추가</button>
                             </div>
                         </div>
                         {/* Format Entry */}
                         <div className="col-md-6 mb-3">
-                            <div className="border rounded p-3 h-100">
+                            <div className="admin-section-box p-3 h-100">
                                 <h5 className="mb-3">포맷 정보</h5>
                                 {formatEntry.map((entry, index) => (
                                     <div key={`format-${index}`} className="d-flex align-items-center mb-2">
@@ -160,7 +158,7 @@ const
                                         />
                                         <button
                                             type="button"
-                                            className="btn btn-danger"
+                                            className="btn admin-btn-icon admin-btn-danger"
                                             onClick={() => removeEntry(setFormatEntry, formatEntry, index)}
                                         >✕</button>
                                     </div>
@@ -168,7 +166,7 @@ const
                                 <button
                                     type="button"
                                     onClick={() => addEntry(setFormatEntry, formatEntry)}
-                                    className="btn btn-outline-success mt-2"
+                                    className="btn admin-btn admin-btn-outline admin-btn-sm mt-2"
                                 >+ 항목 추가</button>
                             </div>
                         </div>
@@ -177,17 +175,17 @@ const
                     <div className="mt-4 d-flex justify-content-between align-items-center">
                         <div className="d-flex align-items-center">
                             <button
-                                className={`btn btn-sm ${active ? 'btn-success' : 'btn-outline-success'}`}
+                                className={`btn btn-sm admin-toggle ${active ? 'admin-toggle-on' : 'admin-toggle-off'}`}
                                 onClick={() => setActive(!active)}
                                 type="button"
                             >
-                                활성화: {active ? "On" : "Off"}
+                                활성화: {active ? "ON" : "OFF"}
                             </button>
                         </div>
-                        <div>
-                            <button type="submit" className="btn btn-primary me-2">수정</button>
-                            <button type="button" onClick={removeFormat} className="btn btn-danger me-2">삭제</button>
-                            <button type="button" onClick={onClose} className="btn btn-outline-secondary">닫기</button>
+                        <div className="d-flex gap-2">
+                            <button type="submit" className="btn admin-btn admin-btn-primary">수정</button>
+                            <button type="button" onClick={removeFormat} className="btn admin-btn admin-btn-danger">삭제</button>
+                            <button type="button" onClick={onClose} className="btn admin-btn admin-btn-outline">닫기</button>
                         </div>
                     </div>
                 </form>

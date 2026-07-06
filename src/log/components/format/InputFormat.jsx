@@ -66,11 +66,11 @@ const InputFormat = ({ onClose, processId }) => {
                     <input type="text" className="form-control me-2" placeholder="Value"
                         value={entry.value}
                         onChange={e => handleEntryChange(setDefaultEntry, defaultEntry, index, 'value', e.target.value)} />
-                    <button type="button" className="btn btn-danger btn-sm"
+                    <button type="button" className="btn admin-btn-icon admin-btn-danger"
                         onClick={() => removeEntry(setDefaultEntry, defaultEntry, index)}>✕</button>
                 </div>
             ))}
-            <button type="button" className="btn btn-success btn-sm mb-3"
+            <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm mb-3"
                 onClick={() => addEntry(setDefaultEntry, defaultEntry)}>+ 추가</button>
 
             <h5>포맷 정보</h5>
@@ -79,24 +79,26 @@ const InputFormat = ({ onClose, processId }) => {
                     <input type="text" className="form-control me-2" placeholder="Key"
                         value={entry.key}
                         onChange={e => handleEntryChange(setFormatEntry, formatEntry, index, 'key', e.target.value)} />
-                    ⬅
+                    <span className="mx-1">⬅</span>
                     <input type="text" className="form-control me-2" placeholder="Value"
                         value={entry.value}
                         onChange={e => handleEntryChange(setFormatEntry, formatEntry, index, 'value', e.target.value)} />
-                    <button type="button" className="btn btn-danger btn-sm"
+                    <button type="button" className="btn admin-btn-icon admin-btn-danger"
                         onClick={() => removeEntry(setFormatEntry, formatEntry, index)}>✕</button>
                 </div>
             ))}
-            <button type="button" className="btn btn-success btn-sm mb-3"
+            <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm mb-3"
                 onClick={() => addEntry(setFormatEntry, formatEntry)}>+ 추가</button>
 
             <div className="d-flex justify-content-between mt-4">
-                <button type="button" className="btn btn-danger" onClick={onClose}>닫기</button>
-                <button type="submit" className="btn btn-primary">추가 </button>
-                <button type="button" className={`btn ${active ? 'btn-success' : 'btn-outline-success'}`}
+                <button type="button" className={`btn admin-toggle ${active ? 'admin-toggle-on' : 'admin-toggle-off'}`}
                     onClick={() => setActive(prev => !prev)}>
-                    활성화: {active ? "On" : "Off"}
+                    활성화: {active ? "ON" : "OFF"}
                 </button>
+                <div className="d-flex gap-2">
+                    <button type="button" className="btn admin-btn admin-btn-outline" onClick={onClose}>닫기</button>
+                    <button type="submit" className="btn admin-btn admin-btn-primary">추가</button>
+                </div>
             </div>
         </form>
     );

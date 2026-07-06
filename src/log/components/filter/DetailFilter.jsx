@@ -162,7 +162,7 @@ const DetailFilter = ({ onClose, processId, filterId }) => {
     return (
         <div className="container mt-5 log-filter-detail-container">
             <div className="mb-2">
-                <h4 className="fw-bold text-primary">필터 수정</h4>
+                <h4 className="admin-detail-title">필터 수정</h4>
                 <hr />
             </div>
 
@@ -191,23 +191,23 @@ const DetailFilter = ({ onClose, processId, filterId }) => {
                         <div className="mb-4">
                             <label className="form-label fw-semibold">조건 추가</label>
                             <div className="d-flex gap-2">
-                                <button className="btn btn-outline-secondary" onClick={addParenAndConditionWithAnd}>
+                                <button className="btn admin-btn admin-btn-outline" onClick={addParenAndConditionWithAnd}>
                                     ( + 조건
                                 </button>
-                                <button className="btn btn-outline-secondary" onClick={addRightParen}>)</button>
-                                <button className="btn btn-outline-success" onClick={addCondition}>조건</button>
+                                <button className="btn admin-btn admin-btn-outline" onClick={addRightParen}>)</button>
+                                <button className="btn admin-btn admin-btn-outline" onClick={addCondition}>조건</button>
                             </div>
                         </div>
                         <div className="mb-3">
-                            <button className={`btn ${active ? "btn-success" : "btn-outline-success"} w-100 rounded-pill`}
+                            <button className={`btn admin-toggle ${active ? "admin-toggle-on" : "admin-toggle-off"} w-100`}
                                 onClick={() => setActive(!active)}>
                                 <span className="fw-bold">활성화: {active ? "ON" : "OFF"}</span>
                             </button>
                         </div>
                         <div className="d-flex gap-2">
-                            <button className="btn btn-primary flex-fill rounded-3" onClick={handleSubmit}>수정</button>
-                            <button className="btn btn-danger flex-fill rounded-3" onClick={removeFilter}>삭제</button>
-                            <button className="btn btn-outline-dark flex-fill rounded-3" onClick={onClose}>닫기</button>
+                            <button className="btn admin-btn admin-btn-primary flex-fill" onClick={handleSubmit}>수정</button>
+                            <button className="btn admin-btn admin-btn-danger flex-fill" onClick={removeFilter}>삭제</button>
+                            <button className="btn admin-btn admin-btn-outline flex-fill" onClick={onClose}>닫기</button>
                         </div>
                     </div>
                 </div>
@@ -236,7 +236,7 @@ const DetailFilter = ({ onClose, processId, filterId }) => {
                                                 return (
                                                     <div className="d-flex justify-content-center mb-2" key={i}>
                                                         <button
-                                                            className="btn btn-outline-primary rounded-pill px-4"
+                                                            className="btn admin-btn admin-btn-outline px-4"
                                                             onClick={() => updateToken(tokenIndex, 'value', t.value === '&&' ? '||' : '&&')}
                                                         >
                                                             {t.value === '&&' ? 'AND' : 'OR'}
@@ -271,11 +271,11 @@ const DetailFilter = ({ onClose, processId, filterId }) => {
                                                             />
                                                             {groupId !== 0 && (
                                                                 <>
-                                                                    <button className="btn btn-outline-danger btn-sm me-1" onClick={() => deleteGroup(groupId)} title="삭제">
+                                                                    <button className="btn admin-btn-icon admin-btn-danger me-1" onClick={() => deleteGroup(groupId)} title="삭제">
                                                                         <i className="bi bi-x-lg"></i>
                                                                     </button>
-                                                                    <button className="btn btn-outline-dark btn-sm me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
-                                                                    <button className="btn btn-outline-dark btn-sm" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
+                                                                    <button className="btn admin-btn-icon admin-btn-ghost me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
+                                                                    <button className="btn admin-btn-icon admin-btn-ghost" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
                                                                 </>
                                                             )}
                                                         </div>
@@ -302,11 +302,11 @@ const DetailFilter = ({ onClose, processId, filterId }) => {
                                                             onChange={(e) => updateToken(tokenIndex, 'value', e.target.value)} />
                                                         {groupId !== 0 && (
                                                             <>
-                                                                <button className="btn btn-outline-danger btn-sm me-1" onClick={() => deleteGroup(groupId)} title="삭제">
+                                                                <button className="btn admin-btn-icon admin-btn-danger me-1" onClick={() => deleteGroup(groupId)} title="삭제">
                                                                     <i className="bi bi-x-lg"></i>
                                                                 </button>
-                                                                <button className="btn btn-outline-dark btn-sm me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
-                                                                <button className="btn btn-outline-dark btn-sm" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
+                                                                <button className="btn admin-btn-icon admin-btn-ghost me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
+                                                                <button className="btn admin-btn-icon admin-btn-ghost" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
                                                             </>
                                                         )}
                                                     </div>
@@ -319,11 +319,11 @@ const DetailFilter = ({ onClose, processId, filterId }) => {
                                                         <span className="fs-4 fw-bold text-primary me-2">)</span>
                                                         {groupId !== 0 && (
                                                             <>
-                                                                <button className="btn btn-outline-danger btn-sm me-1" onClick={() => deleteGroup(groupId)} title="삭제">
+                                                                <button className="btn admin-btn-icon admin-btn-danger me-1" onClick={() => deleteGroup(groupId)} title="삭제">
                                                                     <i className="bi bi-x-lg"></i>
                                                                 </button>
-                                                                <button className="btn btn-outline-dark btn-sm me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
-                                                                <button className="btn btn-outline-dark btn-sm" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
+                                                                <button className="btn admin-btn-icon admin-btn-ghost me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
+                                                                <button className="btn admin-btn-icon admin-btn-ghost" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
                                                             </>
                                                         )}
                                                     </div>

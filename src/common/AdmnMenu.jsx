@@ -1,18 +1,19 @@
 // AdmnMenu.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FaMapMarkedAlt, FaUsers, FaCogs, FaDatabase, FaChartLine } from 'react-icons/fa';
 
 const MENU_ITEMS = [
-    { key: 'board', label: '여행지 관리' },
-    { key: 'member', label: '회원 관리' },
-    { key: 'process', label: '프로세스 관리' },
-    { key: 'log', label: '로그 DB' },
-    { key: 'monitoring', label: 'Monitoring' },
+    { key: 'board', label: '여행지 관리', icon: <FaMapMarkedAlt /> },
+    { key: 'member', label: '회원 관리', icon: <FaUsers /> },
+    { key: 'process', label: '프로세스 관리', icon: <FaCogs /> },
+    { key: 'log', label: '로그 DB', icon: <FaDatabase /> },
+    { key: 'monitoring', label: 'Monitoring', icon: <FaChartLine /> },
 ];
 
 const AdmnMenu = ({ onMenuClick, activeMenu }) => {
     return (
-        <div className="list-group text-center admin-menu">
+        <div className="list-group admin-menu">
             <h4 className="admin-menu-title">관리자 메뉴</h4>
             {MENU_ITEMS.map(item => (
                 <button
@@ -20,6 +21,7 @@ const AdmnMenu = ({ onMenuClick, activeMenu }) => {
                     className={`list-group-item list-group-item-action admin-menu-item${activeMenu === item.key ? ' active' : ''}`}
                     onClick={() => onMenuClick(item.key)}
                 >
+                    <span className="admin-menu-item-icon">{item.icon}</span>
                     {item.label}
                 </button>
             ))}

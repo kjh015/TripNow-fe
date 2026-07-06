@@ -54,10 +54,10 @@ const AdmnPage = () => {
   }, []);
 
   return (
-    <div className="container-fluid" style={{marginTop: "1.1rem"}}>
+    <div className="container-fluid admin-page-root">
       <div className="row">
         {/* 왼쪽: 메뉴 (props로 onMenuClick 전달) */}
-        <div className="col-lg-2 p-0 border-end bg-body-tertiary min-vh-100" >
+        <div className="col-lg-2 p-0 admin-sidebar min-vh-100" >
           <AdmnMenu
             onMenuClick={setActiveMenu}
             activeMenu={['format', 'filter', 'deduplication'].includes(activeMenu) ? 'process' : activeMenu}

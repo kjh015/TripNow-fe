@@ -48,7 +48,7 @@
 
 /* ===== 프로세스 관리 (ProcessManagement) ===== */
 .process-edit-row {
-  background: #f6f8fa;
+  background: var(--admin-row-hover);
   border-bottom-left-radius: var(--radius-btn);
   border-bottom-right-radius: var(--radius-btn);
 }
@@ -106,7 +106,7 @@
 }
 
 .log-condition-row {
-  background: #f8f9fa;
+  background: var(--admin-row-hover);
   border-radius: 8px;
   margin-bottom: 6px;
 }
@@ -117,13 +117,12 @@
   border-radius: var(--radius-card-sm);
   max-width: 900px;
   margin: 30px auto;
-  background: #fff;
-  box-shadow: 0 2px 10px #eee;
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
 }
 
 .log-format-detail-name-input {
-  width: 415px;
-  transform: translateY(-28px);
+  max-width: 415px;
 }
 
 .log-format-input-name-input {
@@ -167,7 +166,8 @@
 
 /* ===== 중복 제거 (DeduplicationRow / InputDeduplication) ===== */
 .dedup-row-card {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--card-shadow);
+  border-color: var(--admin-border) !important;
   position: relative;
 }
 
@@ -192,10 +192,10 @@
 }
 
 .dedup-input-container {
-  background: #fff;
+  background: var(--card-bg);
   border-radius: var(--radius-card-sm);
   padding: 28px 24px 24px 24px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.09);
+  box-shadow: var(--card-shadow);
   max-width: 600px;
   margin: 0 auto;
 }

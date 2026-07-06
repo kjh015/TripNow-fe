@@ -25,15 +25,15 @@ const InputProcess = ({ onClose }) => {
                 value={name}
                 onChange={e => setName(e.target.value)}
             />
-            <div className="d-flex justify-content-between">
+            <div className="d-flex justify-content-end gap-2">
+                <button className="btn admin-btn admin-btn-outline" onClick={onClose}>닫기</button>
                 <button
-                    className="btn btn-primary"
+                    className="btn admin-btn admin-btn-primary"
                     onClick={addProcess}
                     disabled={!name.trim()} // 이름 없으면 비활성화(UX 개선)
                 >
                     추가
                 </button>
-                <button className="btn btn-outline-secondary" onClick={onClose}>닫기</button>
             </div>
         </div>
     );
