@@ -52,7 +52,7 @@ const SignUpdatePage = () => {
     }, []);
 
     return (
-        <div className="min-vh-100 d-flex flex-column">
+        <div className="min-vh-100 d-flex flex-column sign-page-bg">
             <main className="flex-grow-1 d-flex align-items-center justify-content-center">
                 <div className="sign-card">
                     <div className="sign-card-title text-center mb-4">회원 정보 수정</div>
