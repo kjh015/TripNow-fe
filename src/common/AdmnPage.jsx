@@ -58,7 +58,10 @@ const AdmnPage = () => {
       <div className="row">
         {/* 왼쪽: 메뉴 (props로 onMenuClick 전달) */}
         <div className="col-lg-2 p-0 border-end bg-body-tertiary min-vh-100" >
-          <AdmnMenu onMenuClick={setActiveMenu} />
+          <AdmnMenu
+            onMenuClick={setActiveMenu}
+            activeMenu={['format', 'filter', 'deduplication'].includes(activeMenu) ? 'process' : activeMenu}
+          />
         </div>
 
         {/* 오른쪽: 본문 */}

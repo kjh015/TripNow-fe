@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import DeduplicationRow from './DeduplicationRow';
 import { createDedupRule } from '../../../api/log/deduplicationApi';
 
@@ -15,15 +16,10 @@ const toApiRules = (rows) => rows.map(row => ({
     expirationTime: { days: row.days, hours: row.hours, minutes: row.minutes, seconds: row.seconds },
 }));
 
-const InputDeduplication = ({ processId, onClose,  showOutAlert}) => {
+const InputDeduplication = ({ processId, onClose }) => {
     const [rows, setRows] = useState([initialRow]);
     const [name, setName] = useState('');
     const [active, setActive] = useState(false);
-    const [alert, setAlert] = useState({ show: false, message: '', type: '' });
-
-    const showAlert = useCallback(({ type, message }) => {
-        setAlert({ show: true, type, message });
-    }, []);
 
     const handleChange = (index, updatedRow) => {
         const newRows = [...rows];
@@ -46,24 +42,15 @@ const InputDeduplication = ({ processId, onClose,  showOutAlert}) => {
     const handleSubmit = async () => {
         try {
             await createDedupRule(processId, { name, isActive: active, rules: toApiRules(rows) });
-            showOutAlert({ message: '중복 제거가 추가되었습니다.', type: "success" });
+            toast.success('중복 제거가 추가되었습니다.');
             onClose();
         } catch {
-            showAlert({ message: '에러 발생', type: "danger" });
+            toast.error('에러 발생');
         }
     };
 
     return (
         <div className="dedup-input-container">
-            {/* Modal 안에만 표시되는 alert */}
-            {alert.show && (
-                <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">
-                    {alert.message}
-                    <button type="button" className="btn-close" aria-label="Close"
-                        onClick={() => setAlert({ ...alert, show: false })}></button>
-                </div>
-            )}
-
             <div className="mb-3">
                 <label className="form-label fw-bold">중복 이름</label>
                 <input

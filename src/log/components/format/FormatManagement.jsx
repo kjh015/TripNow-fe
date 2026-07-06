@@ -1,5 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { Modal } from 'react-bootstrap';
 import { getFormatRules } from '../../../api/log/formatApi';
+import { formatDate } from '../../../utils/dateUtils';
+import AdminPageHeader from '../../../common/AdminPageHeader';
+import AdminPipelineNav from '../../../common/AdminPipelineNav';
 import InputFormat from './InputFormat';
 import DetailFormat from './DetailFormat';
 
@@ -7,13 +11,6 @@ const FormatManagement = ({ processId, onMenuClick }) => {
     const [formatList, setFormatList] = useState([]);
     const [inputComp, setInputComp] = useState(false);
     const [detailComp, setDetailComp] = useState(0);
-    const [alert, setAlert] = useState(null);
-
-    // 경고창 자동 사라짐
-    const showAlert = useCallback((type, message, duration = 1800) => {
-        setAlert({ type, message });
-        if (duration > 0) setTimeout(() => setAlert(null), duration);
-    }, []);
 
     const getFormats = useCallback(async () => {
         try {
@@ -26,28 +23,13 @@ const FormatManagement = ({ processId, onMenuClick }) => {
 
     useEffect(() => { getFormats(); }, [inputComp, detailComp, getFormats]);
 
-    const formatDate = (isoString) => {
-        if (!isoString) return "-";
-        return isoString.substring(0, 16).replace("T", " ");
-    };
-
     return (
         <div className="log-page-spacer">
-            <h2 className="fw-bold mb-4">포맷 관리</h2>
+            <AdminPageHeader title="포맷 관리">
+                <button className="btn btn-primary" onClick={() => setInputComp(true)}>포맷 추가</button>
+            </AdminPageHeader>
 
-            {/* 중앙 상단 고정 경고창 */}
-            {alert && (
-                <div
-                    className={`alert alert-${alert.type} fw-semibold py-2 px-3 mb-0 d-inline-block text-center custom-alert-center`}
-                >
-                    {alert.message}
-                </div>
-            )}
-
-            <div className="d-flex justify-content-end mb-3">
-                <button className="btn btn-primary me-2" onClick={() => setInputComp(true)}>포맷 추가</button>
-                <button className="btn btn-secondary" onClick={() => onMenuClick('filter')}>필터링 관리 ➡</button>
-            </div>
+            <AdminPipelineNav active="format" onNavigate={onMenuClick} />
 
             <div className="card shadow-sm rounded-4 mb-4 log-card-noborder">
                 <table className="table table-bordered text-center align-middle mb-0">
@@ -93,7 +75,6 @@ const FormatManagement = ({ processId, onMenuClick }) => {
                                             <DetailFormat
                                                 onClose={() => setDetailComp(0)}
                                                 formatId={format.formatRuleId}
-                                                showAlert={showAlert}
                                             />
                                         </td>
                                     </tr>
@@ -104,13 +85,14 @@ const FormatManagement = ({ processId, onMenuClick }) => {
                 </table>
             </div>
 
-            {inputComp && (
-                <InputFormat
-                    onClose={() => setInputComp(false)}
-                    processId={processId}
-                    showAlert={showAlert}
-                />
-            )}
+            <Modal show={inputComp} onHide={() => setInputComp(false)} size="lg" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>포맷 추가</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <InputFormat onClose={() => setInputComp(false)} processId={processId} />
+                </Modal.Body>
+            </Modal>
         </div>
     );
 };

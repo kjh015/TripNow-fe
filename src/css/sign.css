@@ -79,10 +79,6 @@
   margin-top: 80px;
 }
 
-.member-mgmt-title {
-  margin-bottom: 3.5rem;
-}
-
 /* ===== 마이페이지 (MyPage) ===== */
 .mypage-root {
   background: linear-gradient(135deg, #eaf4fc 60%, #fff 100%);

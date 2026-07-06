@@ -1,18 +1,16 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Modal } from 'react-bootstrap';
 import InputDeduplication from './InputDeduplication';
 import { getDedupRules } from '../../../api/log/deduplicationApi';
+import { formatDate } from '../../../utils/dateUtils';
+import AdminPageHeader from '../../../common/AdminPageHeader';
+import AdminPipelineNav from '../../../common/AdminPipelineNav';
 import DetailDeduplication from './DetailDeduplication';
 
 const DeduplicationManagement = ({ processId, onMenuClick }) => {
   const [ddpList, setDdpList] = useState([]);
   const [showInput, setShowInput] = useState(false);
   const [showDetail, setShowDetail] = useState(0);
-  const [alert, setAlert] = useState(null);
-
-  const showAlert = useCallback(({ type, message, duration = 2000 }) => {
-    setAlert({ type, message });
-    if (duration > 0) setTimeout(() => setAlert(null), duration);
-  }, []);
 
   const getDeduplicationList = async () => {
     try {
@@ -42,13 +40,6 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
     //   });
   };
 
-  // 날짜 포맷
-  const formatDate = (isoString) => {
-    if (!isoString) return "-";
-    return isoString.substring(0, 16).replace("T", " ");
-  };
-
-
   useEffect(() => {
     getDeduplicationList();
     // eslint-disable-next-line
@@ -56,28 +47,11 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
 
   return (
     <div className="log-page-spacer">
-      <h2 className="fw-bold mb-4">중복 제거 관리</h2>
+      <AdminPageHeader title="중복 제거 관리">
+        <button className="btn btn-primary" onClick={() => setShowInput(true)}>중복 제거 추가</button>
+      </AdminPageHeader>
 
-      {/* 중앙 상단 고정 경고창 */}
-      {alert && (
-        <div
-          className={`alert alert-${alert.type} fw-semibold py-2 px-3 mb-0 d-inline-block text-center custom-alert-center`}
-        >
-          {alert.message}
-        </div>
-      )}
-
-
-
-      {/* 상단 버튼 영역 */}
-      <div className="d-flex justify-content-end mb-3">
-        <button className="btn btn-primary me-2" onClick={() => setShowInput(true)}>
-          중복 제거 추가
-        </button>
-        <button className="btn btn-secondary" onClick={() => onMenuClick('filter')}>
-          ⬅ 필터 관리
-        </button>
-      </div>
+      <AdminPipelineNav active="deduplication" onNavigate={onMenuClick} />
 
       <table className="table table-bordered text-center align-middle">
         <thead className="table-light">
@@ -128,7 +102,6 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
                         processId={processId}
                         id={ddp.dedupRuleId}
                         onClose={handleDetailClose}
-                        showOutAlert={showAlert}
                       />
                     </td>
                   </tr>
@@ -139,28 +112,14 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
         </tbody>
       </table>
 
-      {/* 추가 입력 모달 */}
-      {showInput && (
-        <div
-          className="modal show d-block log-modal-backdrop-50"
-          tabIndex="-1"
-        >
-          <div className="modal-dialog modal-lg" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">중복 제거 추가</h5>
-                <button type="button" className="btn-close" aria-label="Close"
-                  onClick={() => handleInputClose(false)}></button>
-              </div>
-              <div className="modal-body">
-                <InputDeduplication processId={processId} onClose={handleInputClose}
-                  showOutAlert={showAlert}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal show={showInput} onHide={() => handleInputClose(false)} size="lg" centered>
+        <Modal.Header closeButton>
+          <Modal.Title>중복 제거 추가</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <InputDeduplication processId={processId} onClose={handleInputClose} />
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

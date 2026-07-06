@@ -1,24 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { getActiveFormatRuleFields } from '../../../api/log/formatApi';
 import { createFilterRule } from '../../../api/log/filterApi';
 
 const operatorOptions = ['>', '<', '>=', '<=', '==', '!=', 'Equals'];
 
-const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
+const ConditionBuilder = ({ onClose, processId }) => {
     const [fieldList, setFieldList] = useState([]);
     const [name, setName] = useState('');
     const [active, setActive] = useState(false);
     const [tokens, setTokens] = useState([
         { type: 'condition', field: '', operator: '>', value: '', groupId: 0 }
     ]);
-
-    // alert 상태
-    const [alert, setAlert] = useState(null);
-
-    const showAlert = useCallback(({ type, message }) => {
-        setAlert({ type, message });
-    }, []);
-
 
     useEffect(() => {
         const load = async () => {
@@ -119,7 +112,7 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
 
     const handleSubmit = async (e) => {
         if (!validateParentheses()) {
-            showAlert({ message: "❌ 괄호 짝이 맞지 않습니다.", type: 'danger' });
+            toast.error("❌ 괄호 짝이 맞지 않습니다.");
             return;
         }
 
@@ -128,7 +121,7 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
             (token.field === '' || token.operator === '' || token.value === '')
         );
         if (hasInvalid) {
-            showAlert({ message: '❌ 조건에 빈 값이 있습니다. 모든 필드, 연산자, 값을 입력해주세요.', type: 'danger' });
+            toast.error('❌ 조건에 빈 값이 있습니다. 모든 필드, 연산자, 값을 입력해주세요.');
             return;
         }
 
@@ -136,23 +129,15 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
 
         try {
             await createFilterRule(processId, { name, conditions, isActive: active });
-            showOutAlert({ message: '필터 추가 성공', type: 'success' });
+            toast.success('필터 추가 성공');
             onClose();
         } catch {
-            showAlert({ message: '에러가 발생했습니다.', type: 'danger' });
+            toast.error('에러가 발생했습니다.');
         }
     };
 
     return (
         <div className="container mt-4 text-center log-condition-container">
-            {/* Alert 메시지 */}
-            {alert && (
-                <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">
-                    {alert.message}
-
-                </div>
-            )}
-
             <h5>필터 추가</h5>
             <div className="mb-3">
                 <label className="form-label">필터 이름</label>
