@@ -201,23 +201,6 @@ const AdmnBoard = () => {
                 </div>
 
             </div>
-            <style>
-                {`
-.board-list-card {
-  transition: box-shadow 0.18s, transform 0.16s, background 0.16s, border 0.13s;
-  border: 1.5px solid #f0f0f7;
-  background: #f9faff;
-  border-radius: 1.1rem;
-}
-.board-list-card:hover, .board-list-card:focus {
-  box-shadow: 0 8px 28px 0 rgba(123,82,255,0.16), 0 2px 16px rgba(60,0,128,0.04);
-  border-color: #a084ee;
-  background: #f6f3ff;
-  transform: translateY(-2px) scale(1.012);
-  cursor: pointer;
-}
-                `}
-            </style>
         </div>
     );
 };

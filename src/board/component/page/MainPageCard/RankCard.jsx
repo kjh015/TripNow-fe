@@ -47,27 +47,6 @@ const images = {
   "체험": 체험
 };
 
-// 1등 왕관 배지 스타일 (z-index: 99, pointerEvents: "none")
-const firstRankBadgeStyle = {
-    position: 'absolute',
-    top: 22,
-    left: 22,
-    background: 'linear-gradient(135deg, #ffd700 70%, #fff9c4 100%)',
-    color: "#725b10",
-    fontWeight: 900,
-    borderRadius: "50%",
-    width: 54,
-    height: 54,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "2rem",
-    boxShadow: "0 4px 12px rgba(180,140,20,0.13)",
-    border: "3px solid #fffbe8",
-    zIndex: 99,            // 왕관을 카드보다 항상 위에!
-    pointerEvents: "none", // 카드 클릭 방해 X
-};
-
 const RankCard = ({ data, type, rank }) => {
     const navigate = useNavigate();
 
@@ -83,8 +62,8 @@ const RankCard = ({ data, type, rank }) => {
         >
             {/* 1등 왕관 배지 (hover와 무관, 항상 위) */}
             {(rank === 1 || rank === undefined) && (
-                <div style={firstRankBadgeStyle}>
-                    <span role="img" aria-label="king-crown" style={{ fontSize: "2.2rem", marginTop: "-4px" }}>👑</span>
+                <div className="main-rank-crown">
+                    <span role="img" aria-label="king-crown">👑</span>
                 </div>
             )}
 
@@ -142,16 +121,6 @@ const RankCard = ({ data, type, rank }) => {
                     </div>
                 </div>
             </div>
-            {/* Hover 효과 CSS */}
-            <style>
-                {`
-          .mainpage-card-hover:hover {
-            transform: scale(1.035);
-            box-shadow: 0 12px 36px 0 rgba(100,100,150,0.19);
-            z-index: 2; /* 이 값도 왕관(99)보다 낮아야 함 */
-          }
-        `}
-            </style>
         </div>
     );
 };

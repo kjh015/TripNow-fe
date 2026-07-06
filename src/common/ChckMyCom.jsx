@@ -66,15 +66,6 @@ const ChckMyCom = () => {
                     </div>
                 </div>
             </div>
-            <style>
-                {`
-          .mainpage-card-hover:hover {
-            transform: scale(1.035);
-            box-shadow: 0 12px 36px 0 rgba(100,100,150,0.19);
-            z-index: 2;
-          }
-        `}
-            </style>
         </div>
     );
 };

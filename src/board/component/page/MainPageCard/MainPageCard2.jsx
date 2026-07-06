@@ -29,24 +29,9 @@ const MainPageCard2 = ({ postId, score, rank }) => {
 
   return (
     <div className="w-100 h-100 d-flex align-items-stretch position-relative" style={{ minHeight: 112, position: 'relative' }}>
-      {/* --- 순위 뱃지 --- */}
+      {/* --- 순위 뱃지 (배경색은 rank별 런타임 값이라 인라인 유지) --- */}
       {rank &&
-        <div style={{
-          position: 'absolute',
-          top: 12, left: 12,
-          background: rankColors[(rank - 1) % 5],
-          color: "#fff",
-          fontWeight: 900,
-          borderRadius: "50%",
-          width: 40, height: 40,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: "1.2rem",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.10)",
-          zIndex: 99,           // 카드 hover보다 확실히 위!
-          pointerEvents: "none" // 클릭 이벤트는 카드로 전달
-        }}>
+        <div className="main-rank-badge" style={{ background: rankColors[(rank - 1) % 5] }}>
           {rank}
         </div>
       }
@@ -123,17 +108,6 @@ const MainPageCard2 = ({ postId, score, rank }) => {
           </div>
         </div>
       </div>
-
-      {/* Hover 효과 스타일 */}
-      <style>
-        {`
-          .mainpage-card2-hover:hover {
-            transform: scale(1.035);
-            box-shadow: 0 8px 32px 0 rgba(100,100,150,0.19);
-            z-index: 2; /* 뱃지(99)보다 낮거나 같게 유지 */
-          }
-        `}
-      </style>
     </div>
   );
 };

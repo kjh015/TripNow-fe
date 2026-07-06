@@ -49,32 +49,6 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
 
     return (
         <div style={{ marginTop: '80px' }}>
-            <style>{`
-                .process-name-hover {
-                    font-weight: bold;
-                    cursor: pointer;
-                    text-decoration: none;
-                    transition: text-decoration 0.13s;
-                }
-                .process-name-hover:hover {
-                    text-decoration: underline;
-                }
-                .custom-alert-center {
-                    position: fixed;
-                    top: 64px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    z-index: 3000;
-                    min-width: 220px;
-                    max-width: 380px;
-                    border-radius: 0.95rem;
-                    box-shadow: 0 3px 12px 0 rgba(0,0,0,0.14);
-                    font-size: 1.06rem;
-                    padding: 0.7rem 2rem;
-                    pointer-events: none;
-                }
-            `}</style>
-
             <div className="d-flex align-items-center mb-4" style={{ minHeight: 40 }}>
                 <h2 className="fw-bold" style={{ color: "#34a853", paddingBottom: "2px" }}>●</h2>
                 <h2 className="fw-bold" style={{ marginLeft: "7px" }}>프로세스 관리</h2>

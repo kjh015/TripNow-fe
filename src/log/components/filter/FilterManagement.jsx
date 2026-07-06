@@ -40,32 +40,6 @@ const FilterManagement = ({ processId, onMenuClick }) => {
 
     return (
         <div style={{ marginTop: '80px' }}>
-            <style>{`
-                .format-name-hover {
-                    font-weight: bold;
-                    cursor: pointer;
-                    text-decoration: none;
-                    transition: text-decoration 0.13s;
-                }
-                .format-name-hover:hover {
-                    text-decoration: underline;
-                }
-                .custom-alert-center {
-                    position: fixed;
-                    top: 64px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    z-index: 3000;
-                    min-width: 220px;
-                    max-width: 380px;
-                    border-radius: 0.95rem;
-                    box-shadow: 0 3px 12px 0 rgba(0,0,0,0.14);
-                    font-size: 1.06rem;
-                    padding: 0.7rem 2rem;
-                    pointer-events: none;
-                }
-            `}</style>
-
             {/* 화면 중앙 위 고정 알림 */}
             {alert && (
                 <div className={`alert alert-${alert.type} fw-semibold mb-0 text-center custom-alert-center`}>
