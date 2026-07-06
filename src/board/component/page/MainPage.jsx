@@ -87,11 +87,11 @@ const MainPage = () => {
       {/* 지역/카테고리별 */}
       <div >
         <div className="mainpage-category-section" >
-          <h4 className="text-left mb-4 mainpage-subsection-title">실시간 인기 카테고리</h4>
+          <h4 className="mainpage-subsection-title">실시간 인기 카테고리</h4>
           <MainPageCardsLayout2 top5Data={top5Category} />
         </div>
         <div className="mainpage-region-section">
-          <h4 className="text-left mb-4 mainpage-subsection-title">실시간 인기 지역</h4>
+          <h4 className="mainpage-subsection-title">실시간 인기 지역</h4>
           <MainPageCardsLayout2 top5Data={top5Region} />
         </div>
 

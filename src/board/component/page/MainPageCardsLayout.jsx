@@ -9,12 +9,12 @@ const mainCardHeight = 520;
 
 /**
  * 인기 게시판 카드 레이아웃
- * - 데이터가 5개 미만이면 비행기 로딩 애니메이션 표시
- * - 5개 이상이면 1~5위 카드 정렬
+ * - 데이터가 없으면 로딩 애니메이션 표시
+ * - 1개 이상이면 있는 만큼 1~5위 카드 정렬
  */
 const MainPageCardsLayout = ({ top5Posts }) => {
-    // 데이터가 5개 미만이면 로딩 화면
-    if (!top5Posts || top5Posts.length < 5) {
+    // 데이터가 아직 없으면 로딩 화면
+    if (!top5Posts || top5Posts.length === 0) {
         return <LoadingSpinner text="여행지 인기순위를 불러오는 중..." minHeight={mainCardHeight} />;
     }
 

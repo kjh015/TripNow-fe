@@ -440,18 +440,18 @@
 
 /* ===== 인기 카테고리/지역 레이아웃 (MainPageCardsLayout2) ===== */
 .mainpage-layout2-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
   gap: 24px;
-  overflow-x: auto;
   padding: 8px 0;
 }
 
 .mainpage-layout2-card {
-  width: 240px;
+  width: 100%;
   height: 200px;
-  flex-shrink: 0;
   border-radius: var(--radius-card-md);
   overflow: hidden;
   background: var(--card-bg);
@@ -600,12 +600,12 @@
 }
 
 .mainpage-subsection-title {
-  padding-left: 19rem;
+  max-width: 1400px;
+  margin: 0 auto 1.4rem auto;
   text-align: left;
   font-family: var(--font-display);
   color: #b7aaff;
   font-weight: 700;
   font-size: 1.55rem;
   letter-spacing: -0.03em;
-  margin-bottom: 1.4rem;
 }
