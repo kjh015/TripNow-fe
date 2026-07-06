@@ -1,13 +1,16 @@
 
 //페이지 밑에 들어가는 footers 파일
+const APP_NAME = process.env.REACT_APP_APP_NAME || "TripNow";
+
 const Footers = () => {
+  const year = new Date().getFullYear();
+
   return (
-    <div className="container">
-      <footer className="row row-cols-1 row-cols-sm-2 row-cols-md-5 border-top app-footer">
-
-
-      </footer>
-    </div>
+    <footer className="app-footer border-top">
+      <div className="container text-center text-muted app-footer-copy">
+        © {year} {APP_NAME}. All rights reserved.
+      </div>
+    </footer>
   );
 }
 

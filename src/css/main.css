@@ -483,7 +483,6 @@
 /* ===== 메인 히어로/섹션 (MainPage) ===== */
 .mainpage-root {
   min-height: 100vh;
-  background: #F5F6FF;
   width: 100%;
   overflow-x: hidden;
   margin-top: -1px;

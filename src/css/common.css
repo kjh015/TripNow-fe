@@ -1,5 +1,16 @@
 /* 공통 레이아웃: Navbar / NavMenu / Footer / 공통 패턴 */
 
+/* ===== 페이지 셸 (sticky footer) ===== */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1 0 auto;
+}
+
 /* ===== 상단 고정 알림 (Navbar) ===== */
 .app-alert-fixed {
   position: fixed;
@@ -116,8 +127,12 @@
 
 /* ===== Footer ===== */
 .app-footer {
-  margin: 100px 0 0 0;
-  padding: 64px 0 32px 0;
+  margin: 48px 0 0 0;
+  padding: 24px 0;
+}
+
+.app-footer-copy {
+  font-size: 0.875rem;
 }
 
 /* ===== 공통 페이지 타이틀 ===== */

@@ -5,7 +5,6 @@ import { subscribeRankings } from "../../../api/rankingApi";
 
 import MainPageCardsLayout from "./MainPageCardsLayout";
 import MainPageCardsLayout2 from "./MainPageCardsLayout2";
-import Footers from "../../../common/Footers";
 
 
 const MainPage = () => {
@@ -97,8 +96,6 @@ const MainPage = () => {
         </div>
 
       </div>
-
-      <Footers />
     </div>
   );
 };
