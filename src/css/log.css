@@ -46,12 +46,12 @@
 }
 
 .log-btn-rounded {
-  border-radius: 0.7rem;
+  border-radius: var(--radius-btn);
   font-weight: 600;
 }
 
 .log-btn-rounded-sm {
-  border-radius: 0.7rem;
+  border-radius: var(--radius-btn);
   font-weight: 500;
 }
 
@@ -92,8 +92,8 @@
 
 .process-edit-row {
   background: #f6f8fa;
-  border-bottom-left-radius: 0.7rem;
-  border-bottom-right-radius: 0.7rem;
+  border-bottom-left-radius: var(--radius-btn);
+  border-bottom-right-radius: var(--radius-btn);
 }
 
 /* 프로세스 추가/수정 카드 (InputProcess / EditProcess) */
@@ -157,7 +157,7 @@
 /* ===== 포맷 상세/추가 (DetailFormat / InputFormat) ===== */
 .log-format-detail-container {
   padding: 24px;
-  border-radius: 12px;
+  border-radius: var(--radius-card-sm);
   max-width: 900px;
   margin: 30px auto;
   background: #fff;
@@ -236,7 +236,7 @@
 
 .dedup-input-container {
   background: #fff;
-  border-radius: 12px;
+  border-radius: var(--radius-card-sm);
   padding: 28px 24px 24px 24px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.09);
   max-width: 600px;

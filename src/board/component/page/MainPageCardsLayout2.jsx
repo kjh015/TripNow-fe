@@ -1,5 +1,5 @@
 import React from 'react';
-import RankCard from './MainPageCard/RankCard';
+import MainPageCard from './MainPageCard/MainPageCard';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 
 const cardHeight = 200;
@@ -16,8 +16,8 @@ const MainPageCardsLayout2 = ({ top5Data }) => {
             {top5Data.map((data, idx) => (
                 <div key={idx}>
                     <div className="mainpage-layout2-card">
-                        {/* RankCard */}
-                        <RankCard
+                        <MainPageCard
+                            variant="category"
                             data={data.region || data.category}
                             type={data.region ? "region" : "category"}
                             rank={idx + 1}

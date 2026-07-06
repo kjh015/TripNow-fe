@@ -125,7 +125,7 @@
   padding: 0;
   background: #fff;
   border: 1px solid #eee;
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 var(--radius-card-sm) var(--radius-card-sm);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   list-style: none;
   max-height: 260px;
@@ -230,7 +230,7 @@
 .post-content-carousel {
   max-width: 800px;
   margin: 0 auto 24px auto;
-  border-radius: 16px;
+  border-radius: var(--radius-card-md);
   overflow: hidden;
   box-shadow: 0 6px 18px #0001;
 }
