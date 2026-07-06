@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { getMyProfile, deleteMyProfile } from '../api/memberApi';
 import { useEffect, useState } from 'react';
 import { formatDate } from '../utils/dateUtils';
+import { genderLabels } from '../constants/colorMaps';
 import { toast } from 'react-toastify';
 
 const myPageImage = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
@@ -111,7 +112,7 @@ const MyPage = () => {
                     <div className="d-flex align-items-center bg-light rounded-3 px-3 py-2 shadow-sm mb-2">
                       <i className="bi bi-gender-ambiguous text-info me-2" />
                       <span className="text-secondary small fw-semibold me-2">성별</span>
-                      <span className="ms-auto fw-bold">{member.gender || '-'}</span>
+                      <span className="ms-auto fw-bold">{genderLabels[member.gender] || member.gender || '-'}</span>
                     </div>
                   </div>
                   <div className="col-6 col-sm-3">

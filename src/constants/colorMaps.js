@@ -21,3 +21,9 @@ export const regionColors = {
   인천: "dark",
   전남: "secondary",
 };
+
+export const genderLabels = {
+  MALE: "남",
+  FEMALE: "여",
+  NONE: "선택 안함",
+};
