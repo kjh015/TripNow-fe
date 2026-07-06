@@ -146,9 +146,9 @@ const ConditionBuilder = ({ onClose, processId }) => {
 
             <div className="mt-3">
                 <label>추가:  </label>
-                <button className="btn btn-secondary me-2" onClick={addParenAndConditionWithAnd}>(</button>
-                <button className="btn btn-secondary me-2" onClick={addRightParen}>)</button>
-                <button className="btn btn-success me-2" onClick={addCondition}>조건</button>
+                <button className="btn admin-btn admin-btn-outline admin-btn-sm me-2" onClick={addParenAndConditionWithAnd}>( + 조건</button>
+                <button className="btn admin-btn admin-btn-outline admin-btn-sm me-2" onClick={addRightParen}>)</button>
+                <button className="btn admin-btn admin-btn-outline admin-btn-sm me-2" onClick={addCondition}>조건</button>
             </div>
 
             <div className="mt-4">
@@ -169,7 +169,7 @@ const ConditionBuilder = ({ onClose, processId }) => {
                                     return (
                                         <div className="w-100 text-center mb-2" key={i}>
                                             <button
-                                                className="btn btn-outline-primary"
+                                                className="btn admin-btn admin-btn-outline admin-btn-sm px-4"
                                                 onClick={() =>
                                                     updateToken(tokenIndex, 'value', t.value === '&&' ? '||' : '&&')
                                                 }
@@ -203,9 +203,9 @@ const ConditionBuilder = ({ onClose, processId }) => {
                                                     onChange={(e) => updateToken(condIndex, 'value', e.target.value)} />
                                                 {groupId !== 0 && (
                                                     <>
-                                                        <button className="btn btn-danger btn-sm me-2" onClick={() => deleteGroup(groupId)}>X</button>
-                                                        <button className="btn btn-outline-dark btn-sm me-1" onClick={() => moveGroup(groupId, 'up')}>⬆</button>
-                                                        <button className="btn btn-outline-dark btn-sm" onClick={() => moveGroup(groupId, 'down')}>⬇</button>
+                                                        <button className="btn admin-btn-icon admin-btn-danger me-2" onClick={() => deleteGroup(groupId)} title="삭제">✕</button>
+                                                        <button className="btn admin-btn-icon admin-btn-ghost me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
+                                                        <button className="btn admin-btn-icon admin-btn-ghost" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
                                                     </>
                                                 )}
                                             </div>
@@ -232,9 +232,9 @@ const ConditionBuilder = ({ onClose, processId }) => {
                                                 onChange={(e) => updateToken(tokenIndex, 'value', e.target.value)} />
                                             {groupId !== 0 && (
                                                 <>
-                                                    <button className="btn btn-danger btn-sm me-2" onClick={() => deleteGroup(groupId)}>X</button>
-                                                    <button className="btn btn-outline-dark btn-sm me-1" onClick={() => moveGroup(groupId, 'up')}>⬆</button>
-                                                    <button className="btn btn-outline-dark btn-sm" onClick={() => moveGroup(groupId, 'down')}>⬇</button>
+                                                    <button className="btn admin-btn-icon admin-btn-danger me-2" onClick={() => deleteGroup(groupId)} title="삭제">✕</button>
+                                                    <button className="btn admin-btn-icon admin-btn-ghost me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
+                                                    <button className="btn admin-btn-icon admin-btn-ghost" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
                                                 </>
                                             )}
                                         </div>
@@ -247,9 +247,9 @@ const ConditionBuilder = ({ onClose, processId }) => {
                                             <h2 className="me-2">)</h2>
                                             {groupId !== 0 && (
                                                 <>
-                                                    <button className="btn btn-danger btn-sm me-2" onClick={() => deleteGroup(groupId)}>X</button>
-                                                    <button className="btn btn-outline-dark btn-sm me-1" onClick={() => moveGroup(groupId, 'up')}>⬆</button>
-                                                    <button className="btn btn-outline-dark btn-sm" onClick={() => moveGroup(groupId, 'down')}>⬇</button>
+                                                    <button className="btn admin-btn-icon admin-btn-danger me-2" onClick={() => deleteGroup(groupId)} title="삭제">✕</button>
+                                                    <button className="btn admin-btn-icon admin-btn-ghost me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
+                                                    <button className="btn admin-btn-icon admin-btn-ghost" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
                                                 </>
                                             )}
                                         </div>
@@ -262,15 +262,19 @@ const ConditionBuilder = ({ onClose, processId }) => {
                     </div>
                 );
             })}
-            <button
-                className={`btn btn-sm ${active ? 'btn-success' : 'btn-outline-success'}`}
-                onClick={() => setActive(!active)}
-                type="button"
-            >
-                활성화: {active ? "On" : "Off"}
-            </button>
-            <button className="btn btn-primary me-2" onClick={handleSubmit}>추가</button>
-            <button className="btn btn-danger" onClick={onClose}>닫기</button>
+            <div className="d-flex justify-content-between align-items-center mt-4">
+                <button
+                    className={`btn admin-toggle ${active ? 'admin-toggle-on' : 'admin-toggle-off'}`}
+                    onClick={() => setActive(!active)}
+                    type="button"
+                >
+                    활성화: {active ? "ON" : "OFF"}
+                </button>
+                <div className="d-flex gap-2">
+                    <button className="btn admin-btn admin-btn-outline" onClick={onClose}>닫기</button>
+                    <button className="btn admin-btn admin-btn-primary" onClick={handleSubmit}>추가</button>
+                </div>
+            </div>
         </div>
     );
 };

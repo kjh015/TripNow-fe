@@ -186,7 +186,8 @@
 }
 
 .admin-menu {
-  padding: 0 0.85rem 1rem;
+  /* 고정 Navbar(--nav-height) 아래로 내용 시작 */
+  padding: var(--nav-height) 0.85rem 1rem;
 }
 
 .admin-menu-title {
@@ -242,6 +243,7 @@
   font-weight: 600;
   padding: 0.45rem 1.3rem;
   border: 1.5px solid transparent;
+  white-space: nowrap;
   transition: background 0.15s, color 0.15s, box-shadow 0.15s, filter 0.15s, transform 0.1s;
 }
 
@@ -324,6 +326,7 @@
   font-weight: 700;
   letter-spacing: 0.03em;
   border: 1.5px solid transparent;
+  white-space: nowrap;
   transition: background 0.15s, color 0.15s, filter 0.15s;
 }
 

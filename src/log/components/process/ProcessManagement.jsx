@@ -34,14 +34,14 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
     return (
         <div className="log-page-spacer">
             <AdminPageHeader title="프로세스 관리">
-                <button className="btn btn-success shadow-sm log-btn-rounded" onClick={() => setShowModal(true)}>
+                <button className="btn admin-btn admin-btn-primary" onClick={() => setShowModal(true)}>
                     + 프로세스 추가
                 </button>
             </AdminPageHeader>
 
-            <div className="card shadow-sm rounded-4 mb-4 log-card-noborder">
-                <table className="table table-hover table-bordered align-middle text-center mb-0">
-                    <thead className="table-light">
+            <div className="admin-table-card mb-4">
+                <table className="table admin-table align-middle text-center mb-0">
+                    <thead>
                         <tr>
                             <th className="log-col-15">ID</th>
                             <th className="text-start">이름</th>
@@ -77,7 +77,7 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
                                     <td>{process.updatedAt && formatDate(process.updatedAt)}</td>
                                     <td>
                                         <button
-                                            className="btn btn-outline-primary btn-sm px-3 log-btn-rounded-sm"
+                                            className="btn admin-btn admin-btn-outline admin-btn-sm px-3"
                                             onClick={() => setEditComp(process.logProcessId)}
                                         >
                                             수정
@@ -85,7 +85,7 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
                                     </td>
                                 </tr>
                                 {editComp === process.logProcessId && (
-                                    <tr>
+                                    <tr className="admin-table-detail-row">
                                         <td colSpan={5} className="process-edit-row">
                                             <EditProcess
                                                 onClose={handleEditComp}

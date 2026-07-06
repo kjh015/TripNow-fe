@@ -26,8 +26,8 @@ const EditProcess = ({ onClose, processId, _name }) => {
     };
 
     return (
-        <div className="card mt-4 p-4 mx-auto log-process-card">
-            <h4 className="mb-3">Process 수정</h4>
+        <div className="card mt-4 p-4 mx-auto log-process-card admin-section-box border-0 shadow-sm">
+            <h4 className="mb-3 admin-detail-title">프로세스 수정</h4>
             <input
                 type='text'
                 className="form-control mb-3"
@@ -35,10 +35,10 @@ const EditProcess = ({ onClose, processId, _name }) => {
                 onChange={e => setName(e.target.value)}
                 placeholder="프로세스 이름"
             />
-            <div className="d-flex justify-content-between">
-                <button className="btn btn-primary" onClick={updateProcess}>수정</button>
-                <button className="btn btn-danger" onClick={removeProcess}>삭제</button>
-                <button className="btn btn-outline-secondary" onClick={onClose}>닫기</button>
+            <div className="d-flex justify-content-center gap-2">
+                <button className="btn admin-btn admin-btn-primary" onClick={updateProcess}>수정</button>
+                <button className="btn admin-btn admin-btn-danger" onClick={removeProcess}>삭제</button>
+                <button className="btn admin-btn admin-btn-outline" onClick={onClose}>닫기</button>
             </div>
         </div>
 

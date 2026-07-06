@@ -83,15 +83,16 @@ const DeduplicationRow = ({ processId, index, data, onChange, onRemove }) => {
                                 <option value="Any">Any</option>
                             </select>
                             <button
-                                className="btn btn-outline-danger btn-sm"
+                                className="btn admin-btn-icon admin-btn-danger"
                                 type="button"
+                                title="조건 삭제"
                                 onClick={() => handleRemoveCondition(condIdx)}
                                 disabled={data.conditions.length === 1}
-                            >삭제</button>
+                            >✕</button>
                         </div>
                     ))}
-                    <button className="btn btn-outline-success btn-sm mt-1" type="button" onClick={handleAddCondition}>
-                        +
+                    <button className="btn admin-btn admin-btn-outline admin-btn-sm mt-1" type="button" onClick={handleAddCondition}>
+                        + 조건
                     </button>
                 </div>
             </div>
@@ -121,7 +122,7 @@ const DeduplicationRow = ({ processId, index, data, onChange, onRemove }) => {
             </div>
             {/* 삭제 버튼 */}
             <div className="d-flex justify-content-end">
-                <button className="btn btn-outline-danger mt-3" onClick={() => onRemove(index)} type="button" aria-label="삭제">X</button>
+                <button className="btn admin-btn admin-btn-danger admin-btn-sm mt-3" onClick={() => onRemove(index)} type="button" aria-label="삭제">✕ 규칙 삭제</button>
             </div>
         </div>
     );

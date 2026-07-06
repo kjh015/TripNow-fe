@@ -64,11 +64,11 @@ const InputDeduplication = ({ processId, onClose }) => {
 
             <div className="mb-3 d-flex justify-content-end">
                 <button
-                    className={`btn btn-sm ${active ? 'btn-success' : 'btn-outline-success'}`}
+                    className={`btn btn-sm admin-toggle ${active ? 'admin-toggle-on' : 'admin-toggle-off'}`}
                     onClick={() => setActive(!active)}
                     type="button"
                 >
-                    활성화: {active ? "On" : "Off"}
+                    활성화: {active ? "ON" : "OFF"}
                 </button>
             </div>
 
@@ -86,10 +86,10 @@ const InputDeduplication = ({ processId, onClose }) => {
             </div>
 
             <div className="d-flex justify-content-between align-items-center mt-3">
-                <button className="btn btn-success" onClick={handleAddRow}>
-                    + 조건 추가
+                <button className="btn admin-btn admin-btn-outline" onClick={handleAddRow}>
+                    + 규칙 추가
                 </button>
-                <button className="btn btn-primary" onClick={handleSubmit}>
+                <button className="btn admin-btn admin-btn-primary" onClick={handleSubmit}>
                     추가
                 </button>
             </div>

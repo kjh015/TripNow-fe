@@ -37,10 +37,14 @@ const LogTable = ({
 
     return (
         <div>
-            <h3 className="mb-3">{title}</h3>
-            <div className="table-responsive log-table-scroll">
-                <table className={`table table-bordered table-hover align-middle`}>
-                    <thead className={`text-center table-${color}`}>
+            <h4 className="mb-3 fw-bold">
+                <span className={`admin-log-table-dot bg-${color}`}></span>
+                {title}
+            </h4>
+            <div className="admin-table-card">
+                <div className="table-responsive log-table-scroll">
+                <table className="table admin-table align-middle mb-0">
+                    <thead className="text-center">
                         <tr>
                             {columns.map(col =>
                                 <th
@@ -71,8 +75,8 @@ const LogTable = ({
                                     ))}
                                 </tr>,
                                 expandedRowId === row.historyId && (
-                                    <tr key={`${row.historyId}-expanded`}>
-                                        <td colSpan={columns.length} className="text-start bg-light">
+                                    <tr key={`${row.historyId}-expanded`} className="admin-table-detail-row">
+                                        <td colSpan={columns.length} className="text-start">
                                             <strong>Log Data:</strong>
                                             <pre
                                                 className="mb-0 mt-2 log-table-detail-pre"
@@ -86,6 +90,7 @@ const LogTable = ({
                         )}
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     );

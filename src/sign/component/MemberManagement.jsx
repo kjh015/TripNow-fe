@@ -32,9 +32,10 @@ const MemberManagement = () => {
     return (
         <div className="container sign-page-spacer">
             <AdminPageHeader title="회원 관리" />
-            <div className="table-responsive">
-                <table className="table table-hover align-middle">
-                    <thead className="table-light">
+            <div className="admin-table-card">
+                <div className="table-responsive">
+                <table className="table admin-table align-middle mb-0">
+                    <thead>
                         <tr>
                             <th>#</th>
                             <th>ID</th>
@@ -67,7 +68,7 @@ const MemberManagement = () => {
                                     <td>{member.roles?.includes("ROLE_ADMIN") ? "관리자" : "회원"}</td>
                                     <td className='text-center'>
                                         <button
-                                            className="btn btn-sm btn-outline-success"
+                                            className="btn admin-btn-icon admin-btn-outline"
                                             title="관리자 위임"
                                             onClick={() => delegateAdmin({ memberId: member.memberId })}
                                             disabled={member.roles?.includes("ROLE_ADMIN")}
@@ -79,6 +80,7 @@ const MemberManagement = () => {
                             ))}
                     </tbody>
                 </table>
+                </div>
             </div>
 
         </div>

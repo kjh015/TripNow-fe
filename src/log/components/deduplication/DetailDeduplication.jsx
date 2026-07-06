@@ -86,7 +86,7 @@ const DetailDeduplication = ({ processId, id, onClose }) => {
 
     return (
         <div className="container mt-5">
-            <h3 className="mb-4">중복 제거 설정 수정</h3>
+            <h4 className="mb-4 admin-detail-title">중복 제거 설정 수정</h4>
             <div className="mb-3">
                 <label className="form-label">중복 이름</label>
                 <input type="text" className="form-control"
@@ -104,18 +104,18 @@ const DetailDeduplication = ({ processId, id, onClose }) => {
                 />
             ))}
 
-            <div className="d-flex justify-content-between mt-3">
-                <button className="btn btn-success" onClick={handleAddRow}>+ 조건 추가</button>
+            <div className="d-flex justify-content-between align-items-center mt-3">
+                <button className="btn admin-btn admin-btn-outline" onClick={handleAddRow}>+ 규칙 추가</button>
                 <button
-                    className={`btn btn-sm ${active ? 'btn-success' : 'btn-outline-success'}`}
+                    className={`btn btn-sm admin-toggle ${active ? 'admin-toggle-on' : 'admin-toggle-off'}`}
                     onClick={() => setActive(!active)}
                     type="button"
                 >
-                    활성화: {active ? "On" : "Off"}
+                    활성화: {active ? "ON" : "OFF"}
                 </button>
-                <div className="d-flex justify-content-end">
-                    <button className="btn btn-primary" onClick={handleSubmit}>수정</button>
-                    <button className="btn btn-danger" onClick={handleRemove}>삭제</button>
+                <div className="d-flex justify-content-end gap-2">
+                    <button className="btn admin-btn admin-btn-primary" onClick={handleSubmit}>수정</button>
+                    <button className="btn admin-btn admin-btn-danger" onClick={handleRemove}>삭제</button>
                 </div>
             </div>
         </div>
