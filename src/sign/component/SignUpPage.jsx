@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import useSignUpForm from '../../hooks/useSignUpForm';
 
 const SignUpPage = () => {
@@ -17,11 +16,6 @@ const SignUpPage = () => {
         handleBirthDate,
         handleSubmit,
     } = useSignUpForm();
-
-    useEffect(() => {
-        document.body.classList.add('bg-body-tertiary');
-        return () => document.body.classList.remove('bg-body-tertiary');
-    }, []);
 
     return (
         <div className="min-vh-100 d-flex flex-column sign-page-bg">

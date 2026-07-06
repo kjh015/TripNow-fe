@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { login } from '../../api/authApi';
 import { getMyProfile } from '../../api/memberApi';
 import { useNavigate } from 'react-router-dom';
@@ -41,11 +41,6 @@ const SignInPage = () => {
             showAlert(error.response?.data?.message || "에러가 발생했습니다.", "danger");
         }
     };
-
-    useEffect(() => {
-        document.body.classList.add('bg-body-tertiary');
-        return () => document.body.classList.remove('bg-body-tertiary');
-    }, []);
 
     return (
         <div className="min-vh-100 d-flex flex-column sign-page-bg sign-page-bg-full">
