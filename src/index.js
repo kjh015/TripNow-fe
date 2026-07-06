@@ -13,17 +13,13 @@ import './css/comment.css';
 import './css/log.css';
 
 import App from './App';
-import { getUserIdForMatomo } from './utils/tokenUtils';
+import { setUserAttributes, getUserIdForMatomo } from './analytics/analytics';
 
 // 3. Matomo Tag Manager 스크립트 삽입 + 데이터레이어에 userId 전달
 function insertMatomoScript() {
   if (!document.getElementById('matomo-container-script')) {
-    // userId 결정
-    const userId = getUserIdForMatomo();
-
     // 데이터레이어에 userId 전달
-    window._mtm = window._mtm || [];
-    window._mtm.push({ userId, age: -1, role: "user" });
+    setUserAttributes({ userId: getUserIdForMatomo(), age: -1, role: "user" });
 
     // Matomo Tag Manager 스크립트 삽입
     const script = document.createElement('script');

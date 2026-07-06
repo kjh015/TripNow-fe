@@ -65,23 +65,23 @@ src/analytics/
 
 ## 이벤트 카탈로그
 
-### 유저 식별/속성 (`_mtm` 직접 push → `analytics.js`로 이관 대상)
+### 유저 식별/속성 (M1에서 `analytics.js`의 `setUserAttributes` 경유로 이관 완료)
 
-| 데이터 | 시점 | 현재 위치 | 필드 |
+| 데이터 | 시점 | 호출 위치 | 필드 |
 |---|---|---|---|
-| userId (토큰 sub 또는 익명 UUID), age, role | 앱 부팅 1회 | `src/index.js` | userId, age(-1 고정), role |
-| 로그인 유저 속성 | 로그인 성공 | `src/sign/component/SignInPage.jsx` | nickname, gender, age, role — **userId 미갱신 (버그)** |
+| userId (토큰 sub 또는 익명 UUID), age, role | 앱 부팅 1회 | `src/index.js` | userId, age(-1 고정), role — 매직 값은 M3에서 정리 |
+| 로그인 유저 속성 | 로그인 성공 | `src/sign/component/SignInPage.jsx` | nickname, gender, age, role — **userId 미갱신 (버그, M2)** |
 
-### 현재 이벤트 (`window.dataLayer` push — 전부 `events.js`로 이관 대상)
+### 현재 이벤트 (M1에서 `events.js` 트래커 → `_mtm` push로 이관 완료, 이슈 #73)
 
-| 이벤트 | 발화 시점 | 현재 위치 | 페이로드 | 문제 |
+| 이벤트 | 발화 시점 | 트래커 함수 (`src/analytics/events.js`) / 호출 위치 | 페이로드 | 남은 문제 |
 |---|---|---|---|---|
-| `travel_main_view` | 메인 페이지 진입 | `src/board/component/page/MainPage.jsx` | visit_time, referrer | 둘 다 Matomo 기본 수집과 중복 → 제거 |
-| `travel_search_click` | 검색 버튼 클릭 | `src/post/components/PostSearch.jsx` | category, region | 빈 값이 `"없음"` 문자열, keyword 미수집 |
-| `travel_detail_pageview` | 상세 데이터 로드 후 | `src/post/pages/PostDetailPage.jsx` | postId, category, region, title | 찜/댓글 시마다 재발화 (중복 집계) |
-| `travel_detail_exit` | 상세 이탈 (effect cleanup) | `src/post/pages/PostDetailPage.jsx` | postId, staySeconds, title | deps `[no, liked, commentFlag]` → 찜/댓글마다 발화, staySeconds 왜곡 |
-| `travel_favorite_add` / `_remove` | 찜 토글 | `src/post/pages/PostDetailPage.jsx` | postId, category, region, title | postId가 문자열 |
-| `travel_comment_add` / `_remove` | 댓글 등록/삭제 | `src/comment/component/CommentPage.jsx` | **boardId**, category, region, title | boardId→postId 통일 필요, star(별점) 미수집 |
+| `travel_main_view` | 메인 페이지 진입 | `trackMainView` / `src/board/component/page/MainPage.jsx` | (공통 필드만) | — |
+| `travel_search_click` | 검색 버튼 클릭 | `trackSearchClick` / `src/post/components/PostSearch.jsx` | category, region (빈 값 null) | keyword 미수집 (M4) |
+| `travel_detail_pageview` | 상세 데이터 로드 후 | `trackDetailPageview` / `src/post/pages/PostDetailPage.jsx` | postId(number), category, region, title | 찜/댓글 시마다 재발화 — 중복 집계 (M2) |
+| `travel_detail_exit` | 상세 이탈 (effect cleanup) | `trackDetailExit` / `src/post/pages/PostDetailPage.jsx` | postId(number), staySeconds, title | deps `[no, liked, commentFlag]` → 찜/댓글마다 발화, staySeconds 왜곡 (M2) |
+| `travel_favorite_add` / `_remove` | 찜 토글 | `trackFavoriteAdd` / `trackFavoriteRemove` / `src/post/pages/PostDetailPage.jsx` | postId(number), category, region, title | — |
+| `travel_comment_add` / `_remove` | 댓글 등록/삭제 | `trackCommentAdd` / `trackCommentRemove` / `src/comment/component/CommentPage.jsx` | postId(number), category, region, title | star(별점) 미수집 (M4) |
 
 ### 신규 이벤트 (이슈 M4에서 추가)
 
@@ -103,7 +103,9 @@ src/analytics/
 
 ## 작업 이슈 목록 (2026-07-07 진단 결과)
 
-### 이슈 M0 — 데이터 레이어 이원화 확인 (선행 조사, 🐛)
+### 이슈 M0 — 데이터 레이어 이원화 확인 (선행 조사, 🐛) — ✅ 완료 (이슈 #72)
+
+> 결과: 컨테이너는 `_mtm`만 상시 수신 → push 대상 `_mtm` 통일 확정. 컨테이너 ID는 `container_2yv5mH8U.js`로 교체됨. 컨테이너는 아직 태그/트리거 미구성·미게시 상태로, 사용자가 MTM에서 travel_* Custom Event 트리거 + History Change 트리거 구성 후 게시 필요.
 
 **진단**
 - 초기화·로그인은 `window._mtm`, 이벤트 5곳은 `window.dataLayer`에 push. MTM(Matomo Tag Manager)의 기본 데이터 레이어는 `_mtm`이므로, 컨테이너에 커스텀 설정이 없다면 `dataLayer` 이벤트는 Matomo에 도달하지 않을 수 있음.
@@ -112,7 +114,7 @@ src/analytics/
 - Matomo 대시보드(또는 MTM 프리뷰 모드)에서 `travel_*` 이벤트 수신 여부 확인이 1순위. 컨테이너 트리거 설정(History Change 트리거 포함 — SPA 라우트 pageview)도 함께 확인.
 - 확인 결과에 따라 M1에서 push 대상을 한쪽으로 통일. 코드만으로 판단 불가하므로 **작업 시작 전 사용자에게 확인 결과를 물어볼 것**.
 
-### 이슈 M1 — `src/analytics/` 모듈 도입 + 기존 이벤트 이관 (중형, ♻️)
+### 이슈 M1 — `src/analytics/` 모듈 도입 + 기존 이벤트 이관 (중형, ♻️) — ✅ 완료 (이슈 #73)
 
 **진단**
 - `window.dataLayer = window.dataLayer || []; push(...)` 보일러플레이트가 5개 파일에 복붙됨.

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import PostSearch from "../../../post/components/PostSearch";
 import tgd3 from '../imgs/tgd3.jpg';
 import { subscribeRankings } from "../../../api/rankingApi";
+import { trackMainView } from "../../../analytics/events";
 
 import MainPageCardsLayout from "./MainPageCardsLayout";
 import MainPageCardsLayout2 from "./MainPageCardsLayout2";
@@ -13,12 +14,7 @@ const MainPage = () => {
   const [top5Category, setTop5Category] = useState([]);
 
   useEffect(() => {
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-      event: "travel_main_view",
-      visit_time: new Date().toISOString(),
-      referrer: document.referrer
-    });
+    trackMainView();
 
     const evt = subscribeRankings();
     evt.addEventListener("ranking-update", (e) => {
