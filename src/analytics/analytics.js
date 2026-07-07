@@ -105,3 +105,38 @@ export const setLoggedInUserAttributes = ({ gender, age, role }) => {
 export const resetUser = () => {
   setUserAttributes({ userId: getOrCreateAnonymousId(), gender: null, ageGroup: null, role: "user" });
 };
+
+/**
+ * 앱 부팅 시 1회 호출: 유저 식별(userId) push 후 MTM 컨테이너 스크립트를 삽입한다.
+ * 컨테이너 주소는 REACT_APP_MATOMO_URL + REACT_APP_MATOMO_CONTAINER_ID 환경변수로만 결정하며,
+ * 둘 중 하나라도 없으면 삽입을 건너뛰고 console.error만 남긴다 (트래킹 실패가 기능을 깨지 않는다).
+ * gender/ageGroup/role은 부팅 시점에 알 수 없으므로 보내지 않는다 — 로그인 시 setLoggedInUserAttributes가 채운다.
+ * 호출 위치: src/index.js
+ */
+export const initAnalytics = () => {
+  try {
+    if (document.getElementById("matomo-container-script")) return;
+
+    // 컨테이너 로드 전에 큐에 넣어 첫 이벤트부터 userId가 실리게 한다.
+    setUserAttributes({ userId: getUserIdForMatomo() });
+
+    const matomoUrl = process.env.REACT_APP_MATOMO_URL;
+    const containerId = process.env.REACT_APP_MATOMO_CONTAINER_ID;
+    if (!matomoUrl || !containerId) {
+      console.error(
+        "analytics initAnalytics: REACT_APP_MATOMO_URL / REACT_APP_MATOMO_CONTAINER_ID 환경변수가 없어 MTM 컨테이너를 삽입하지 않습니다."
+      );
+      return;
+    }
+
+    getDataLayer().push({ "mtm.startTime": new Date().getTime(), event: "mtm.Start" });
+
+    const script = document.createElement("script");
+    script.id = "matomo-container-script";
+    script.async = true;
+    script.src = `${matomoUrl}/js/${containerId}.js`;
+    document.body.appendChild(script);
+  } catch (e) {
+    console.error("analytics initAnalytics 실패:", e);
+  }
+};
