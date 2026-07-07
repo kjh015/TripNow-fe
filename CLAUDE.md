@@ -65,11 +65,11 @@ src/analytics/
 
 ## 이벤트 카탈로그
 
-### 유저 식별/속성 (M1에서 `analytics.js`의 `setUserAttributes` 경유로 이관, M2에서 userId 갱신/리셋 연결 완료)
+### 유저 식별/속성 (M1에서 `analytics.js`의 `setUserAttributes` 경유로 이관, M2에서 userId 갱신/리셋 연결, M3에서 부팅 push 정리 완료)
 
 | 데이터 | 시점 | 호출 위치 | 필드 |
 |---|---|---|---|
-| userId (토큰 sub 또는 익명 UUID), age, role | 앱 부팅 1회 | `src/index.js` | userId, age(-1 고정), role — 매직 값은 M3에서 정리 |
+| userId (토큰 sub 또는 익명 UUID) — `initAnalytics` 내부 | 앱 부팅 1회 (컨테이너 삽입 직전) | `src/analytics/analytics.js` (호출: `src/index.js`) | userId만 — gender/ageGroup/role은 부팅 시점에 알 수 없어 미전송 (M3에서 age -1·role "user" 매직 값 제거) |
 | 로그인 유저 속성 (`setLoggedInUserAttributes`) | 로그인 성공 | `src/sign/components/SignInPage.jsx` | userId(토큰 식별자로 전환), gender, ageGroup(연령대 구간, 예: "20대"), role — **개인정보 방침(M2 결정): nickname·age 원값 미전송** |
 | 유저 속성 리셋 (`resetUser`) | 로그아웃 | `src/common/Navbar.jsx` | userId(익명 UUID로 복귀), gender/ageGroup null, role "user" |
 
@@ -140,7 +140,9 @@ src/analytics/
 - pageview는 postId 기준 1회 발화 가드(ref로 마지막 발화 postId 기억).
 - 로그인 성공 시 `setUserAttributes`(userId 포함), 로그아웃 시 `resetUser` 호출. nickname·gender·age 원값 전송은 개인정보 관점에서 재검토(연령대 구간화 등) 후 결정.
 
-### 이슈 M3 — 하드코딩 제거 + 스크립트 삽입 정리 (소형, 📦)
+### 이슈 M3 — 하드코딩 제거 + 스크립트 삽입 정리 (소형, 📦) — ✅ 완료 (이슈 #79)
+
+> 결과: 컨테이너 삽입 로직을 `analytics.js`의 `initAnalytics()`로 이동(`index.js`는 1줄 호출), `innerHTML` 주입 → `script.src` 직접 설정으로 전환. `REACT_APP_MATOMO_CONTAINER_ID` env 도입, fallback URL 제거(env 미설정 시 삽입 스킵 + console.error). 부팅 push의 `age: -1`·`role: "user"` 매직 값 제거(userId만 전송).
 
 **진단**
 - `index.js`에 컨테이너 파일명 `container_5uzHzMcX.js`과 fallback `http://localhost:9080` 하드코딩. 스크립트를 `innerHTML` 문자열로 주입(불필요한 간접 실행).
@@ -257,7 +259,7 @@ REACT_APP_IMAGE_BASE_URL=<이미지 베이스 URL>
 
 # Matomo
 REACT_APP_MATOMO_URL=http://localhost:9080
-REACT_APP_MATOMO_CONTAINER_ID=<MTM 컨테이너 ID>   # 예) container_5uzHzMcX (M3에서 도입)
+REACT_APP_MATOMO_CONTAINER_ID=<MTM 컨테이너 ID>   # 예) container_2yv5mH8U — 미설정 시 컨테이너 삽입 스킵 (M3에서 도입, fallback 없음)
 
 # 앱
 REACT_APP_APP_NAME=TripNow
