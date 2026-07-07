@@ -78,25 +78,24 @@ src/analytics/
 | 이벤트 | 발화 시점 | 트래커 함수 (`src/analytics/events.js`) / 호출 위치 | 페이로드 | 남은 문제 |
 |---|---|---|---|---|
 | `travel_main_view` | 메인 페이지 진입 | `trackMainView` / `src/main/pages/MainPage.jsx` | (공통 필드만) | — |
-| `travel_search_click` | 검색 버튼 클릭 | `trackSearchClick` / `src/post/components/PostSearch.jsx` | category, region (빈 값 null) | keyword 미수집 (M4) |
+| `travel_search_click` | 검색 버튼 클릭 | `trackSearchClick` / `src/post/components/PostSearch.jsx` | category, region, keyword (빈 값 null) | — (M4에서 keyword 추가) |
 | `travel_detail_pageview` | 상세 데이터 로드 후 (postId당 1회 가드) | `trackDetailPageview` / `src/post/pages/PostDetailPage.jsx` | postId(number), category, region, title | — (M2에서 중복 발화 수정) |
 | `travel_detail_exit` | 상세 이탈 (effect cleanup + `pagehide` 보완) | `trackDetailExit` / `src/post/pages/PostDetailPage.jsx` | postId(number), staySeconds, title | — (M2에서 과다 발화·staySeconds 왜곡 수정) |
 | `travel_favorite_add` / `_remove` | 찜 토글 | `trackFavoriteAdd` / `trackFavoriteRemove` / `src/post/pages/PostDetailPage.jsx` | postId(number), category, region, title | — |
-| `travel_comment_add` / `_remove` | 댓글 등록/삭제 | `trackCommentAdd` / `trackCommentRemove` / `src/comment/components/CommentPage.jsx` | postId(number), category, region, title | star(별점) 미수집 (M4) |
+| `travel_comment_add` / `_remove` | 댓글 등록/삭제 | `trackCommentAdd` / `trackCommentRemove` / `src/comment/components/CommentPage.jsx` | postId(number), category, region, title, star(add만, number) | — (M4에서 star 추가) |
 
-### 신규 이벤트 (이슈 M4에서 추가)
+### 신규 이벤트 (M4에서 추가 완료, 이슈 #81)
 
-| 이벤트 | 발화 시점 | 호출 위치(예정) | 페이로드 | 목적 |
+| 이벤트 | 발화 시점 | 트래커 함수 (`src/analytics/events.js`) / 호출 위치 | 페이로드 | 목적 |
 |---|---|---|---|---|
-| `travel_signup_complete` | 회원가입 성공 | `src/sign/components/SignUpPage.jsx` | gender, age | 가입 퍼널 |
-| `travel_login` / `travel_login_fail` | 로그인 성공/실패 | `src/sign/components/SignInPage.jsx` | (성공 시 role) | 로그인 퍼널 |
-| `travel_post_add` / `_update` / `_remove` | 게시글 CRUD 성공 | post 작성/수정 화면 | postId, category, region | 콘텐츠 생산 지표 |
-| `travel_search_click` (확장) | 검색 | `src/post/components/PostSearch.jsx` | + keyword | 검색어 분석 |
-| `travel_search_result` | 검색 결과 로드 | `src/post/pages/PostListPage.jsx` | keyword, category, region, resultCount | **0건 검색 = 콘텐츠 갭** |
-| `travel_list_item_click` | 리스트→상세 클릭 | 리스트 화면 | postId, position(순번), keyword | 검색 CTR |
-| `travel_ranking_click` | 메인 랭킹 카드 클릭 | `MainPageCard` 계열 | rankType(region/category/post), rank, label | 랭킹 기능 효용 검증 |
-| `travel_comment_add` (확장) | 댓글 등록 | `src/comment/components/CommentPage.jsx` | + star | 지역/카테고리 만족도 |
-| `travel_error` | ErrorBoundary·API 실패 | `src/components/ErrorBoundary.jsx` 등 | errorType, message, path | 사용자 체감 장애 |
+| `travel_signup_complete` | 회원가입 성공 | `trackSignupComplete` / `src/hooks/useSignUpForm.js` | gender, ageGroup(연령대 구간 — 개인정보 방침에 따라 age 원값 미전송) | 가입 퍼널 |
+| `travel_login` / `travel_login_fail` | 로그인 성공/실패 | `trackLogin` / `trackLoginFail` / `src/sign/components/SignInPage.jsx` | 성공 시 role("admin"\|"user"), 실패 시 공통 필드만 | 로그인 퍼널 |
+| `travel_post_add` | 게시글 작성 성공 | `trackPostAdd` / `src/post/pages/PostWritePage.jsx` | postId(생성 응답에서 확보, 없으면 null), category, region (코드값) | 콘텐츠 생산 지표 |
+| `travel_post_update` / `_remove` | 게시글 수정/삭제 성공 | `trackPostUpdate` / `trackPostRemove` / `src/post/pages/PostEditPage.jsx` | postId, category, region (코드값) | 콘텐츠 생산 지표 |
+| `travel_search_result` | 검색 결과 로드 성공 (정렬/페이지 이동 포함 매 로드) | `trackSearchResult` / `src/post/pages/PostListPage.jsx` | keyword, category, region, resultCount(totalElements, 없으면 페이지 건수) | **0건 검색 = 콘텐츠 갭** |
+| `travel_list_item_click` | 검색 결과 카드 → 상세 클릭 | `trackListItemClick` / `src/post/pages/PostListPage.jsx` (`PostListCard`의 `onCardClick` prop 경유) | postId, position(페이지 내 순번 1~), keyword | 검색 CTR |
+| `travel_ranking_click` | 메인 랭킹 카드 클릭 | `trackRankingClick` / `src/main/components/MainPageCard/MainPageCard.jsx` | rankType("post"\|"region"\|"category"), rank(1~5), label(post는 제목, 그 외 코드값), postId(post일 때만) | 랭킹 기능 효용 검증 |
+| `travel_error` | 렌더 크래시 / 목록 로드 실패(에러 화면 노출) | `trackError` / `src/components/ErrorBoundary.jsx`(render) · `src/post/pages/PostListPage.jsx`(api) | errorType("render"\|"api"), message, path | 사용자 체감 장애 |
 
 > 공통 필드(`isLoggedIn`, `userId`)는 `pushEvent`가 모든 이벤트에 자동 주입하므로 표에서 생략.
 
@@ -152,11 +151,9 @@ src/analytics/
 - `REACT_APP_MATOMO_CONTAINER_ID` 환경변수 추가(.env.example 갱신), fallback URL 제거 또는 env 필수화.
 - `innerHTML` 대신 index.js에서 동일 로직 직접 실행. 삽입 로직 자체를 `analytics.js`의 `initAnalytics()`로 이동.
 
-### 이슈 M4 — 신규 이벤트 추가 (중형, ✨)
+### 이슈 M4 — 신규 이벤트 추가 (중형, ✨) — ✅ 완료 (이슈 #81)
 
-- 위 "신규 이벤트" 표 참조. 전환·생산 퍼널(가입/로그인/게시글 CRUD) → 검색 품질(keyword, resultCount, list click) → 랭킹 클릭 → 에러/기타 순으로 우선순위.
-- Web Vitals(패키지 이미 의존성에 있음, 미사용)를 Matomo 이벤트로 보내는 것은 선택 항목 — 별도 이슈로 분리 가능.
-- 이벤트마다 카탈로그 표 갱신 필수.
+> 결과: 신규 이벤트 10종 추가(위 "신규 이벤트" 표) + 기존 2종 확장(search_click keyword, comment_add star). 개인정보 방침에 따라 signup은 age 원값 대신 ageGroup 전송. `travel_error`는 ErrorBoundary(render)와 PostListPage 목록 로드 실패(api) 2곳 연결 — `src/api/` 수정 금지 원칙 때문에 axios 인터셉터 방식은 쓰지 않음. Web Vitals → Matomo 전송은 별도 이슈로 분리(미착수). MTM 컨테이너에 신규 travel_* Custom Event 트리거 등록·게시는 사용자 대시보드 작업으로 남음.
 
 ### 작업 순서
 

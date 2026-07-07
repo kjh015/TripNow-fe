@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import CountUp from 'react-countup';
 import { CATEGORY_CODE_TO_LABEL, REGION_CODE_TO_LABEL } from '../../../constants/categoryRegion';
 import { CATEGORY_REGION_IMAGES } from './categoryRegionImages';
+import { trackRankingClick } from '../../../analytics/events';
 
 // 1~5위 색상 예시 (secondary variant 순위 뱃지)
 const rankColors = ["#ffd700", "#C0C0C0", "#cd7f32", "#90caf9", "#b39ddb"];
@@ -47,8 +48,10 @@ const MainPageCard = ({ variant = 'primary', rank, postId, score, data, type }) 
 
   const handleClick = () => {
     if (variant === 'category') {
+      trackRankingClick({ rankType: type, rank, label: data });
       navigate(`/post/list/?${type}=${data}`);
     } else {
+      trackRankingClick({ rankType: 'post', rank, label: post.title, postId: post.postId });
       navigate(`/post/detail/?postId=${post.postId}`);
     }
   };

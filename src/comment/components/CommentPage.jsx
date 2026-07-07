@@ -59,7 +59,7 @@ const CommentPage = ({ postId, isLoggedIn, ratingAvg, setCommentFlag, category, 
     };
 
     const addComment = async ({ rating, comment }) => {
-        trackCommentAdd({ postId, category, region, title });
+        trackCommentAdd({ postId, category, region, title, star: rating });
         const payload = { postId: parseInt(postId), content: comment, star: rating };
         try {
             const { data } = await commentApi.addComment(payload);

@@ -4,12 +4,13 @@ import { categoryColors, regionColors } from "../../constants/colorMaps";
 import { CATEGORY_CODE_TO_LABEL, REGION_CODE_TO_LABEL } from "../../constants/categoryRegion";
 import { formatDate } from "../../utils/dateUtils";
 
-const PostListCard = ({ post, navigateTo, navigateState }) => {
+const PostListCard = ({ post, navigateTo, navigateState, onCardClick }) => {
   const navigate = useNavigate();
   const categoryLabel = CATEGORY_CODE_TO_LABEL[post.category] ?? post.category;
   const regionLabel = REGION_CODE_TO_LABEL[post.region] ?? post.region;
 
   const handleClick = () => {
+    onCardClick?.();
     const to = navigateTo ?? `/post/detail?postId=${post.postId}`;
     navigate(to, navigateState ? { state: navigateState } : undefined);
   };

@@ -73,7 +73,7 @@ const PostSearch = ({ selectedCategory, selectedRegion }) => {
         if (post.category) params.append("category", post.category);
         if (post.region) params.append("region", post.region);
         if (keyword) params.append("keyword", keyword);
-        trackSearchClick({ category: post.category, region: post.region });
+        trackSearchClick({ category: post.category, region: post.region, keyword });
         navigate(`/post/list?${params.toString()}`);
     };
 
