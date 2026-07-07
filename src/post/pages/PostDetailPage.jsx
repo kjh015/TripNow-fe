@@ -11,6 +11,8 @@ import { trackFavoriteAdd, trackFavoriteRemove, trackDetailPageview, trackDetail
 
 const PostDetailPage = () => {
   const enterTime = useRef(Date.now());
+  const titleRef = useRef(''); // exit 발화 시점의 최신 제목 (cleanup 클로저의 stale 값 방지)
+  const lastPageviewPostId = useRef(null); // pageview 중복 발화 가드 (postId당 1회)
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const no = searchParams.get('no');
@@ -65,6 +67,7 @@ const PostDetailPage = () => {
     try {
       const { data } = await getPost(no);
       const post = data.result;
+      titleRef.current = post.title;
       setPost({ ...post, images: post.images || [] });
     } catch {
       showAlert("게시글을 불러오지 못했습니다.", "danger");
@@ -74,19 +77,33 @@ const PostDetailPage = () => {
   useEffect(() => {
     loadPost();
     getLike();
-    enterTime.current = Date.now();
-    return () => {
-      const leaveTime = Date.now();
-      const stayDuration = Math.floor((leaveTime - enterTime.current) / 1000);
-      trackDetailExit({ postId: no, staySeconds: stayDuration, title: post.title });
-    };
   }, [no, liked, commentFlag]);
 
+  // 이탈 추적: no에만 의존해 실제 상세 진입/이탈 시에만 발화 (찜/댓글 상호작용에는 반응하지 않음)
   useEffect(() => {
-    if (post && post.category && post.region) {
+    enterTime.current = Date.now();
+    const fireExit = () => {
+      const staySeconds = Math.floor((Date.now() - enterTime.current) / 1000);
+      trackDetailExit({ postId: no, staySeconds, title: titleRef.current });
+    };
+    const handlePagehide = () => fireExit(); // 탭 닫기/외부 이동은 cleanup이 실행되지 않으므로 보완 발화
+    const handlePageshow = () => { enterTime.current = Date.now(); }; // bfcache 복귀 시 체류시간 재시작
+    window.addEventListener('pagehide', handlePagehide);
+    window.addEventListener('pageshow', handlePageshow);
+    return () => {
+      window.removeEventListener('pagehide', handlePagehide);
+      window.removeEventListener('pageshow', handlePageshow);
+      fireExit();
+    };
+  }, [no]);
+
+  // 진입 추적: loadPost 재실행마다 재발화하지 않도록 postId당 1회만 발화
+  useEffect(() => {
+    if (post.postId && lastPageviewPostId.current !== post.postId) {
+      lastPageviewPostId.current = post.postId;
       trackDetailPageview(post);
     }
-  }, [post, no]);
+  }, [post]);
 
   const nickname = localStorage.getItem("nickname");
   const isLoggedIn = !!localStorage.getItem('accessToken');

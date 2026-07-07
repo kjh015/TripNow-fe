@@ -2,6 +2,7 @@ import { Button } from 'react-bootstrap';
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import { logout } from "../api/authApi";
+import { resetUser } from "../analytics/analytics";
 import UserAuthentication from '../sign/service/UserAuthentication';
 import { toast } from 'react-toastify';
 import useAlert from '../hooks/useAlert';
@@ -21,6 +22,7 @@ const Navbar = () => {
       await logout();
       localStorage.removeItem('accessToken');
       localStorage.removeItem('nickname');
+      resetUser();
       toast.info("로그아웃 되었습니다.");
       handleClose();
       navigate("/");

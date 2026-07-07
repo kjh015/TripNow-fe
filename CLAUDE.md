@@ -65,12 +65,13 @@ src/analytics/
 
 ## 이벤트 카탈로그
 
-### 유저 식별/속성 (M1에서 `analytics.js`의 `setUserAttributes` 경유로 이관 완료)
+### 유저 식별/속성 (M1에서 `analytics.js`의 `setUserAttributes` 경유로 이관, M2에서 userId 갱신/리셋 연결 완료)
 
 | 데이터 | 시점 | 호출 위치 | 필드 |
 |---|---|---|---|
 | userId (토큰 sub 또는 익명 UUID), age, role | 앱 부팅 1회 | `src/index.js` | userId, age(-1 고정), role — 매직 값은 M3에서 정리 |
-| 로그인 유저 속성 | 로그인 성공 | `src/sign/component/SignInPage.jsx` | nickname, gender, age, role — **userId 미갱신 (버그, M2)** |
+| 로그인 유저 속성 (`setLoggedInUserAttributes`) | 로그인 성공 | `src/sign/component/SignInPage.jsx` | userId(토큰 식별자로 전환), gender, ageGroup(연령대 구간, 예: "20대"), role — **개인정보 방침(M2 결정): nickname·age 원값 미전송** |
+| 유저 속성 리셋 (`resetUser`) | 로그아웃 | `src/common/Navbar.jsx` | userId(익명 UUID로 복귀), gender/ageGroup null, role "user" |
 
 ### 현재 이벤트 (M1에서 `events.js` 트래커 → `_mtm` push로 이관 완료, 이슈 #73)
 
@@ -78,8 +79,8 @@ src/analytics/
 |---|---|---|---|---|
 | `travel_main_view` | 메인 페이지 진입 | `trackMainView` / `src/board/component/page/MainPage.jsx` | (공통 필드만) | — |
 | `travel_search_click` | 검색 버튼 클릭 | `trackSearchClick` / `src/post/components/PostSearch.jsx` | category, region (빈 값 null) | keyword 미수집 (M4) |
-| `travel_detail_pageview` | 상세 데이터 로드 후 | `trackDetailPageview` / `src/post/pages/PostDetailPage.jsx` | postId(number), category, region, title | 찜/댓글 시마다 재발화 — 중복 집계 (M2) |
-| `travel_detail_exit` | 상세 이탈 (effect cleanup) | `trackDetailExit` / `src/post/pages/PostDetailPage.jsx` | postId(number), staySeconds, title | deps `[no, liked, commentFlag]` → 찜/댓글마다 발화, staySeconds 왜곡 (M2) |
+| `travel_detail_pageview` | 상세 데이터 로드 후 (postId당 1회 가드) | `trackDetailPageview` / `src/post/pages/PostDetailPage.jsx` | postId(number), category, region, title | — (M2에서 중복 발화 수정) |
+| `travel_detail_exit` | 상세 이탈 (effect cleanup + `pagehide` 보완) | `trackDetailExit` / `src/post/pages/PostDetailPage.jsx` | postId(number), staySeconds, title | — (M2에서 과다 발화·staySeconds 왜곡 수정) |
 | `travel_favorite_add` / `_remove` | 찜 토글 | `trackFavoriteAdd` / `trackFavoriteRemove` / `src/post/pages/PostDetailPage.jsx` | postId(number), category, region, title | — |
 | `travel_comment_add` / `_remove` | 댓글 등록/삭제 | `trackCommentAdd` / `trackCommentRemove` / `src/comment/component/CommentPage.jsx` | postId(number), category, region, title | star(별점) 미수집 (M4) |
 
@@ -125,7 +126,9 @@ src/analytics/
 - 이 과정에서 스키마 통일(boardId→postId, Number 캐스팅, null 처리, 중복 필드 제거).
 - `getUserIdForMatomo` 등 분석 전용 로직은 `tokenUtils.js`에서 `analytics.js`로 이동 검토 (토큰 디코딩 자체는 tokenUtils에 유지).
 
-### 이슈 M2 — 트래킹 버그 수정 (소형, 🐛)
+### 이슈 M2 — 트래킹 버그 수정 (소형, 🐛) — ✅ 완료 (이슈 #75)
+
+> 결과: exit 추적을 `no`만 의존하는 별도 effect로 분리(+`pagehide`/`pageshow` 보완), pageview는 ref로 postId당 1회 가드. 로그인 시 `setLoggedInUserAttributes`(userId 포함), 로그아웃 시 `resetUser` 연결. 개인정보 방침 결정: nickname 미전송, age는 `ageGroup` 연령대 구간("20대" 등)으로 변환 전송. Heartbeat Timer는 컨테이너 설정 이슈로 미포함.
 
 **진단**
 - `travel_detail_exit`: `PostDetailPage.jsx` useEffect deps가 `[no, liked, commentFlag]` → 찜 토글/댓글마다 cleanup 실행되어 이탈이 아닌데 발화, `enterTime`도 리셋되어 staySeconds가 "마지막 상호작용 후 경과 시간"이 됨. 체류시간 데이터 신뢰 불가.

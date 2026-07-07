@@ -62,8 +62,8 @@ export const pushEvent = (eventName, payload = {}) => {
 };
 
 /**
- * 유저 속성(userId, nickname, gender, age, role 등)을 데이터 레이어에 push한다.
- * 호출 위치: src/index.js(앱 부팅), src/sign/component/SignInPage.jsx(로그인 성공)
+ * 유저 속성(userId, gender, ageGroup, role 등)을 데이터 레이어에 push한다.
+ * 호출 위치: src/index.js(앱 부팅), 로그인/로그아웃은 아래 setLoggedInUserAttributes/resetUser 경유
  */
 export const setUserAttributes = (attributes) => {
   try {
@@ -74,9 +74,34 @@ export const setUserAttributes = (attributes) => {
 };
 
 /**
+ * 나이 원값을 연령대 구간 문자열로 변환한다. (개인정보 최소화 — 원값은 보내지 않는다)
+ * 예: 27 → "20대". 60 이상은 "60대 이상", 10 미만·비정상 값은 null.
+ */
+const toAgeGroup = (age) => {
+  const n = Number(age);
+  if (!Number.isFinite(n) || n < 10) return null;
+  const decade = Math.floor(n / 10) * 10;
+  return decade >= 60 ? "60대 이상" : `${decade}대`;
+};
+
+/**
+ * 로그인 성공 시 유저 속성을 갱신한다. userId를 익명 UUID → 토큰 식별자로 전환한다.
+ * 개인정보 최소화 방침(M2 결정): nickname은 보내지 않고, age는 연령대 구간(ageGroup)으로 변환한다.
+ * 호출 위치: src/sign/component/SignInPage.jsx (accessToken 저장 이후에 호출해야 userId가 갱신된다)
+ */
+export const setLoggedInUserAttributes = ({ gender, age, role }) => {
+  setUserAttributes({
+    userId: getUserIdForMatomo(),
+    gender: gender || null,
+    ageGroup: toAgeGroup(age),
+    role,
+  });
+};
+
+/**
  * 로그아웃 시 유저 속성을 익명 상태로 되돌린다.
- * 호출 위치: 미연결 — 이슈 M2에서 Navbar 로그아웃에 연결 예정.
+ * 호출 위치: src/common/Navbar.jsx (handleLogout)
  */
 export const resetUser = () => {
-  setUserAttributes({ userId: getOrCreateAnonymousId(), nickname: null, gender: null, age: null, role: "user" });
+  setUserAttributes({ userId: getOrCreateAnonymousId(), gender: null, ageGroup: null, role: "user" });
 };
