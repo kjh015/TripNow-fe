@@ -7,6 +7,7 @@ import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import CommentPage from "../../comment/component/CommentPage";
 import useAlert from "../../hooks/useAlert";
 import PostContent from "../components/PostContent";
+import { trackFavoriteAdd, trackFavoriteRemove, trackDetailPageview, trackDetailExit } from "../../analytics/events";
 
 const PostDetailPage = () => {
   const enterTime = useRef(Date.now());
@@ -36,14 +37,12 @@ const PostDetailPage = () => {
       if (liked) {
         await deleteLike(Number(no));
         setLiked(false);
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ event: "travel_favorite_remove", postId: no, category: post.category, region: post.region, title: post.title });
+        trackFavoriteRemove(post);
         showAlert("찜 목록에서 삭제되었습니다.", "danger");
       } else {
         await addLike(Number(no));
         setLiked(true);
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ event: "travel_favorite_add", postId: no, category: post.category, region: post.region, title: post.title });
+        trackFavoriteAdd(post);
         showAlert("찜 목록에 추가되었습니다.", "success");
       }
     } catch {
@@ -79,26 +78,13 @@ const PostDetailPage = () => {
     return () => {
       const leaveTime = Date.now();
       const stayDuration = Math.floor((leaveTime - enterTime.current) / 1000);
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({
-        event: "travel_detail_exit",
-        postId: no,
-        staySeconds: stayDuration,
-        title: post.title
-      });
+      trackDetailExit({ postId: no, staySeconds: stayDuration, title: post.title });
     };
   }, [no, liked, commentFlag]);
 
   useEffect(() => {
     if (post && post.category && post.region) {
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({
-        event: "travel_detail_pageview",
-        postId: no,
-        category: post.category,
-        region: post.region,
-        title: post.title
-      });
+      trackDetailPageview(post);
     }
   }, [post, no]);
 

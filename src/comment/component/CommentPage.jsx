@@ -2,6 +2,7 @@ import CommentList from "./CommentList";
 import WriteComment from "./WriteComment";
 import * as commentApi from "../../api/commentApi";
 import { useEffect, useState } from "react";
+import { trackCommentAdd, trackCommentRemove } from "../../analytics/events";
 
 function ConfirmModal({ show, type = "danger", message, onConfirm, onCancel }) {
     if (!show) return null;
@@ -47,8 +48,7 @@ const CommentPage = ({ no, isLoggedIn, ratingAvg, setCommentFlag, category, regi
                     setCommentList(prev => prev.filter((c) => c.commentId !== commentId));
                     const message = "댓글이 삭제되었습니다.";
                     setAlert({ show: true, message, type: "success" });
-                    window.dataLayer = window.dataLayer || [];
-                    window.dataLayer.push({ event: "travel_comment_remove", boardId: no, category, region, title });
+                    trackCommentRemove({ postId: no, category, region, title });
                     setCommentFlag?.(prev => !prev);
                 } catch (err) {
                     const message = err.response?.data?.message || "오류가 발생했습니다.";
@@ -59,8 +59,7 @@ const CommentPage = ({ no, isLoggedIn, ratingAvg, setCommentFlag, category, regi
     };
 
     const addComment = async ({ rating, comment }) => {
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ event: "travel_comment_add", boardId: no, category, region, title });
+        trackCommentAdd({ postId: no, category, region, title });
         const payload = { postId: parseInt(no), content: comment, star: rating };
         try {
             const { data } = await commentApi.addComment(payload);

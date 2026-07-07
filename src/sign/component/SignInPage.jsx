@@ -4,6 +4,7 @@ import { getMyProfile } from '../../api/memberApi';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { isAdmin } from '../../utils/tokenUtils';
+import { setUserAttributes } from '../../analytics/analytics';
 import useAlert from '../../hooks/useAlert';
 
 const SignInPage = () => {
@@ -28,8 +29,7 @@ const SignInPage = () => {
             const { data: profileRes } = await getMyProfile();
             const member = profileRes.result ?? profileRes;
             localStorage.setItem('nickname', member.nickname);
-            window._mtm = window._mtm || [];
-            window._mtm.push({
+            setUserAttributes({
                 nickname: member.nickname,
                 gender: member.gender,
                 age: member.age,

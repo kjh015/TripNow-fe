@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import RegionRadioComp from "../../board/component/page/RegionRadioComp";
 import CategoryCard from "../../board/component/page/CategoryCard";
 import { autoCompleteSearch } from "../../api/postSearchApi";
+import { trackSearchClick } from "../../analytics/events";
 
 const PostSearch = ({ selectedCategory, selectedRegion }) => {
     const [post, setPost] = useState({ category: "", region: "" });
@@ -72,12 +73,7 @@ const PostSearch = ({ selectedCategory, selectedRegion }) => {
         if (post.category) params.append("category", post.category);
         if (post.region) params.append("region", post.region);
         if (keyword) params.append("keyword", keyword);
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-            event: "travel_search_click",
-            category: post.category ? post.category : "없음",
-            region: post.region ? post.region : "없음"
-        });
+        trackSearchClick({ category: post.category, region: post.region });
         navigate(`/post/list?${params.toString()}`);
     };
 
