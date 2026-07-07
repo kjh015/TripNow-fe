@@ -135,7 +135,7 @@
   margin-top: 2rem;
 }
 
-/* ===== 마이페이지 하위 목록 (LikeListPage / CheckMyArt 공통) ===== */
+/* ===== 마이페이지 하위 목록 (FavoriteListPage / MyPostsPage 공통) ===== */
 .mypage-list-page {
   overflow-x: hidden;
 }
@@ -144,7 +144,7 @@
   max-width: 850px;
 }
 
-/* ===== 작성 댓글 목록 (ChckMyCom) ===== */
+/* ===== 작성 댓글 목록 (MyCommentsPage) ===== */
 .mypage-comment-star {
   font-size: 1.15rem;
 }

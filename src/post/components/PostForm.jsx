@@ -1,5 +1,5 @@
-import CategoryCard from '../../board/component/page/CategoryCard';
-import RegionRadioComp from '../../board/component/page/RegionRadioComp';
+import CategoryCard from './CategoryCard';
+import RegionCard from './RegionCard';
 
 const PostForm = ({
     post,
@@ -79,7 +79,7 @@ const PostForm = ({
                                 <div className="col-md-6">
                                     <label className="form-label fw-semibold">지역 선택</label>
                                     <div className="bg-light rounded-4 p-2 px-3 border">
-                                        <RegionRadioComp selectedRegion={post.region} setRegion={onRegionChange} />
+                                        <RegionCard selectedRegion={post.region} setRegion={onRegionChange} />
                                     </div>
                                 </div>
                             </div>

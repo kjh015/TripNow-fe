@@ -39,7 +39,7 @@ const buildPostPayload = (post) => ({
 
 /**
  * 메인 페이지 진입 시 1회 발화.
- * 호출 위치: src/board/component/page/MainPage.jsx
+ * 호출 위치: src/main/pages/MainPage.jsx
  * 페이로드: 없음 (visit_time·referrer는 Matomo 기본 수집과 중복이라 보내지 않는다)
  */
 export const trackMainView = () => {
@@ -93,7 +93,7 @@ export const trackFavoriteRemove = (post) => {
 
 /**
  * 댓글 등록 시 발화.
- * 호출 위치: src/comment/component/CommentPage.jsx
+ * 호출 위치: src/comment/components/CommentPage.jsx
  * 페이로드: postId(number|null), category, region, title
  */
 export const trackCommentAdd = ({ postId, category, region, title }) => {
@@ -102,7 +102,7 @@ export const trackCommentAdd = ({ postId, category, region, title }) => {
 
 /**
  * 댓글 삭제 성공 시 발화.
- * 호출 위치: src/comment/component/CommentPage.jsx
+ * 호출 위치: src/comment/components/CommentPage.jsx
  * 페이로드: postId(number|null), category, region, title
  */
 export const trackCommentRemove = ({ postId, category, region, title }) => {

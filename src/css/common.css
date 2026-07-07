@@ -142,7 +142,7 @@
   font-size: 2rem;
 }
 
-/* ===== 관리자 공통 (AdminPageHeader / AdminPipelineNav / AdmnMenu) ===== */
+/* ===== 관리자 공통 (AdminPageHeader / AdminPipelineNav / AdminMenu) ===== */
 .admin-page-root {
   margin-top: 1.1rem;
 }
@@ -179,7 +179,7 @@
   box-shadow: var(--admin-btn-shadow);
 }
 
-/* ===== 관리자 사이드바 (AdmnMenu) ===== */
+/* ===== 관리자 사이드바 (AdminMenu) ===== */
 .admin-sidebar {
   background: var(--card-bg);
   border-right: 1px solid var(--admin-border);

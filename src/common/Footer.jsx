@@ -1,8 +1,8 @@
 
-//페이지 밑에 들어가는 footers 파일
+//페이지 하단 공통 푸터
 const APP_NAME = process.env.REACT_APP_APP_NAME || "TripNow";
 
-const Footers = () => {
+const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
@@ -14,4 +14,4 @@ const Footers = () => {
   );
 }
 
-export default Footers;
+export default Footer;

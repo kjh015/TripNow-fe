@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { getMyComments } from "../api/commentApi";
+import { getMyComments } from "../../api/commentApi";
 import { useNavigate } from "react-router-dom";
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const renderStarsStatic = (score = 0) => (
     <span>
@@ -11,7 +11,7 @@ const renderStarsStatic = (score = 0) => (
     </span>
 );
 
-const ChckMyCom = () => {
+const MyCommentsPage = () => {
     const navigate = useNavigate();
     const nickname = localStorage.getItem("nickname");
     const [commentList, setCommentList] = useState([]);
@@ -53,7 +53,7 @@ const ChckMyCom = () => {
                     <div>
                         {commentList.map((c, idx) => (
                             <div key={idx} className="mainpage-card-hover card mb-3 border-0 shadow-sm rounded-3 position-relative"
-                                onClick={() => navigate(`/post/detail/?no=${c.postId}`)}>
+                                onClick={() => navigate(`/post/detail/?postId=${c.postId}`)}>
                                 <div className="card-body">
                                     <div className="d-flex align-items-center mb-2">
                                         <strong className="me-2">{c.memberNickname}</strong>
@@ -70,4 +70,4 @@ const ChckMyCom = () => {
     );
 };
 
-export default ChckMyCom;
+export default MyCommentsPage;

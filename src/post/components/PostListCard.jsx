@@ -10,7 +10,7 @@ const PostListCard = ({ post, navigateTo, navigateState }) => {
   const regionLabel = REGION_CODE_TO_LABEL[post.region] ?? post.region;
 
   const handleClick = () => {
-    const to = navigateTo ?? `/post/detail?no=${post.postId}`;
+    const to = navigateTo ?? `/post/detail?postId=${post.postId}`;
     navigate(to, navigateState ? { state: navigateState } : undefined);
   };
 

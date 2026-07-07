@@ -3,8 +3,8 @@ import { Modal } from 'react-bootstrap';
 import InputDeduplication from './InputDeduplication';
 import { getDedupRules } from '../../../api/log/deduplicationApi';
 import { formatDate } from '../../../utils/dateUtils';
-import AdminPageHeader from '../../../common/AdminPageHeader';
-import AdminPipelineNav from '../../../common/AdminPipelineNav';
+import AdminPageHeader from '../../../admin/AdminPageHeader';
+import AdminPipelineNav from '../../../admin/AdminPipelineNav';
 import DetailDeduplication from './DetailDeduplication';
 
 const DeduplicationManagement = ({ processId, onMenuClick }) => {

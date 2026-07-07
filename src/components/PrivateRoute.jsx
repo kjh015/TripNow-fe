@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 const PrivateRoute = ({ children, adminOnly = false }) => {
   const token = localStorage.getItem("accessToken");
   if (!token) {
-    return <Navigate to="/sign/component/SignInPage" replace />;
+    return <Navigate to="/sign/in" replace />;
   }
   if (adminOnly) {
     try {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { getAdminMembers, updateMemberRole } from '../../api/memberApi';
 import { FaTrash, FaUserShield } from 'react-icons/fa';
-import AdminPageHeader from '../../common/AdminPageHeader';
+import AdminPageHeader from '../../admin/AdminPageHeader';
 import { genderLabels } from '../../constants/colorMaps';
 
 const MemberManagement = () => {

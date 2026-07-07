@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal } from 'react-bootstrap';
 import { getLogProcesses } from '../../../api/log/logProcessApi';
 import { formatDate } from '../../../utils/dateUtils';
-import AdminPageHeader from '../../../common/AdminPageHeader';
+import AdminPageHeader from '../../../admin/AdminPageHeader';
 import InputProcess from './InputProcess';
 import EditProcess from './EditProcess';
 

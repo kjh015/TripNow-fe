@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { getMyLikes } from '../api/likeApi';
+import { getMyLikes } from '../../api/likeApi';
 
-import LoadingSpinner from "../components/LoadingSpinner";
-import useAlert from "../hooks/useAlert";
-import PostListCard from "../post/components/PostListCard";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import useAlert from "../../hooks/useAlert";
+import PostListCard from "../components/PostListCard";
 
-const LikeListPage = () => {
+const FavoriteListPage = () => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -70,4 +70,4 @@ const LikeListPage = () => {
     );
 };
 
-export default LikeListPage;
+export default FavoriteListPage;

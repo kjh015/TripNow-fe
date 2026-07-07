@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { getFilterRules } from '../../../api/log/filterApi';
 import { formatDate } from '../../../utils/dateUtils';
-import AdminPageHeader from '../../../common/AdminPageHeader';
-import AdminPipelineNav from '../../../common/AdminPipelineNav';
+import AdminPageHeader from '../../../admin/AdminPageHeader';
+import AdminPipelineNav from '../../../admin/AdminPipelineNav';
 import DetailFilter from './DetailFilter';
 import ConditionBuilder from './ConditionBuilder';
 

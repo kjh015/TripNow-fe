@@ -87,7 +87,7 @@ const toAgeGroup = (age) => {
 /**
  * 로그인 성공 시 유저 속성을 갱신한다. userId를 익명 UUID → 토큰 식별자로 전환한다.
  * 개인정보 최소화 방침(M2 결정): nickname은 보내지 않고, age는 연령대 구간(ageGroup)으로 변환한다.
- * 호출 위치: src/sign/component/SignInPage.jsx (accessToken 저장 이후에 호출해야 userId가 갱신된다)
+ * 호출 위치: src/sign/components/SignInPage.jsx (accessToken 저장 이후에 호출해야 userId가 갱신된다)
  */
 export const setLoggedInUserAttributes = ({ gender, age, role }) => {
   setUserAttributes({

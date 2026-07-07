@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { getHistories, getHistory } from '../../../api/log/historyApi';
-import AdminPageHeader from '../../../common/AdminPageHeader';
+import AdminPageHeader from '../../../admin/AdminPageHeader';
 import LogTable from './LogTable';
 
 const LogManagement = ({ onMenuClick }) => {

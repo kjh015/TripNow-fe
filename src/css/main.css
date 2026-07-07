@@ -1,6 +1,6 @@
-/* 메인(board) 도메인: 랭킹 카드, 관리자 게시글 목록 */
+/* 메인(main) 도메인: 랭킹 카드, 관리자 게시글 목록 */
 
-/* 랭킹 카드 hover (MainPageCard variant="primary"|"category" / ChckMyCom 공통) */
+/* 랭킹 카드 hover (MainPageCard variant="primary"|"category" / MyCommentsPage 공통) */
 .mainpage-card-hover:hover {
   transform: scale(1.035);
   box-shadow: 0 12px 36px 0 rgba(100, 100, 150, 0.19);
@@ -59,8 +59,8 @@
   pointer-events: none;
 }
 
-/* 관리자 게시글 카드 (AdmnBoard) */
-.board-list-card {
+/* 관리자 게시글 카드 (AdminPostManagement) */
+.admin-post-card {
   transition: box-shadow 0.18s, transform 0.16s, background 0.16s, border 0.13s;
   border: 1.5px solid #f0f0f7;
   background: var(--card-bg);
@@ -70,8 +70,8 @@
   position: relative;
 }
 
-.board-list-card:hover,
-.board-list-card:focus {
+.admin-post-card:hover,
+.admin-post-card:focus {
   box-shadow: 0 8px 28px 0 rgba(123, 82, 255, 0.16), 0 2px 16px rgba(60, 0, 128, 0.04);
   border-color: #a084ee;
   background: #f6f3ff;
@@ -79,57 +79,57 @@
   cursor: pointer;
 }
 
-.board-list-card-title-row {
+.admin-post-card-title-row {
   font-size: 1.12rem;
   margin-bottom: 6px;
 }
 
-.board-list-card-title {
+.admin-post-card-title {
   max-width: 75%;
 }
 
-.board-list-card-title-text {
+.admin-post-card-title-text {
   color: #222;
   font-weight: bold;
   font-family: var(--font-display);
 }
 
-.board-list-card-date {
+.admin-post-card-date {
   font-size: 0.95rem;
   white-space: nowrap;
 }
 
-.board-list-card-meta {
+.admin-post-card-meta {
   font-size: 0.97rem;
   min-height: 36px;
 }
 
-.board-list-card-author {
+.admin-post-card-author {
   color: #222;
 }
 
-.board-list-card-stat {
+.admin-post-card-stat {
   font-size: 1rem;
   font-weight: 500;
 }
 
-.board-list-card-star {
+.admin-post-card-star {
   color: #ffc107;
   font-size: 1rem;
   font-weight: 500;
 }
 
-/* ===== 관리자 페이지 공통 (AdmnPage / AdmnBoard) ===== */
+/* ===== 관리자 페이지 공통 (AdminPage / AdminPostManagement) ===== */
 .admin-page-spacer {
   margin-top: 80px;
 }
 
-.admin-board-container {
+.admin-post-container {
   max-width: 1500px;
   padding-bottom: 40px;
 }
 
-.admin-board-panel {
+.admin-post-panel {
   background: rgba(250, 251, 255, 0.97);
   min-height: 540px;
 }
@@ -149,7 +149,7 @@
   filter: invert(0.5);
 }
 
-/* ===== 지역/카테고리 선택 위젯 (RegionRadioComp / CategoryCard) ===== */
+/* ===== 지역/카테고리 선택 위젯 (RegionCard / CategoryCard) ===== */
 .selector-panel {
   min-width: 240px;
   max-width: 350px;
@@ -349,7 +349,7 @@
   text-overflow: ellipsis;
 }
 
-/* ===== 인기 랭킹 레이아웃 (MainPageCardsLayout) ===== */
+/* ===== 인기 랭킹 레이아웃 (PostRankingCards) ===== */
 .mainpage-layout-row {
   min-height: 520px;
   gap: 36px;
@@ -438,8 +438,8 @@
   }
 }
 
-/* ===== 인기 카테고리/지역 레이아웃 (MainPageCardsLayout2) ===== */
-.mainpage-layout2-row {
+/* ===== 인기 카테고리/지역 레이아웃 (CategoryRegionRankingCards) ===== */
+.mainpage-ranking-cards-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   width: 100%;
@@ -449,7 +449,7 @@
   padding: 8px 0;
 }
 
-.mainpage-layout2-card {
+.mainpage-ranking-cards-card {
   width: 100%;
   height: 200px;
   border-radius: var(--radius-card-md);
@@ -460,7 +460,7 @@
   align-items: stretch;
 }
 
-.mainpage-layout2-badge {
+.mainpage-ranking-cards-badge {
   background: rgba(30, 30, 55, 0.56);
   color: #fff;
   padding: 1.75rem 0 0.2rem 4.75rem;
@@ -475,7 +475,7 @@
   margin-top: -25px;
 }
 
-.mainpage-layout2-badge span {
+.mainpage-ranking-cards-badge span {
   color: #fff;
   font-weight: 700;
 }

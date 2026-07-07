@@ -1,5 +1,5 @@
 import Navbar from "../../common/Navbar";
-import Footers from "../../common/Footers";
+import Footer from "../../common/Footer";
 import GlobalNavigator from "../../common/GlobalNavigator";
 
 const RootLayout = ({ children }) => {
@@ -9,7 +9,7 @@ const RootLayout = ({ children }) => {
       <Navbar />
       <div style={{ paddingTop: 25 }} />
       <main className="app-main">{children}</main>
-      <Footers />
+      <Footer />
     </div>
   );
 };
