@@ -1,18 +1,18 @@
 import React from 'react';
 import MainPageCard from './MainPageCard/MainPageCard';
 import { AnimatePresence, motion } from 'framer-motion';
-import LoadingSpinner from '../../../components/LoadingSpinner';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 
 
 const mainCardHeight = 520;
 
 /**
- * 인기 게시판 카드 레이아웃
+ * 인기 게시글 랭킹 카드 (1~5위)
  * - 데이터가 없으면 로딩 애니메이션 표시
  * - 1개 이상이면 있는 만큼 1~5위 카드 정렬
  */
-const MainPageCardsLayout = ({ top5Posts }) => {
+const PostRankingCards = ({ top5Posts }) => {
     // 데이터가 아직 없으면 로딩 화면
     if (!top5Posts || top5Posts.length === 0) {
         return <LoadingSpinner text="여행지 인기순위를 불러오는 중..." minHeight={mainCardHeight} />;
@@ -73,14 +73,14 @@ const MainPageCardsLayout = ({ top5Posts }) => {
 
             {/* 오른쪽 2~5위 카드 */}
             <div className="mainpage-layout-secondary">
-                {top5Posts.slice(1, 5).map((board, idx) => (
+                {top5Posts.slice(1, 5).map((post, idx) => (
                     <motion.div
-                        key={board.postId}
+                        key={post.postId}
                         layout
                         className="mainpage-layout-secondary-item"
                         transition={{ type: "spring", stiffness: 350, damping: 34 }}
                     >
-                        <MainPageCard variant="secondary" postId={board.postId} score={board.score} rank={idx + 2} />
+                        <MainPageCard variant="secondary" postId={post.postId} score={post.score} rank={idx + 2} />
                     </motion.div>
                 ))}
 
@@ -89,4 +89,4 @@ const MainPageCardsLayout = ({ top5Posts }) => {
     );
 };
 
-export default MainPageCardsLayout;
+export default PostRankingCards;

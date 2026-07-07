@@ -84,7 +84,7 @@ const SignInPage = () => {
                                     <button
                                         type="button"
                                         className="btn btn-outline-success"
-                                        onClick={() => navigate('/sign/component/SignUpPage')}
+                                        onClick={() => navigate('/sign/up')}
                                     >
                                         회원가입
                                     </button>

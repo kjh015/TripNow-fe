@@ -35,7 +35,7 @@ const Navbar = () => {
     if (localStorage.getItem('accessToken') != null) {
       showAlert("이미 로그인되어 있습니다.", "info");
     } else {
-      navigate("/sign/component/SignInPage");
+      navigate("/sign/in");
     }
   };
 
@@ -43,7 +43,7 @@ const Navbar = () => {
     if (localStorage.getItem('accessToken') != null) {
       showAlert("이미 로그인되어 있습니다.", "info");
     } else {
-      navigate("/sign/component/SignUpPage");
+      navigate("/sign/up");
     }
   };
 

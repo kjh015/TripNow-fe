@@ -22,16 +22,16 @@ const NavMenu = ({ show, onClose, isLoggedIn, isAdmin, curUser, onLogout, onLogi
                         <MenuLink to="/post/list" icon="bi-card-list" label="여행지" onClick={onClose} />
                         {!isLoggedIn && (
                             <>
-                                <MenuLink to="sign/component/signinpage" icon="bi-box-arrow-in-right" label="로그인" onClick={onLogin} />
-                                <MenuLink to="sign/component/signuppage" icon="bi-person-plus" label="회원 가입" onClick={onSignup} />
+                                <MenuLink to="/sign/in" icon="bi-box-arrow-in-right" label="로그인" onClick={onLogin} />
+                                <MenuLink to="/sign/up" icon="bi-person-plus" label="회원 가입" onClick={onSignup} />
                             </>
                         )}
                         {isLoggedIn && (
                             <>
                                 {isAdmin && (
-                                    <MenuLink to="/component/admnpage" icon="bi-gear" label="관리자 메뉴" onClick={onClose} />
+                                    <MenuLink to="/admin" icon="bi-gear" label="관리자 메뉴" onClick={onClose} />
                                 )}
-                                <MenuLink to="/common/MyPage" icon="bi-person-circle" label="마이페이지" onClick={onClose} />
+                                <MenuLink to="/mypage" icon="bi-person-circle" label="마이페이지" onClick={onClose} />
                             </>
                         )}
                     </div>

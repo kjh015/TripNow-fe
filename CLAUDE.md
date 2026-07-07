@@ -70,32 +70,32 @@ src/analytics/
 | 데이터 | 시점 | 호출 위치 | 필드 |
 |---|---|---|---|
 | userId (토큰 sub 또는 익명 UUID), age, role | 앱 부팅 1회 | `src/index.js` | userId, age(-1 고정), role — 매직 값은 M3에서 정리 |
-| 로그인 유저 속성 (`setLoggedInUserAttributes`) | 로그인 성공 | `src/sign/component/SignInPage.jsx` | userId(토큰 식별자로 전환), gender, ageGroup(연령대 구간, 예: "20대"), role — **개인정보 방침(M2 결정): nickname·age 원값 미전송** |
+| 로그인 유저 속성 (`setLoggedInUserAttributes`) | 로그인 성공 | `src/sign/components/SignInPage.jsx` | userId(토큰 식별자로 전환), gender, ageGroup(연령대 구간, 예: "20대"), role — **개인정보 방침(M2 결정): nickname·age 원값 미전송** |
 | 유저 속성 리셋 (`resetUser`) | 로그아웃 | `src/common/Navbar.jsx` | userId(익명 UUID로 복귀), gender/ageGroup null, role "user" |
 
 ### 현재 이벤트 (M1에서 `events.js` 트래커 → `_mtm` push로 이관 완료, 이슈 #73)
 
 | 이벤트 | 발화 시점 | 트래커 함수 (`src/analytics/events.js`) / 호출 위치 | 페이로드 | 남은 문제 |
 |---|---|---|---|---|
-| `travel_main_view` | 메인 페이지 진입 | `trackMainView` / `src/board/component/page/MainPage.jsx` | (공통 필드만) | — |
+| `travel_main_view` | 메인 페이지 진입 | `trackMainView` / `src/main/pages/MainPage.jsx` | (공통 필드만) | — |
 | `travel_search_click` | 검색 버튼 클릭 | `trackSearchClick` / `src/post/components/PostSearch.jsx` | category, region (빈 값 null) | keyword 미수집 (M4) |
 | `travel_detail_pageview` | 상세 데이터 로드 후 (postId당 1회 가드) | `trackDetailPageview` / `src/post/pages/PostDetailPage.jsx` | postId(number), category, region, title | — (M2에서 중복 발화 수정) |
 | `travel_detail_exit` | 상세 이탈 (effect cleanup + `pagehide` 보완) | `trackDetailExit` / `src/post/pages/PostDetailPage.jsx` | postId(number), staySeconds, title | — (M2에서 과다 발화·staySeconds 왜곡 수정) |
 | `travel_favorite_add` / `_remove` | 찜 토글 | `trackFavoriteAdd` / `trackFavoriteRemove` / `src/post/pages/PostDetailPage.jsx` | postId(number), category, region, title | — |
-| `travel_comment_add` / `_remove` | 댓글 등록/삭제 | `trackCommentAdd` / `trackCommentRemove` / `src/comment/component/CommentPage.jsx` | postId(number), category, region, title | star(별점) 미수집 (M4) |
+| `travel_comment_add` / `_remove` | 댓글 등록/삭제 | `trackCommentAdd` / `trackCommentRemove` / `src/comment/components/CommentPage.jsx` | postId(number), category, region, title | star(별점) 미수집 (M4) |
 
 ### 신규 이벤트 (이슈 M4에서 추가)
 
 | 이벤트 | 발화 시점 | 호출 위치(예정) | 페이로드 | 목적 |
 |---|---|---|---|---|
-| `travel_signup_complete` | 회원가입 성공 | `src/sign/component/SignUpPage.jsx` | gender, age | 가입 퍼널 |
-| `travel_login` / `travel_login_fail` | 로그인 성공/실패 | `src/sign/component/SignInPage.jsx` | (성공 시 role) | 로그인 퍼널 |
+| `travel_signup_complete` | 회원가입 성공 | `src/sign/components/SignUpPage.jsx` | gender, age | 가입 퍼널 |
+| `travel_login` / `travel_login_fail` | 로그인 성공/실패 | `src/sign/components/SignInPage.jsx` | (성공 시 role) | 로그인 퍼널 |
 | `travel_post_add` / `_update` / `_remove` | 게시글 CRUD 성공 | post 작성/수정 화면 | postId, category, region | 콘텐츠 생산 지표 |
 | `travel_search_click` (확장) | 검색 | `src/post/components/PostSearch.jsx` | + keyword | 검색어 분석 |
 | `travel_search_result` | 검색 결과 로드 | `src/post/pages/PostListPage.jsx` | keyword, category, region, resultCount | **0건 검색 = 콘텐츠 갭** |
 | `travel_list_item_click` | 리스트→상세 클릭 | 리스트 화면 | postId, position(순번), keyword | 검색 CTR |
 | `travel_ranking_click` | 메인 랭킹 카드 클릭 | `MainPageCard` 계열 | rankType(region/category/post), rank, label | 랭킹 기능 효용 검증 |
-| `travel_comment_add` (확장) | 댓글 등록 | `src/comment/component/CommentPage.jsx` | + star | 지역/카테고리 만족도 |
+| `travel_comment_add` (확장) | 댓글 등록 | `src/comment/components/CommentPage.jsx` | + star | 지역/카테고리 만족도 |
 | `travel_error` | ErrorBoundary·API 실패 | `src/components/ErrorBoundary.jsx` 등 | errorType, message, path | 사용자 체감 장애 |
 
 > 공통 필드(`isLoggedIn`, `userId`)는 `pushEvent`가 모든 이벤트에 자동 주입하므로 표에서 생략.
@@ -173,7 +173,7 @@ src/css/
 ├── index.css       # 리셋 + body 기본
 ├── common.css      # Navbar, Footer, 공통 카드/뱃지/페이지 헤더 패턴
 ├── post.css        # post 도메인 화면
-├── main.css        # 메인(board) 화면, 랭킹 카드
+├── main.css        # 메인(main) 화면, 랭킹 카드
 ├── sign.css        # 로그인/회원가입/마이페이지
 ├── comment.css     # 댓글
 └── log.css         # 로그 관리 Admin 화면

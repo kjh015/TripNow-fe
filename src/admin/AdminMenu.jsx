@@ -1,17 +1,17 @@
-// AdmnMenu.jsx
+// AdminMenu.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FaMapMarkedAlt, FaUsers, FaCogs, FaDatabase, FaChartLine } from 'react-icons/fa';
 
 const MENU_ITEMS = [
-    { key: 'board', label: '여행지 관리', icon: <FaMapMarkedAlt /> },
+    { key: 'post', label: '여행지 관리', icon: <FaMapMarkedAlt /> },
     { key: 'member', label: '회원 관리', icon: <FaUsers /> },
     { key: 'process', label: '프로세스 관리', icon: <FaCogs /> },
     { key: 'log', label: '로그 DB', icon: <FaDatabase /> },
     { key: 'monitoring', label: 'Monitoring', icon: <FaChartLine /> },
 ];
 
-const AdmnMenu = ({ onMenuClick, activeMenu }) => {
+const AdminMenu = ({ onMenuClick, activeMenu }) => {
     return (
         <div className="list-group admin-menu">
             <h4 className="admin-menu-title">관리자 메뉴</h4>
@@ -35,9 +35,9 @@ const AdmnMenu = ({ onMenuClick, activeMenu }) => {
     );
 };
 
-AdmnMenu.propTypes = {
+AdminMenu.propTypes = {
     onMenuClick: PropTypes.func.isRequired,
     activeMenu: PropTypes.string,
 };
 
-export default AdmnMenu;
+export default AdminMenu;

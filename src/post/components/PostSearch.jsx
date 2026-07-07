@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Form, Button, Card, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-import RegionRadioComp from "../../board/component/page/RegionRadioComp";
-import CategoryCard from "../../board/component/page/CategoryCard";
+import RegionCard from "./RegionCard";
+import CategoryCard from "./CategoryCard";
 import { autoCompleteSearch } from "../../api/postSearchApi";
 import { trackSearchClick } from "../../analytics/events";
 
@@ -126,7 +126,7 @@ const PostSearch = ({ selectedCategory, selectedRegion }) => {
                     </Col>
                     <Col md={6}>
                         <div className="bg-light rounded-4 p-2 px-3 border">
-                            <RegionRadioComp selectedRegion={post.region} setRegion={handleRegionChange} />
+                            <RegionCard selectedRegion={post.region} setRegion={handleRegionChange} />
                         </div>
                     </Col>
                 </Row>

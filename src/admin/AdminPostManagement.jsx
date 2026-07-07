@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { getPostListBySearch } from "../../../api/postSearchApi";
-import { deletePost } from "../../../api/postApi";
+import { getPostListBySearch } from "../api/postSearchApi";
+import { deletePost } from "../api/postApi";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { CATEGORY_CODE_TO_LABEL, REGION_CODE_TO_LABEL } from "../../../constants/categoryRegion";
-import { formatDate } from "../../../utils/dateUtils";
-import AdminPageHeader from "../../../common/AdminPageHeader";
+import { CATEGORY_CODE_TO_LABEL, REGION_CODE_TO_LABEL } from "../constants/categoryRegion";
+import { formatDate } from "../utils/dateUtils";
+import AdminPageHeader from "./AdminPageHeader";
 
 const Pagination = ({ total, page, onChange, pageSize = 10 }) => {
     const pageCount = Math.ceil(total / pageSize);
@@ -31,7 +31,7 @@ const Pagination = ({ total, page, onChange, pageSize = 10 }) => {
     );
 };
 
-const BoardList = ({ title, boards, loading, error, categoryColors, regionColors, formatDate, onRemove, onClickCard }) => (
+const PostList = ({ title, posts, loading, error, categoryColors, regionColors, formatDate, onRemove, onClickCard }) => (
     <div className="mb-4">
         <h5 className="fw-bold mb-3">{title}</h5>
         {loading ? (
@@ -40,44 +40,44 @@ const BoardList = ({ title, boards, loading, error, categoryColors, regionColors
             </div>
         ) : error ? (
             <div className="text-danger text-center py-5">에러 발생: {error.message}</div>
-        ) : boards.length === 0 ? (
+        ) : posts.length === 0 ? (
             <div className="text-center text-secondary py-5 fs-5">게시글이 없습니다. 검색해주세요.</div>
         ) : (
             <div className="d-flex flex-column gap-4">
-                {boards.map((board) => (
+                {posts.map((post) => (
                     <div
-                        key={board.postId}
-                        className="p-3 rounded-3 border board-list-card"
+                        key={post.postId}
+                        className="p-3 rounded-3 border admin-post-card"
                         tabIndex={0}
-                        onClick={() => onClickCard(board)}
-                        onKeyDown={e => { if (e.key === "Enter" || e.key === " ") onClickCard(board); }}
+                        onClick={() => onClickCard(post)}
+                        onKeyDown={e => { if (e.key === "Enter" || e.key === " ") onClickCard(post); }}
                     >
-                        <div className="d-flex justify-content-between align-items-start fw-bold board-list-card-title-row">
-                            <div className="text-truncate board-list-card-title">
-                                <span className="board-list-card-title-text" title={board.title}>
-                                    {board.title}
+                        <div className="d-flex justify-content-between align-items-start fw-bold admin-post-card-title-row">
+                            <div className="text-truncate admin-post-card-title">
+                                <span className="admin-post-card-title-text" title={post.title}>
+                                    {post.title}
                                 </span>
                             </div>
-                            <span className="text-secondary ms-2 board-list-card-date">
-                                {formatDate(board.updatedAt)}
+                            <span className="text-secondary ms-2 admin-post-card-date">
+                                {formatDate(post.updatedAt)}
                             </span>
                         </div>
-                        <div className="d-flex align-items-center flex-wrap gap-2 justify-content-between board-list-card-meta">
+                        <div className="d-flex align-items-center flex-wrap gap-2 justify-content-between admin-post-card-meta">
                             <div>
-                                <Badge bg={categoryColors[CATEGORY_CODE_TO_LABEL[board.category] ?? board.category]} className="me-1">{CATEGORY_CODE_TO_LABEL[board.category] ?? board.category}</Badge>
-                                <Badge bg={regionColors[REGION_CODE_TO_LABEL[board.region] ?? board.region]} className="me-2">{REGION_CODE_TO_LABEL[board.region] ?? board.region}</Badge>
-                                <span className="board-list-card-author">by {board.memberNickname}</span>
+                                <Badge bg={categoryColors[CATEGORY_CODE_TO_LABEL[post.category] ?? post.category]} className="me-1">{CATEGORY_CODE_TO_LABEL[post.category] ?? post.category}</Badge>
+                                <Badge bg={regionColors[REGION_CODE_TO_LABEL[post.region] ?? post.region]} className="me-2">{REGION_CODE_TO_LABEL[post.region] ?? post.region}</Badge>
+                                <span className="admin-post-card-author">by {post.memberNickname}</span>
                             </div>
                             <div className="d-flex align-items-center">
-                                <span className="badge text-dark d-flex align-items-center board-list-card-stat">
-                                    <i className="bi bi-eye me-1" />{board.viewCount || 0}
+                                <span className="badge text-dark d-flex align-items-center admin-post-card-stat">
+                                    <i className="bi bi-eye me-1" />{post.viewCount || 0}
                                 </span>
-                                <span className="badge board-list-card-star">
-                                    <i className="bi bi-star-fill me-1" />{board.starAvg ? board.starAvg.toFixed(1) : 0}
+                                <span className="badge admin-post-card-star">
+                                    <i className="bi bi-star-fill me-1" />{post.starAvg ? post.starAvg.toFixed(1) : 0}
                                 </span>
                                 {onRemove &&
                                     <button className="btn btn-sm btn-outline-danger"
-                                        onClick={e => { e.stopPropagation(); onRemove({ no: board.postId }); }}>
+                                        onClick={e => { e.stopPropagation(); onRemove({ postId: post.postId }); }}>
                                         삭제
                                     </button>
                                 }
@@ -90,8 +90,8 @@ const BoardList = ({ title, boards, loading, error, categoryColors, regionColors
     </div>
 );
 
-const AdmnBoard = () => {
-    const [esBoards, setEsBoards] = useState([]);
+const AdminPostManagement = () => {
+    const [esPosts, setEsPosts] = useState([]);
     const [esLoading, setEsLoading] = useState(false);
     const [esError, setEsError] = useState(null);
     const [showConfirm, setShowConfirm] = useState(false);
@@ -110,16 +110,16 @@ const AdmnBoard = () => {
         대구: "secondary", 인천: "dark", 전남: "secondary"
     };
 
-    const handleRemove = ({ no }) => {
-        setRemoveTarget(no);
+    const handleRemove = ({ postId }) => {
+        setRemoveTarget(postId);
         setShowConfirm(true);
     };
 
-    const removeBoard = async () => {
+    const removePost = async () => {
         try {
             await deletePost(removeTarget);
             toast.success("삭제에 성공했습니다.");
-            getEsBoards();
+            getEsPosts();
         } catch {
             toast.error("삭제에 실패했습니다.");
         } finally {
@@ -128,11 +128,11 @@ const AdmnBoard = () => {
         }
     };
 
-    const getEsBoards = async (page = 0) => {
+    const getEsPosts = async (page = 0) => {
         setEsLoading(true);
         try {
             const { data } = await getPostListBySearch({ category: "", region: "", keyword: "", sort: "id", direction: "asc", page });
-            setEsBoards(data.result.content);
+            setEsPosts(data.result.content);
             setEsDocCount(data.result.totalElements);
         } catch (e) {
             setEsError(e);
@@ -142,15 +142,15 @@ const AdmnBoard = () => {
     };
 
     useEffect(() => {
-        getEsBoards(0);
+        getEsPosts(0);
     }, []);
 
     const navigate = useNavigate();
-    const handleGoDetail = (board) => navigate(`/post/detail?no=${board.postId}`);
+    const handleGoDetail = (post) => navigate(`/post/detail?postId=${post.postId}`);
 
     const handleEsPageChange = (newPage) => {
         setEsPage(newPage);
-        getEsBoards(newPage);
+        getEsPosts(newPage);
     };
 
     return (
@@ -170,7 +170,7 @@ const AdmnBoard = () => {
                                 <p className="fs-5 mb-3 text-dark">정말 <span className="fw-bold text-danger">삭제</span>하시겠습니까?</p>
                                 <div className="d-flex justify-content-center gap-3 mt-4">
                                     <button className="btn btn-outline-secondary px-4" onClick={() => setShowConfirm(false)}>취소</button>
-                                    <button className="btn btn-danger px-4 shadow-sm" onClick={removeBoard}>
+                                    <button className="btn btn-danger px-4 shadow-sm" onClick={removePost}>
                                         <i className="bi bi-trash3 me-1"></i> 삭제
                                     </button>
                                 </div>
@@ -179,14 +179,14 @@ const AdmnBoard = () => {
                     </div>
                 </div>
             )}
-            <div className="container admin-board-container">
+            <div className="container admin-post-container">
                 <AdminPageHeader title="여행지 관리" />
                 <div className="row g-4">
                     <div className="col-12">
-                        <div className="panel-bg p-4 rounded-4 h-100 shadow-sm admin-board-panel">
-                            <BoardList
+                        <div className="panel-bg p-4 rounded-4 h-100 shadow-sm admin-post-panel">
+                            <PostList
                                 title={<span className="text-info"><i className="bi bi-search me-1"></i>게시글 목록</span>}
-                                boards={esBoards} loading={esLoading} error={esError}
+                                posts={esPosts} loading={esLoading} error={esError}
                                 categoryColors={categoryColors} regionColors={regionColors}
                                 formatDate={formatDate} onRemove={handleRemove} onClickCard={handleGoDetail}
                             />
@@ -200,4 +200,4 @@ const AdmnBoard = () => {
     );
 };
 
-export default AdmnBoard;
+export default AdminPostManagement;

@@ -48,7 +48,7 @@ const PostContent = ({ post, liked, onLike, nickname }) => {
                     {nickname === post.memberNickname && (
                         <OverlayTrigger placement="top" overlay={<Tooltip id="tooltip-edit">수정하기</Tooltip>}>
                             <Link
-                                to={`/post/edit?no=${post.postId}`}
+                                to={`/post/edit?postId=${post.postId}`}
                                 className="btn btn-outline-primary btn-sm ms-2 text-nowrap"
                             >
                                 🖊

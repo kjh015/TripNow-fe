@@ -32,7 +32,7 @@ const uploadImageToS3 = async (file) => {
 
 const PostEditPage = () => {
     const [searchParams] = useSearchParams();
-    const no = searchParams.get('no');
+    const postId = searchParams.get('postId');
     const navigate = useNavigate();
     const [post, setPost] = useState({
         title: '',
@@ -51,7 +51,7 @@ const PostEditPage = () => {
 
     const loadPost = async () => {
         try {
-            const { data } = await getPost(no);
+            const { data } = await getPost(postId);
             const postData = data.result;
             setPost({
                 title: postData.title,
@@ -69,7 +69,7 @@ const PostEditPage = () => {
 
     const removePost = async () => {
         try {
-            await deletePost(no);
+            await deletePost(postId);
             showAlert("삭제 성공", "success");
             setTimeout(() => navigate('/post/list'), 500);
         } catch {
@@ -85,7 +85,7 @@ const PostEditPage = () => {
             return;
         }
         loadPost();
-    }, [no]);
+    }, [postId]);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -124,7 +124,7 @@ const PostEditPage = () => {
             const uploadedImageKeys = await Promise.all(newImageFiles.map(uploadImageToS3));
             // 이미지 정렬 순서는 배열 순서 자체로 전달 (기존 이미지 → 신규 이미지 순)
             const images = [...existingImages.map((img) => img.imageKey), ...uploadedImageKeys];
-            await updatePost(no, {
+            await updatePost(postId, {
                 ...post,
                 category: CATEGORY_LABEL_TO_CODE[post.category] ?? post.category,
                 region: REGION_LABEL_TO_CODE[post.region] ?? post.region,

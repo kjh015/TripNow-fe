@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 
-import { getMyPosts } from '../api/postSearchApi';
+import { getMyPosts } from '../../api/postSearchApi';
 
-import LoadingSpinner from "../components/LoadingSpinner";
-import useAlert from "../hooks/useAlert";
-import PostListCard from "../post/components/PostListCard";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import useAlert from "../../hooks/useAlert";
+import PostListCard from "../components/PostListCard";
 
-const CheckMyArt = () => {
+const MyPostsPage = () => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -59,4 +59,4 @@ const CheckMyArt = () => {
     );
 };
 
-export default CheckMyArt;
+export default MyPostsPage;

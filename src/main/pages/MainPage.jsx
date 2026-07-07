@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import PostSearch from "../../../post/components/PostSearch";
+import PostSearch from "../../post/components/PostSearch";
 import tgd3 from '../imgs/tgd3.jpg';
-import { subscribeRankings } from "../../../api/rankingApi";
-import { trackMainView } from "../../../analytics/events";
+import { subscribeRankings } from "../../api/rankingApi";
+import { trackMainView } from "../../analytics/events";
 
-import MainPageCardsLayout from "./MainPageCardsLayout";
-import MainPageCardsLayout2 from "./MainPageCardsLayout2";
+import PostRankingCards from "../components/PostRankingCards";
+import CategoryRegionRankingCards from "../components/CategoryRegionRankingCards";
 
 
 const MainPage = () => {
@@ -74,7 +74,7 @@ const MainPage = () => {
               실시간 인기 여행지
             </h2>
 
-            <MainPageCardsLayout top5Posts={top5Posts} />
+            <PostRankingCards top5Posts={top5Posts} />
           </div>
         </div>
       </div>
@@ -84,11 +84,11 @@ const MainPage = () => {
       <div >
         <div className="mainpage-category-section" >
           <h4 className="mainpage-subsection-title">실시간 인기 카테고리</h4>
-          <MainPageCardsLayout2 top5Data={top5Category} />
+          <CategoryRegionRankingCards top5Data={top5Category} />
         </div>
         <div className="mainpage-region-section">
           <h4 className="mainpage-subsection-title">실시간 인기 지역</h4>
-          <MainPageCardsLayout2 top5Data={top5Region} />
+          <CategoryRegionRankingCards top5Data={top5Region} />
         </div>
 
       </div>

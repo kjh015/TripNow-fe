@@ -78,10 +78,10 @@ const CampaignPlan = () => {
               <label className="form-label fw-bold">캠페인 자료 첨부</label>
               <input type="file" className="form-control" onChange={e => setFile(e.target.files[0])} />
             </div>
-            <a className="btn btn-primary" href="/component/admnpage">저장하기</a>
+            <a className="btn btn-primary" href="/admin">저장하기</a>
           </div>
           <p className="float-end mb-1">
-            <a type="button" href="/component/admnpage">관리자 페이지</a>
+            <a type="button" href="/admin">관리자 페이지</a>
           </p>
         </div>
       </div>

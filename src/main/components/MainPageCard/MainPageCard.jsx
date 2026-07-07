@@ -1,8 +1,8 @@
-import { getPost } from '../../../../api/postSearchApi';
+import { getPost } from '../../../api/postSearchApi';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CountUp from 'react-countup';
-import { CATEGORY_CODE_TO_LABEL, REGION_CODE_TO_LABEL } from '../../../../constants/categoryRegion';
+import { CATEGORY_CODE_TO_LABEL, REGION_CODE_TO_LABEL } from '../../../constants/categoryRegion';
 import { CATEGORY_REGION_IMAGES } from './categoryRegionImages';
 
 // 1~5위 색상 예시 (secondary variant 순위 뱃지)
@@ -18,7 +18,7 @@ const MainPageCard = ({ variant = 'primary', rank, postId, score, data, type }) 
   const navigate = useNavigate();
   const isPost = variant !== 'category';
 
-  const [board, setBoard] = useState({
+  const [post, setPost] = useState({
     postId: '', title: '', content: '', memberNickname: '',
     travelPlace: '', address: '', category: '', region: '', images: [],
   });
@@ -29,7 +29,7 @@ const MainPageCard = ({ variant = 'primary', rank, postId, score, data, type }) 
       try {
         const { data } = await getPost(postId);
         const result = data.result || {};
-        setBoard({ ...result, images: result.images || [] });
+        setPost({ ...result, images: result.images || [] });
       } catch {
         // 에러 시 기본 상태 유지
       }
@@ -43,13 +43,13 @@ const MainPageCard = ({ variant = 'primary', rank, postId, score, data, type }) 
 
   const imageSrc = variant === 'category'
     ? CATEGORY_REGION_IMAGES[label]
-    : (board.images.length > 0 ? `${process.env.REACT_APP_IMAGE_BASE_URL}/${board.images[0].imageKey}` : null);
+    : (post.images.length > 0 ? `${process.env.REACT_APP_IMAGE_BASE_URL}/${post.images[0].imageKey}` : null);
 
   const handleClick = () => {
     if (variant === 'category') {
       navigate(`/post/list/?${type}=${data}`);
     } else {
-      navigate(`/post/detail/?no=${board.postId}`);
+      navigate(`/post/detail/?postId=${post.postId}`);
     }
   };
 
@@ -76,7 +76,7 @@ const MainPageCard = ({ variant = 'primary', rank, postId, score, data, type }) 
           </div>
           <div className="card-body py-3 px-4 d-flex flex-column justify-content-center mainpage-card2-content">
             <h6 className="fw-bold mainpage-card2-title">
-              {board.title}
+              {post.title}
             </h6>
             <div className="mainpage-card2-score">
               score:&nbsp;
@@ -90,7 +90,7 @@ const MainPageCard = ({ variant = 'primary', rank, postId, score, data, type }) 
             </div>
             <div className="d-flex justify-content-between align-items-center mt-2">
               <small className="text-muted mainpage-card-nickname">
-                by <b className="mainpage-card-nickname-name">{board.memberNickname}</b>
+                by <b className="mainpage-card-nickname-name">{post.memberNickname}</b>
               </small>
             </div>
           </div>
@@ -145,11 +145,11 @@ const MainPageCard = ({ variant = 'primary', rank, postId, score, data, type }) 
         {variant !== 'category' && (
           <div className="card-body px-4 py-4">
             <div className="mb-3 mainpage-card-title">
-              {board.title}
+              {post.title}
             </div>
             <div className="d-flex justify-content-between align-items-center mt-2">
               <small className="text-muted mainpage-card-nickname">
-                by <b className="mainpage-card-nickname-name">{board.memberNickname}</b>
+                by <b className="mainpage-card-nickname-name">{post.memberNickname}</b>
               </small>
             </div>
           </div>

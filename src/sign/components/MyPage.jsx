@@ -1,8 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { getMyProfile, deleteMyProfile } from '../api/memberApi';
+import { getMyProfile, deleteMyProfile } from '../../api/memberApi';
 import { useEffect, useState } from 'react';
-import { formatDate } from '../utils/dateUtils';
-import { genderLabels } from '../constants/colorMaps';
+import { formatDate } from '../../utils/dateUtils';
+import { genderLabels } from '../../constants/colorMaps';
 import { toast } from 'react-toastify';
 
 const myPageImage = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
@@ -138,7 +138,7 @@ const MyPage = () => {
                 <Link to="/post/my-article" className="btn btn-outline-info rounded-pill w-100 text-dark">
                   <i className="bi bi-geo-alt-fill me-1" /> 여행지 관리
                 </Link>
-                <Link to="/page/chckmycom" className="btn btn-light border rounded-pill w-100">
+                <Link to="/comment/my-comments" className="btn btn-light border rounded-pill w-100">
                   <i className="bi bi-chat-text me-1" /> 작성 댓글
                 </Link>
               </div>

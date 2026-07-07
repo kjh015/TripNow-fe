@@ -157,7 +157,7 @@ const PostListPage = () => {
               <PostListCard
                 key={post.postId}
                 post={post}
-                navigateTo={`/post/detail?no=${post.postId}`}
+                navigateTo={`/post/detail?postId=${post.postId}`}
                 navigateState={{ from: location.search }}
               />
             ))}

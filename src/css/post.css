@@ -39,7 +39,7 @@
   border: none;
 }
 
-/* ===== 목록 카드 (PostListCard — LikeListPage / CheckMyArt 공통 재사용) ===== */
+/* ===== 목록 카드 (PostListCard — FavoriteListPage / MyPostsPage 공통 재사용) ===== */
 .post-list-card {
   background: var(--card-bg);
   min-height: 88px;

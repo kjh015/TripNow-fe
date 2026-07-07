@@ -1,5 +1,5 @@
 
-const RegionRadioCard = ({ selectedRegion, setRegion }) => {
+const RegionCard = ({ selectedRegion, setRegion }) => {
     const cities = ["강원", "경기", "대구", "부산", "서울", "인천", "전남", "제주", "기타"];
     return (
         <div className="selector-panel">
@@ -29,4 +29,4 @@ const RegionRadioCard = ({ selectedRegion, setRegion }) => {
     );
 };
 
-export default RegionRadioCard;
+export default RegionCard;
