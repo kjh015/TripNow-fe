@@ -76,8 +76,9 @@ export const setUserAttributes = (attributes) => {
 /**
  * 나이 원값을 연령대 구간 문자열로 변환한다. (개인정보 최소화 — 원값은 보내지 않는다)
  * 예: 27 → "20대". 60 이상은 "60대 이상", 10 미만·비정상 값은 null.
+ * events.js의 trackSignupComplete도 같은 방침을 쓰므로 export한다.
  */
-const toAgeGroup = (age) => {
+export const toAgeGroup = (age) => {
   const n = Number(age);
   if (!Number.isFinite(n) || n < 10) return null;
   const decade = Math.floor(n / 10) * 10;

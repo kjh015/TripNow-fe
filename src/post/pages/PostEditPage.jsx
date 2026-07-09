@@ -8,6 +8,7 @@ import {
     CATEGORY_LABEL_TO_CODE, CATEGORY_CODE_TO_LABEL,
     REGION_LABEL_TO_CODE, REGION_CODE_TO_LABEL,
 } from '../../constants/categoryRegion';
+import { trackPostUpdate, trackPostRemove } from '../../analytics/events';
 
 const IMAGE_BASE_URL = process.env.REACT_APP_IMAGE_BASE_URL || '';
 
@@ -70,6 +71,11 @@ const PostEditPage = () => {
     const removePost = async () => {
         try {
             await deletePost(postId);
+            trackPostRemove({
+                postId,
+                category: CATEGORY_LABEL_TO_CODE[post.category] ?? post.category,
+                region: REGION_LABEL_TO_CODE[post.region] ?? post.region,
+            });
             showAlert("삭제 성공", "success");
             setTimeout(() => navigate('/post/list'), 500);
         } catch {
@@ -124,12 +130,15 @@ const PostEditPage = () => {
             const uploadedImageKeys = await Promise.all(newImageFiles.map(uploadImageToS3));
             // 이미지 정렬 순서는 배열 순서 자체로 전달 (기존 이미지 → 신규 이미지 순)
             const images = [...existingImages.map((img) => img.imageKey), ...uploadedImageKeys];
+            const category = CATEGORY_LABEL_TO_CODE[post.category] ?? post.category;
+            const region = REGION_LABEL_TO_CODE[post.region] ?? post.region;
             await updatePost(postId, {
                 ...post,
-                category: CATEGORY_LABEL_TO_CODE[post.category] ?? post.category,
-                region: REGION_LABEL_TO_CODE[post.region] ?? post.region,
+                category,
+                region,
                 images,
             });
+            trackPostUpdate({ postId, category, region });
             showAlert("글 수정이 완료되었습니다.", "success");
             setTimeout(() => navigate('/post/list'), 500);
         } catch {

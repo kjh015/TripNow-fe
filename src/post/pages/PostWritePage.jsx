@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import useAlert from '../../hooks/useAlert';
 import PostForm from '../components/PostForm';
 import { CATEGORY_LABEL_TO_CODE, REGION_LABEL_TO_CODE } from '../../constants/categoryRegion';
+import { trackPostAdd } from '../../analytics/events';
 
 const buildSafeFileName = (originalName) => {
     const ext = originalName.includes('.') ? originalName.split('.').pop().toLowerCase() : 'jpg';
@@ -81,12 +82,17 @@ const PostWritePage = () => {
         setUploading(true);
         try {
             const uploadedImageKeys = await Promise.all(images.map(uploadImageToS3));
-            await createPost({
+            const category = CATEGORY_LABEL_TO_CODE[post.category] ?? post.category;
+            const region = REGION_LABEL_TO_CODE[post.region] ?? post.region;
+            const { data } = await createPost({
                 ...post,
-                category: CATEGORY_LABEL_TO_CODE[post.category] ?? post.category,
-                region: REGION_LABEL_TO_CODE[post.region] ?? post.region,
+                category,
+                region,
                 images: uploadedImageKeys,
             });
+            // 생성 응답 result가 { postId } 객체든 id 원시값이든 모두 수용 (없으면 null 전송)
+            const result = data?.result;
+            trackPostAdd({ postId: typeof result === 'object' ? result?.postId : result, category, region });
             showAlert("글 작성이 완료되었습니다.", "success");
             setTimeout(() => navigate('/post/list'), 500);
         } catch {

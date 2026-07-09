@@ -5,6 +5,7 @@ import PostSearch from "../components/PostSearch";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import PostListCard from "../components/PostListCard";
 import useAlert from "../../hooks/useAlert";
+import { trackSearchResult, trackListItemClick, trackError } from "../../analytics/events";
 
 const PostListPage = () => {
   const [posts, setPosts] = useState([]);
@@ -58,8 +59,13 @@ const PostListPage = () => {
       setPosts(result.content ?? []);
       setPagination({ totalPages: result.totalPages ?? 0, isFirst: result.isFirst ?? true, isLast: result.isLast ?? true });
       setRetryCount(0);
+      trackSearchResult({
+        keyword, category, region,
+        resultCount: result.totalElements ?? (result.content?.length ?? 0),
+      });
     } catch (e) {
       setError(e);
+      trackError({ errorType: "api", message: e.message, path: window.location.pathname });
     } finally {
       setLoading(false);
     }
@@ -153,12 +159,13 @@ const PostListPage = () => {
           </div>
         ) : (
           <div className="d-flex flex-column gap-4">
-            {posts.map((post) => (
+            {posts.map((post, idx) => (
               <PostListCard
                 key={post.postId}
                 post={post}
                 navigateTo={`/post/detail?postId=${post.postId}`}
                 navigateState={{ from: location.search }}
+                onCardClick={() => trackListItemClick({ postId: post.postId, position: idx + 1, keyword })}
               />
             ))}
           </div>

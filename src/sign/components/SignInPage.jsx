@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { isAdmin } from '../../utils/tokenUtils';
 import { setLoggedInUserAttributes } from '../../analytics/analytics';
+import { trackLogin, trackLoginFail } from '../../analytics/events';
 import useAlert from '../../hooks/useAlert';
 
 const SignInPage = () => {
@@ -29,14 +30,17 @@ const SignInPage = () => {
             const { data: profileRes } = await getMyProfile();
             const member = profileRes.result ?? profileRes;
             localStorage.setItem('nickname', member.nickname);
+            const role = isAdmin(accessToken) ? "admin" : "user";
             setLoggedInUserAttributes({
                 gender: member.gender,
                 age: member.age,
-                role: isAdmin(accessToken) ? "admin" : "user"
+                role
             });
+            trackLogin({ role });
             toast.success(`${member.nickname}님 환영합니다.`);
             navigate("/");
         } catch (error) {
+            trackLoginFail();
             showAlert(error.response?.data?.message || "에러가 발생했습니다.", "danger");
         }
     };

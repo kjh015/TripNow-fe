@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { checkNickname, checkLoginId, checkEmail, signUp } from '../api/memberApi';
+import { trackSignupComplete } from '../analytics/events';
 
 const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+~\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -107,6 +108,7 @@ const useSignUpForm = () => {
         try {
             const { passwordConfirm: _, ...rest } = formData;
             await signUp({ ...rest, birthDate });
+            trackSignupComplete({ gender: formData.gender, birthDate });
             toast.success("회원가입이 완료되었습니다! 🎉");
             navigate("/");
         } catch (error) {

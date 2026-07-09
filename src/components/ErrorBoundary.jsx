@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { trackError } from '../analytics/events';
 
 class ErrorBoundary extends Component {
     constructor(props) {
@@ -12,6 +13,7 @@ class ErrorBoundary extends Component {
 
     componentDidCatch(error, info) {
         console.error('ErrorBoundary caught:', error, info);
+        trackError({ errorType: 'render', message: error?.message, path: window.location.pathname });
     }
 
     render() {

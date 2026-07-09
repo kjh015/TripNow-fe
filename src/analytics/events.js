@@ -1,4 +1,4 @@
-import { pushEvent } from "./analytics";
+import { pushEvent, toAgeGroup } from "./analytics";
 
 /**
  * 이벤트 카탈로그.
@@ -17,6 +17,16 @@ export const EVENT_NAMES = {
   FAVORITE_REMOVE: "travel_favorite_remove",
   COMMENT_ADD: "travel_comment_add",
   COMMENT_REMOVE: "travel_comment_remove",
+  SIGNUP_COMPLETE: "travel_signup_complete",
+  LOGIN: "travel_login",
+  LOGIN_FAIL: "travel_login_fail",
+  POST_ADD: "travel_post_add",
+  POST_UPDATE: "travel_post_update",
+  POST_REMOVE: "travel_post_remove",
+  SEARCH_RESULT: "travel_search_result",
+  LIST_ITEM_CLICK: "travel_list_item_click",
+  RANKING_CLICK: "travel_ranking_click",
+  ERROR: "travel_error",
 };
 
 /** 게시글 ID는 항상 number로 보낸다. 캐스팅 불가하면 null. */
@@ -49,10 +59,14 @@ export const trackMainView = () => {
 /**
  * 검색 버튼 클릭 시 발화.
  * 호출 위치: src/post/components/PostSearch.jsx
- * 페이로드: category(string|null), region(string|null)
+ * 페이로드: category(string|null), region(string|null), keyword(string|null)
  */
-export const trackSearchClick = ({ category, region }) => {
-  pushEvent(EVENT_NAMES.SEARCH_CLICK, { category: orNull(category), region: orNull(region) });
+export const trackSearchClick = ({ category, region, keyword }) => {
+  pushEvent(EVENT_NAMES.SEARCH_CLICK, {
+    category: orNull(category),
+    region: orNull(region),
+    keyword: orNull(keyword),
+  });
 };
 
 /**
@@ -94,10 +108,13 @@ export const trackFavoriteRemove = (post) => {
 /**
  * 댓글 등록 시 발화.
  * 호출 위치: src/comment/components/CommentPage.jsx
- * 페이로드: postId(number|null), category, region, title
+ * 페이로드: postId(number|null), category, region, title, star(number|null — 별점 1~5)
  */
-export const trackCommentAdd = ({ postId, category, region, title }) => {
-  pushEvent(EVENT_NAMES.COMMENT_ADD, buildPostPayload({ postId, category, region, title }));
+export const trackCommentAdd = ({ postId, category, region, title, star }) => {
+  pushEvent(EVENT_NAMES.COMMENT_ADD, {
+    ...buildPostPayload({ postId, category, region, title }),
+    star: Number.isFinite(Number(star)) && star !== null && star !== "" ? Number(star) : null,
+  });
 };
 
 /**
@@ -107,4 +124,144 @@ export const trackCommentAdd = ({ postId, category, region, title }) => {
  */
 export const trackCommentRemove = ({ postId, category, region, title }) => {
   pushEvent(EVENT_NAMES.COMMENT_REMOVE, buildPostPayload({ postId, category, region, title }));
+};
+
+/** 생년월일(yyyy-MM-dd)로 만 나이를 계산한다. 파싱 불가하면 null. */
+const toAgeFromBirthDate = (birthDate) => {
+  if (!birthDate) return null;
+  const birth = new Date(birthDate);
+  if (Number.isNaN(birth.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - birth.getFullYear();
+  const beforeBirthday =
+    now.getMonth() < birth.getMonth() ||
+    (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate());
+  return beforeBirthday ? age - 1 : age;
+};
+
+/**
+ * 회원가입 성공 시 발화. (가입 퍼널)
+ * 개인정보 최소화 방침(M2 결정): 나이 원값은 보내지 않고 연령대 구간(ageGroup)으로 변환한다.
+ * 호출 위치: src/hooks/useSignUpForm.js
+ * 페이로드: gender(string|null), ageGroup(string|null — 예: "20대")
+ */
+export const trackSignupComplete = ({ gender, birthDate }) => {
+  pushEvent(EVENT_NAMES.SIGNUP_COMPLETE, {
+    gender: orNull(gender),
+    ageGroup: toAgeGroup(toAgeFromBirthDate(birthDate)),
+  });
+};
+
+/**
+ * 로그인 성공 시 발화. (로그인 퍼널)
+ * 호출 위치: src/sign/components/SignInPage.jsx
+ * 페이로드: role("admin"|"user")
+ */
+export const trackLogin = ({ role }) => {
+  pushEvent(EVENT_NAMES.LOGIN, { role: orNull(role) });
+};
+
+/**
+ * 로그인 실패 시 발화. (로그인 퍼널 — 실패 원인은 보안상 페이로드에 싣지 않는다)
+ * 호출 위치: src/sign/components/SignInPage.jsx
+ * 페이로드: 없음 (공통 필드만)
+ */
+export const trackLoginFail = () => {
+  pushEvent(EVENT_NAMES.LOGIN_FAIL);
+};
+
+/**
+ * 게시글 작성 성공 시 발화. (콘텐츠 생산 지표)
+ * 호출 위치: src/post/pages/PostWritePage.jsx
+ * 페이로드: postId(number|null — 생성 응답에서 확보), category, region (코드값)
+ */
+export const trackPostAdd = ({ postId, category, region }) => {
+  pushEvent(EVENT_NAMES.POST_ADD, {
+    postId: toPostId(postId),
+    category: orNull(category),
+    region: orNull(region),
+  });
+};
+
+/**
+ * 게시글 수정 성공 시 발화. (콘텐츠 생산 지표)
+ * 호출 위치: src/post/pages/PostEditPage.jsx
+ * 페이로드: postId(number|null), category, region (코드값)
+ */
+export const trackPostUpdate = ({ postId, category, region }) => {
+  pushEvent(EVENT_NAMES.POST_UPDATE, {
+    postId: toPostId(postId),
+    category: orNull(category),
+    region: orNull(region),
+  });
+};
+
+/**
+ * 게시글 삭제 성공 시 발화. (콘텐츠 생산 지표)
+ * 호출 위치: src/post/pages/PostEditPage.jsx
+ * 페이로드: postId(number|null), category, region (코드값)
+ */
+export const trackPostRemove = ({ postId, category, region }) => {
+  pushEvent(EVENT_NAMES.POST_REMOVE, {
+    postId: toPostId(postId),
+    category: orNull(category),
+    region: orNull(region),
+  });
+};
+
+/**
+ * 검색 결과 로드 성공 시 발화. resultCount 0 = 콘텐츠 갭 신호.
+ * 정렬/페이지 이동도 결과 로드이므로 매 로드마다 발화된다.
+ * 호출 위치: src/post/pages/PostListPage.jsx
+ * 페이로드: keyword, category, region, resultCount(number — 전체 건수, 서버가 안 주면 현재 페이지 건수)
+ */
+export const trackSearchResult = ({ keyword, category, region, resultCount }) => {
+  pushEvent(EVENT_NAMES.SEARCH_RESULT, {
+    keyword: orNull(keyword),
+    category: orNull(category),
+    region: orNull(region),
+    resultCount: Number.isFinite(Number(resultCount)) ? Number(resultCount) : null,
+  });
+};
+
+/**
+ * 검색 결과 리스트에서 게시글 카드 클릭 시 발화. (검색 CTR)
+ * 호출 위치: src/post/pages/PostListPage.jsx
+ * 페이로드: postId(number|null), position(number — 현재 페이지 내 순번, 1부터), keyword
+ */
+export const trackListItemClick = ({ postId, position, keyword }) => {
+  pushEvent(EVENT_NAMES.LIST_ITEM_CLICK, {
+    postId: toPostId(postId),
+    position,
+    keyword: orNull(keyword),
+  });
+};
+
+/**
+ * 메인 랭킹 카드 클릭 시 발화. (랭킹 기능 효용 검증)
+ * 호출 위치: src/main/components/MainPageCard/MainPageCard.jsx
+ * 페이로드: rankType("post"|"region"|"category"), rank(number|null — 1~5),
+ *           label(string|null — post는 제목, region/category는 코드값), postId(number|null — post일 때만)
+ */
+export const trackRankingClick = ({ rankType, rank, label, postId }) => {
+  pushEvent(EVENT_NAMES.RANKING_CLICK, {
+    rankType,
+    rank: Number.isFinite(Number(rank)) && rank !== null && rank !== undefined ? Number(rank) : null,
+    label: orNull(label),
+    postId: toPostId(postId),
+  });
+};
+
+/**
+ * 사용자 체감 장애 발생 시 발화.
+ * - 렌더 크래시: src/components/ErrorBoundary.jsx (errorType "render")
+ * - 목록 로드 실패(에러 화면 노출): src/post/pages/PostListPage.jsx (errorType "api")
+ * 페이로드: errorType("render"|"api"), message(string|null), path(string — window.location.pathname)
+ */
+export const trackError = ({ errorType, message, path }) => {
+  pushEvent(EVENT_NAMES.ERROR, {
+    errorType: orNull(errorType),
+    message: orNull(message),
+    path: orNull(path),
+  });
 };
