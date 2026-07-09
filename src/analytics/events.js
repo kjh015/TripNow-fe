@@ -153,8 +153,8 @@ export const trackSignupComplete = ({ gender, birthDate }) => {
 };
 
 /**
- * 로그인 성공 시 발화. (로그인 퍼널)
- * 호출 위치: src/sign/components/SignInPage.jsx
+ * 로그인 성공 시 발화. (로그인 퍼널 — 일반/카카오 소셜 로그인 공통)
+ * 호출 위치: src/hooks/useLoginSuccess.js (SignInPage·OAuth2RedirectPage가 공유)
  * 페이로드: role("admin"|"user")
  */
 export const trackLogin = ({ role }) => {
@@ -163,7 +163,7 @@ export const trackLogin = ({ role }) => {
 
 /**
  * 로그인 실패 시 발화. (로그인 퍼널 — 실패 원인은 보안상 페이로드에 싣지 않는다)
- * 호출 위치: src/sign/components/SignInPage.jsx
+ * 호출 위치: src/sign/components/SignInPage.jsx, src/sign/components/OAuth2RedirectPage.jsx
  * 페이로드: 없음 (공통 필드만)
  */
 export const trackLoginFail = () => {
