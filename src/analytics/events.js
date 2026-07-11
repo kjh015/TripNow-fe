@@ -140,9 +140,9 @@ const toAgeFromBirthDate = (birthDate) => {
 };
 
 /**
- * 회원가입 성공 시 발화. (가입 퍼널)
+ * 회원가입 성공 시 발화. (가입 퍼널 — 일반 가입은 signUp 성공, 소셜 가입은 추가 정보 입력 완료가 가입 완료 시점)
  * 개인정보 최소화 방침(M2 결정): 나이 원값은 보내지 않고 연령대 구간(ageGroup)으로 변환한다.
- * 호출 위치: src/hooks/useSignUpForm.js
+ * 호출 위치: src/hooks/useSignUpForm.js (일반), src/hooks/useSocialProfileForm.js (소셜)
  * 페이로드: gender(string|null), ageGroup(string|null — 예: "20대")
  */
 export const trackSignupComplete = ({ gender, birthDate }) => {

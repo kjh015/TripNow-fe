@@ -8,7 +8,7 @@ export const signUp = (payload) =>
 export const getMyProfile = () =>
   apiClient.get('/api/v1/members/me');
 
-// 내 정보 수정 (닉네임)
+// 내 정보 수정 (nickname 필수, gender/birthDate 선택 — 소셜 가입 추가 정보 입력에도 사용)
 export const updateMyProfile = (payload) =>
   apiClient.patch('/api/v1/members/me', payload);
 

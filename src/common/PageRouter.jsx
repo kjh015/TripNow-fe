@@ -5,6 +5,7 @@ import SignUpPage from '../sign/components/SignUpPage';
 import SignUpdatePage from "../sign/components/SignUpdatePage";
 import SignInPage from "../sign/components/SignInPage";
 import OAuth2RedirectPage from "../sign/components/OAuth2RedirectPage";
+import SocialProfilePage from "../sign/components/SocialProfilePage";
 import PasswordChangePage from "../sign/components/PasswordChangePage";
 import MyPage from '../sign/components/MyPage';
 
@@ -58,6 +59,7 @@ const PageRouter = () => {
                     <Route path="/post/favorite-list" element={<PrivateRoute><FavoriteListPage /></PrivateRoute>} />
                     <Route path="/post/my-article" element={<PrivateRoute><MyPostsPage /></PrivateRoute>} />
                     <Route path="/mypage" element={<PrivateRoute><MyPage /></PrivateRoute>} />
+                    <Route path="/sign/social-profile" element={<PrivateRoute><SocialProfilePage /></PrivateRoute>} />
                     <Route path="/sign/update" element={<PrivateRoute><SignUpdatePage /></PrivateRoute>} />
                     <Route path="/sign/update/password" element={<PrivateRoute><PasswordChangePage /></PrivateRoute>} />
                     <Route path="/comment/my-comments" element={<PrivateRoute><MyCommentsPage /></PrivateRoute>} />

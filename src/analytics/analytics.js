@@ -88,12 +88,14 @@ export const toAgeGroup = (age) => {
 /**
  * 로그인 성공 시 유저 속성을 갱신한다. userId를 익명 UUID → 토큰 식별자로 전환한다.
  * 개인정보 최소화 방침(M2 결정): nickname은 보내지 않고, age는 연령대 구간(ageGroup)으로 변환한다.
- * 호출 위치: src/hooks/useLoginSuccess.js — 일반/소셜 로그인 공통 (accessToken 저장 이후에 호출해야 userId가 갱신된다)
+ * 신규 소셜 회원의 gender "NONE"(백엔드 기본값 = 미입력)은 null로 정규화한다.
+ * 호출 위치: src/hooks/useLoginSuccess.js — 일반/소셜 로그인 공통 (accessToken 저장 이후에 호출해야 userId가 갱신된다),
+ *           src/hooks/useSocialProfileForm.js — 소셜 추가 정보 입력 완료 시 갱신
  */
 export const setLoggedInUserAttributes = ({ gender, age, role }) => {
   setUserAttributes({
     userId: getUserIdForMatomo(),
-    gender: gender || null,
+    gender: gender && gender !== "NONE" ? gender : null,
     ageGroup: toAgeGroup(age),
     role,
   });

@@ -70,7 +70,7 @@ src/analytics/
 | 데이터 | 시점 | 호출 위치 | 필드 |
 |---|---|---|---|
 | userId (토큰 sub 또는 익명 UUID) — `initAnalytics` 내부 | 앱 부팅 1회 (컨테이너 삽입 직전) | `src/analytics/analytics.js` (호출: `src/index.js`) | userId만 — gender/ageGroup/role은 부팅 시점에 알 수 없어 미전송 (M3에서 age -1·role "user" 매직 값 제거) |
-| 로그인 유저 속성 (`setLoggedInUserAttributes`) | 로그인 성공 (일반·카카오 소셜 공통) | `src/hooks/useLoginSuccess.js` (SignInPage·OAuth2RedirectPage 공유, 이슈 #85) | userId(토큰 식별자로 전환), gender, ageGroup(연령대 구간, 예: "20대"), role — **개인정보 방침(M2 결정): nickname·age 원값 미전송** |
+| 로그인 유저 속성 (`setLoggedInUserAttributes`) | 로그인 성공 (일반·카카오 소셜 공통) + 소셜 추가 정보 입력 완료 | `src/hooks/useLoginSuccess.js` (SignInPage·OAuth2RedirectPage 공유), `src/hooks/useSocialProfileForm.js` (이슈 #85) | userId(토큰 식별자로 전환), gender(백엔드 "NONE"은 null 정규화), ageGroup(연령대 구간, 예: "20대"), role — **개인정보 방침(M2 결정): nickname·age 원값 미전송** |
 | 유저 속성 리셋 (`resetUser`) | 로그아웃 | `src/common/Navbar.jsx` | userId(익명 UUID로 복귀), gender/ageGroup null, role "user" |
 
 ### 현재 이벤트 (M1에서 `events.js` 트래커 → `_mtm` push로 이관 완료, 이슈 #73)
@@ -88,7 +88,7 @@ src/analytics/
 
 | 이벤트 | 발화 시점 | 트래커 함수 (`src/analytics/events.js`) / 호출 위치 | 페이로드 | 목적 |
 |---|---|---|---|---|
-| `travel_signup_complete` | 회원가입 성공 | `trackSignupComplete` / `src/hooks/useSignUpForm.js` | gender, ageGroup(연령대 구간 — 개인정보 방침에 따라 age 원값 미전송) | 가입 퍼널 |
+| `travel_signup_complete` | 회원가입 성공 (일반: signUp 성공, 소셜: 추가 정보 입력 완료) | `trackSignupComplete` / `src/hooks/useSignUpForm.js`(일반)·`src/hooks/useSocialProfileForm.js`(소셜, 이슈 #85) | gender, ageGroup(연령대 구간 — 개인정보 방침에 따라 age 원값 미전송) | 가입 퍼널 |
 | `travel_login` / `travel_login_fail` | 로그인 성공/실패 (일반·카카오 소셜 공통) | `trackLogin` / `trackLoginFail` / 성공: `src/hooks/useLoginSuccess.js`, 실패: `src/sign/components/SignInPage.jsx`·`OAuth2RedirectPage.jsx` | 성공 시 role("admin"\|"user"), 실패 시 공통 필드만 | 로그인 퍼널 |
 | `travel_post_add` | 게시글 작성 성공 | `trackPostAdd` / `src/post/pages/PostWritePage.jsx` | postId(생성 응답에서 확보, 없으면 null), category, region (코드값) | 콘텐츠 생산 지표 |
 | `travel_post_update` / `_remove` | 게시글 수정/삭제 성공 | `trackPostUpdate` / `trackPostRemove` / `src/post/pages/PostEditPage.jsx` | postId, category, region (코드값) | 콘텐츠 생산 지표 |
