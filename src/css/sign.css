@@ -12,6 +12,26 @@
   position: relative;
 }
 
+/* ===== 로그인 소셜 버튼 (SignInPage) ===== */
+.kakao-login-btn {
+  background: var(--kakao-yellow);
+  color: var(--kakao-label);
+  border: none;
+  font-weight: 600;
+}
+
+.kakao-login-btn:hover,
+.kakao-login-btn:focus,
+.kakao-login-btn:active {
+  background: var(--kakao-yellow-hover);
+  color: var(--kakao-label);
+}
+
+.kakao-login-symbol {
+  vertical-align: -0.2em;
+  margin-right: 0.5rem;
+}
+
 /* ===== 회원 정보수정 / 비밀번호 변경 공통 카드 ===== */
 .sign-card {
   max-width: 420px;

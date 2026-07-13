@@ -140,9 +140,9 @@ const toAgeFromBirthDate = (birthDate) => {
 };
 
 /**
- * 회원가입 성공 시 발화. (가입 퍼널)
+ * 회원가입 성공 시 발화. (가입 퍼널 — 일반 가입은 signUp 성공, 소셜 가입은 추가 정보 입력 완료가 가입 완료 시점)
  * 개인정보 최소화 방침(M2 결정): 나이 원값은 보내지 않고 연령대 구간(ageGroup)으로 변환한다.
- * 호출 위치: src/hooks/useSignUpForm.js
+ * 호출 위치: src/hooks/useSignUpForm.js (일반), src/hooks/useSocialProfileForm.js (소셜)
  * 페이로드: gender(string|null), ageGroup(string|null — 예: "20대")
  */
 export const trackSignupComplete = ({ gender, birthDate }) => {
@@ -153,8 +153,8 @@ export const trackSignupComplete = ({ gender, birthDate }) => {
 };
 
 /**
- * 로그인 성공 시 발화. (로그인 퍼널)
- * 호출 위치: src/sign/components/SignInPage.jsx
+ * 로그인 성공 시 발화. (로그인 퍼널 — 일반/카카오 소셜 로그인 공통)
+ * 호출 위치: src/hooks/useLoginSuccess.js (SignInPage·OAuth2RedirectPage가 공유)
  * 페이로드: role("admin"|"user")
  */
 export const trackLogin = ({ role }) => {
@@ -163,7 +163,7 @@ export const trackLogin = ({ role }) => {
 
 /**
  * 로그인 실패 시 발화. (로그인 퍼널 — 실패 원인은 보안상 페이로드에 싣지 않는다)
- * 호출 위치: src/sign/components/SignInPage.jsx
+ * 호출 위치: src/sign/components/SignInPage.jsx, src/sign/components/OAuth2RedirectPage.jsx
  * 페이로드: 없음 (공통 필드만)
  */
 export const trackLoginFail = () => {

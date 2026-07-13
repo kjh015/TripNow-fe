@@ -48,6 +48,11 @@
   --font-display: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Malgun Gothic', sans-serif;
   --page-title-color: #6c45e0;
 
+  /* 소셜 로그인 — 카카오 브랜드 가이드 고정 색상 (임의 변경 금지) */
+  --kakao-yellow: #FEE500;
+  --kakao-yellow-hover: #F2D900;
+  --kakao-label: rgba(0, 0, 0, 0.85);
+
   /* 관리자 (Admin) */
   --brand-tint: #EEF0FB;
   --admin-border: #E4E7F5;
