@@ -1,19 +1,16 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Modal } from 'react-bootstrap';
 import InputDeduplication from './InputDeduplication';
 import { getDedupRules } from '../../../api/log/deduplicationApi';
+import { formatDate } from '../../../utils/dateUtils';
+import AdminPageHeader from '../../../admin/AdminPageHeader';
+import AdminPipelineNav from '../../../admin/AdminPipelineNav';
 import DetailDeduplication from './DetailDeduplication';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const DeduplicationManagement = ({ processId, onMenuClick }) => {
   const [ddpList, setDdpList] = useState([]);
   const [showInput, setShowInput] = useState(false);
   const [showDetail, setShowDetail] = useState(0);
-  const [alert, setAlert] = useState(null);
-
-  const showAlert = useCallback(({ type, message, duration = 2000 }) => {
-    setAlert({ type, message });
-    if (duration > 0) setTimeout(() => setAlert(null), duration);
-  }, []);
 
   const getDeduplicationList = async () => {
     try {
@@ -43,78 +40,28 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
     //   });
   };
 
-  // 날짜 포맷
-  const formatDate = (isoString) => {
-    if (!isoString) return "-";
-    return isoString.substring(0, 16).replace("T", " ");
-  };
-
-
   useEffect(() => {
     getDeduplicationList();
     // eslint-disable-next-line
   }, [showDetail, showInput]);
 
   return (
-    <div style={{ marginTop: '80px' }}>
-      {/* 인라인 스타일 또는 App.css로 분리 가능 */}
-      <style>{`
-        .dedup-name-hover {
-          font-weight: bold;
-          cursor: pointer;
-          text-decoration: none;
-          transition: text-decoration 0.13s;
-        }
-        .dedup-name-hover:hover {
-          text-decoration: underline;
-        }
-          .custom-alert-center {
-                  position: fixed;
-                  top: 64px;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  z-index: 3000;
-                  min-width: 220px;
-                  max-width: 380px;
-                  border-radius: 0.95rem;
-                  box-shadow: 0 3px 12px 0 rgba(0,0,0,0.14);
-                  font-size: 1.06rem;
-                  padding: 0.7rem 2rem;
-                  pointer-events: none;
-                }
-      `}</style>
+    <div className="log-page-spacer">
+      <AdminPageHeader title="중복 제거 관리">
+        <button className="btn admin-btn admin-btn-primary" onClick={() => setShowInput(true)}>+ 중복 제거 추가</button>
+      </AdminPageHeader>
 
-      <h2 className="fw-bold mb-4">중복 제거 관리</h2>
+      <AdminPipelineNav active="deduplication" onNavigate={onMenuClick} />
 
-      {/* 중앙 상단 고정 경고창 */}
-      {alert && (
-        <div
-          className={`alert alert-${alert.type} fw-semibold py-2 px-3 mb-0 d-inline-block text-center custom-alert-center`}
-        >
-          {alert.message}
-        </div>
-      )}
-
-
-
-      {/* 상단 버튼 영역 */}
-      <div className="d-flex justify-content-end mb-3">
-        <button className="btn btn-primary me-2" onClick={() => setShowInput(true)}>
-          중복 제거 추가
-        </button>
-        <button className="btn btn-secondary" onClick={() => onMenuClick('filter')}>
-          ⬅ 필터 관리
-        </button>
-      </div>
-
-      <table className="table table-bordered text-center align-middle">
-        <thead className="table-light">
+      <div className="admin-table-card mb-4">
+      <table className="table admin-table text-center align-middle mb-0">
+        <thead>
           <tr>
-            <th style={{ width: '10%' }}>ID</th>
-            <th className="text-start" style={{ width: '30%' }}>이름</th>
+            <th className="log-col-10">ID</th>
+            <th className="text-start log-col-30">이름</th>
             <th>생성 날짜</th>
             <th>수정 날짜</th>
-            <th style={{ width: '10%' }}>활성화</th>
+            <th className="log-col-10">활성화</th>
           </tr>
         </thead>
         <tbody>
@@ -142,7 +89,7 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
                   <td>
 
                     <button
-                      className={`btn btn-sm ${ddp.isActive ? "btn-success" : "btn-outline-secondary"}`}
+                      className={`btn btn-sm admin-toggle ${ddp.isActive ? "admin-toggle-on" : "admin-toggle-off"}`}
                       onClick={() => handleToggleActive(ddp.dedupRuleId, ddp.isActive)}
                     >
                       {ddp.isActive ? "ON" : "OFF"}
@@ -150,13 +97,12 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
                   </td>
                 </tr>
                 {showDetail === ddp.dedupRuleId && (
-                  <tr>
-                    <td colSpan="5" className="text-center bg-light">
+                  <tr className="admin-table-detail-row">
+                    <td colSpan="5" className="text-center">
                       <DetailDeduplication
                         processId={processId}
                         id={ddp.dedupRuleId}
                         onClose={handleDetailClose}
-                        showOutAlert={showAlert}
                       />
                     </td>
                   </tr>
@@ -166,30 +112,16 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
           )}
         </tbody>
       </table>
+      </div>
 
-      {/* 추가 입력 모달 */}
-      {showInput && (
-        <div
-          className="modal show d-block"
-          tabIndex="-1"
-          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
-        >
-          <div className="modal-dialog modal-lg" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">중복 제거 추가</h5>
-                <button type="button" className="btn-close" aria-label="Close"
-                  onClick={() => handleInputClose(false)}></button>
-              </div>
-              <div className="modal-body">
-                <InputDeduplication processId={processId} onClose={handleInputClose}
-                  showOutAlert={showAlert}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal show={showInput} onHide={() => handleInputClose(false)} size="lg" centered>
+        <Modal.Header closeButton>
+          <Modal.Title>중복 제거 추가</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <InputDeduplication processId={processId} onClose={handleInputClose} />
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

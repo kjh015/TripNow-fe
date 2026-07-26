@@ -1,21 +1,16 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { Modal } from 'react-bootstrap';
 import { getFormatRules } from '../../../api/log/formatApi';
+import { formatDate } from '../../../utils/dateUtils';
+import AdminPageHeader from '../../../admin/AdminPageHeader';
+import AdminPipelineNav from '../../../admin/AdminPipelineNav';
 import InputFormat from './InputFormat';
 import DetailFormat from './DetailFormat';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const FormatManagement = ({ processId, onMenuClick }) => {
     const [formatList, setFormatList] = useState([]);
     const [inputComp, setInputComp] = useState(false);
     const [detailComp, setDetailComp] = useState(0);
-    const [alert, setAlert] = useState(null);
-
-    // 경고창 자동 사라짐
-    const showAlert = useCallback((type, message, duration = 1800) => {
-        setAlert({ type, message });
-        if (duration > 0) setTimeout(() => setAlert(null), duration);
-    }, []);
 
     const getFormats = useCallback(async () => {
         try {
@@ -28,64 +23,23 @@ const FormatManagement = ({ processId, onMenuClick }) => {
 
     useEffect(() => { getFormats(); }, [inputComp, detailComp, getFormats]);
 
-    const formatDate = (isoString) => {
-        if (!isoString) return "-";
-        return isoString.substring(0, 16).replace("T", " ");
-    };
-
     return (
-        <div style={{ marginTop: '80px' }}>
-            <style>{`
-                .format-name-hover {
-                  font-weight: bold;
-                  cursor: pointer;
-                  text-decoration: none;
-                  transition: text-decoration 0.13s;
-                }
-                .format-name-hover:hover {
-                  text-decoration: underline;
-                }
-                .custom-alert-center {
-                  position: fixed;
-                  top: 64px;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  z-index: 3000;
-                  min-width: 220px;
-                  max-width: 380px;
-                  border-radius: 0.95rem;
-                  box-shadow: 0 3px 12px 0 rgba(0,0,0,0.14);
-                  font-size: 1.06rem;
-                  padding: 0.7rem 2rem;
-                  pointer-events: none;
-                }
-            `}</style>
+        <div className="log-page-spacer">
+            <AdminPageHeader title="포맷 관리">
+                <button className="btn admin-btn admin-btn-primary" onClick={() => setInputComp(true)}>+ 포맷 추가</button>
+            </AdminPageHeader>
 
-            <h2 className="fw-bold mb-4">포맷 관리</h2>
+            <AdminPipelineNav active="format" onNavigate={onMenuClick} />
 
-            {/* 중앙 상단 고정 경고창 */}
-            {alert && (
-                <div
-                    className={`alert alert-${alert.type} fw-semibold py-2 px-3 mb-0 d-inline-block text-center custom-alert-center`}
-                >
-                    {alert.message}
-                </div>
-            )}
-
-            <div className="d-flex justify-content-end mb-3">
-                <button className="btn btn-primary me-2" onClick={() => setInputComp(true)}>포맷 추가</button>
-                <button className="btn btn-secondary" onClick={() => onMenuClick('filter')}>필터링 관리 ➡</button>
-            </div>
-
-            <div className="card shadow-sm rounded-4 mb-4" style={{ border: 0 }}>
-                <table className="table table-bordered text-center align-middle mb-0">
-                    <thead className="table-light">
+            <div className="admin-table-card mb-4">
+                <table className="table admin-table text-center align-middle mb-0">
+                    <thead>
                         <tr>
-                            <th style={{ width: '10%' }}>ID</th>
-                            <th className="text-start" style={{ width: '25%' }}>이름</th>
+                            <th className="log-col-10">ID</th>
+                            <th className="text-start log-col-25">이름</th>
                             <th>생성 날짜</th>
                             <th>수정 날짜</th>
-                            <th style={{ width: '18%' }}>관리</th>
+                            <th className="log-col-18">관리</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -110,18 +64,17 @@ const FormatManagement = ({ processId, onMenuClick }) => {
                                     <td>{format.createdAt && formatDate(format.createdAt)}</td>
                                     <td>{format.updatedAt && formatDate(format.updatedAt)}</td>
                                     <td>
-                                        <button className={`btn btn-sm ${format.isActive ? 'btn-primary' : 'btn-outline-primary'} me-2`}>
+                                        <button className={`btn btn-sm admin-toggle ${format.isActive ? 'admin-toggle-on' : 'admin-toggle-off'}`}>
                                             {format.isActive ? 'ON' : 'OFF'}
                                         </button>
                                     </td>
                                 </tr>
                                 {detailComp === format.formatRuleId && (
-                                    <tr>
-                                        <td colSpan="5" className="text-center bg-light">
+                                    <tr className="admin-table-detail-row">
+                                        <td colSpan="5" className="text-center">
                                             <DetailFormat
                                                 onClose={() => setDetailComp(0)}
                                                 formatId={format.formatRuleId}
-                                                showAlert={showAlert}
                                             />
                                         </td>
                                     </tr>
@@ -132,13 +85,14 @@ const FormatManagement = ({ processId, onMenuClick }) => {
                 </table>
             </div>
 
-            {inputComp && (
-                <InputFormat
-                    onClose={() => setInputComp(false)}
-                    processId={processId}
-                    showAlert={showAlert}
-                />
-            )}
+            <Modal show={inputComp} onHide={() => setInputComp(false)} size="lg" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>포맷 추가</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <InputFormat onClose={() => setInputComp(false)} processId={processId} />
+                </Modal.Body>
+            </Modal>
         </div>
     );
 };

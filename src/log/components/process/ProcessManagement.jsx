@@ -1,22 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Modal } from 'react-bootstrap';
 import { getLogProcesses } from '../../../api/log/logProcessApi';
+import { formatDate } from '../../../utils/dateUtils';
+import AdminPageHeader from '../../../admin/AdminPageHeader';
 import InputProcess from './InputProcess';
 import EditProcess from './EditProcess';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const ProcessManagement = ({ setPID, onMenuClick }) => {
     const [processList, setProcessList] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [selectedProcessId, setSelectedProcessId] = useState(null);
     const [editComp, setEditComp] = useState(0);
-    const [alert, setAlert] = useState(null);
-
-    // 공통 경고창 함수 (자동 사라짐)
-    const showAlert = useCallback((type, message, duration = 1800) => {
-        setAlert({ type, message });
-        if (duration > 0) setTimeout(() => setAlert(null), duration);
-    }, []);
 
     const getProcesses = async () => {
         try {
@@ -31,82 +25,29 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
         getProcesses();
     }, [showModal, editComp]);
 
-    // 모달 body 스크롤 방지
-    useEffect(() => {
-        if (showModal) document.body.style.overflow = 'hidden';
-        else document.body.style.overflow = '';
-        return () => { document.body.style.overflow = ''; };
-    }, [showModal]);
-
     const handleCloseModal = () => {
         setShowModal(false);
         setSelectedProcessId(null);
     };
     const handleEditComp = () => setEditComp(0);
 
-    const processDate = (isoString) => {
-        if (!isoString) return "-";
-        return isoString.substring(0, 16).replace("T", " ");
-    };
-
     return (
-        <div style={{ marginTop: '80px' }}>
-            <style>{`
-                .process-name-hover {
-                    font-weight: bold;
-                    cursor: pointer;
-                    text-decoration: none;
-                    transition: text-decoration 0.13s;
-                }
-                .process-name-hover:hover {
-                    text-decoration: underline;
-                }
-                .custom-alert-center {
-                    position: fixed;
-                    top: 64px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    z-index: 3000;
-                    min-width: 220px;
-                    max-width: 380px;
-                    border-radius: 0.95rem;
-                    box-shadow: 0 3px 12px 0 rgba(0,0,0,0.14);
-                    font-size: 1.06rem;
-                    padding: 0.7rem 2rem;
-                    pointer-events: none;
-                }
-            `}</style>
-
-            <div className="d-flex align-items-center mb-4" style={{ minHeight: 40 }}>
-                <h2 className="fw-bold" style={{ color: "#34a853", paddingBottom: "2px" }}>●</h2>
-                <h2 className="fw-bold" style={{ marginLeft: "7px" }}>프로세스 관리</h2>
-            </div>
-            <div className="d-flex justify-content-end  mb-3">
-                <button
-                    className="btn btn-success shadow-sm"
-                    style={{ borderRadius: "0.7rem", fontWeight: 600 }}
-                    onClick={() => setShowModal(true)}
-                >
+        <div className="log-page-spacer">
+            <AdminPageHeader title="프로세스 관리">
+                <button className="btn admin-btn admin-btn-primary" onClick={() => setShowModal(true)}>
                     + 프로세스 추가
                 </button>
-            </div>
+            </AdminPageHeader>
 
-            {/* 중앙 상단 고정 경고창 */}
-            {alert && (
-                <div className={`alert alert-${alert.type} fw-semibold py-2 px-3 mb-0 d-inline-block text-center custom-alert-center`}>
-                    {alert.message}
-                </div>
-            )}
-
-            <div className="card shadow-sm rounded-4 mb-4" style={{ border: 0 }}>
-                <table className="table table-hover table-bordered align-middle text-center mb-0">
-                    <thead className="table-light">
+            <div className="admin-table-card mb-4">
+                <table className="table admin-table align-middle text-center mb-0">
+                    <thead>
                         <tr>
-                            <th style={{ width: '15%' }}>ID</th>
+                            <th className="log-col-15">ID</th>
                             <th className="text-start">이름</th>
                             <th>생성 날짜</th>
                             <th>수정 날짜</th>
-                            <th style={{ width: '15%' }}>수정</th>
+                            <th className="log-col-15">수정</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -132,12 +73,11 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
                                             {process.name}
                                         </span>
                                     </td>
-                                    <td>{process.createdAt && processDate(process.createdAt)}</td>
-                                    <td>{process.updatedAt && processDate(process.updatedAt)}</td>
+                                    <td>{process.createdAt && formatDate(process.createdAt)}</td>
+                                    <td>{process.updatedAt && formatDate(process.updatedAt)}</td>
                                     <td>
                                         <button
-                                            className="btn btn-outline-primary btn-sm px-3"
-                                            style={{ borderRadius: '0.7rem', fontWeight: 500 }}
+                                            className="btn admin-btn admin-btn-outline admin-btn-sm px-3"
                                             onClick={() => setEditComp(process.logProcessId)}
                                         >
                                             수정
@@ -145,13 +85,12 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
                                     </td>
                                 </tr>
                                 {editComp === process.logProcessId && (
-                                    <tr>
-                                        <td colSpan={5} style={{ background: "#f6f8fa", borderBottomLeftRadius: '0.7rem', borderBottomRightRadius: '0.7rem' }}>
+                                    <tr className="admin-table-detail-row">
+                                        <td colSpan={5} className="process-edit-row">
                                             <EditProcess
                                                 onClose={handleEditComp}
                                                 processId={process.logProcessId}
                                                 _name={process.name}
-                                                showAlert={showAlert}
                                             />
                                         </td>
                                     </tr>
@@ -162,40 +101,14 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
                 </table>
             </div>
 
-
-            {/* 모달 구조 */}
-            {showModal && (
-                <div
-                    className="modal fade show"
-                    tabIndex="-1"
-                    style={{
-                        display: 'block',
-                        background: 'rgba(0,0,0,0.3)',
-                        zIndex: 1050,
-                    }}
-                    onClick={handleCloseModal}
-                >
-                    <div
-                        className="modal-dialog modal-dialog-centered"
-                        style={{ maxWidth: 480 }}
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <div className="modal-content rounded-4" >
-                            <div className="modal-header" >
-                                <h5 className="modal-title fw-bold">프로세스 추가</h5>
-                                <button type="button" className="btn-close" onClick={handleCloseModal}></button>
-                            </div>
-                            <div className="modal-body">
-                                <InputProcess
-                                    onClose={handleCloseModal}
-                                    processId={selectedProcessId}
-                                    showAlert={showAlert}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <Modal show={showModal} onHide={handleCloseModal} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title className="fw-bold">프로세스 추가</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <InputProcess onClose={handleCloseModal} processId={selectedProcessId} />
+                </Modal.Body>
+            </Modal>
         </div>
     );
 };

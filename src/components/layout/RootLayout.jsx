@@ -1,16 +1,16 @@
 import Navbar from "../../common/Navbar";
-import Footers from "../../common/Footers";
+import Footer from "../../common/Footer";
 import GlobalNavigator from "../../common/GlobalNavigator";
 
 const RootLayout = ({ children }) => {
   return (
-    <>
+    <div className="app-shell">
       <GlobalNavigator />
       <Navbar />
       <div style={{ paddingTop: 25 }} />
-      <main>{children}</main>
-      <Footers />
-    </>
+      <main className="app-main">{children}</main>
+      <Footer />
+    </div>
   );
 };
 

@@ -1,20 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { getFilterRule, updateFilterRule, deleteFilterRule } from '../../../api/log/filterApi';
 import { getActiveFormatRuleFields } from '../../../api/log/formatApi';
 import { toApiConditions } from './ConditionBuilder';
 
 const operatorOptions = ['>', '<', '>=', '<=', '==', '!=', 'Equals'];
 
-const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
+const DetailFilter = ({ onClose, processId, filterId }) => {
     const [fieldList, setFieldList] = useState([]);
     const [name, setName] = useState('');
     const [active, setActive] = useState(false);
     const [tokens, setTokens] = useState([]);
-    const [alert, setAlert] = useState(null);
-
-    const showAlert = useCallback(({ type, message }) => {
-        setAlert({ type, message });
-    }, []);
 
     const viewFilter = async () => {
         try {
@@ -24,7 +20,7 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
             setName(result.name);
             setActive(result.isActive);
         } catch {
-            showAlert({ message: '필터 정보를 불러오지 못했습니다.', type: 'danger' });
+            toast.error('필터 정보를 불러오지 못했습니다.');
         }
     };
 
@@ -40,10 +36,10 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
     const removeFilter = async () => {
         try {
             await deleteFilterRule(filterId);
-            showOutAlert({ message: '필터가 삭제되었습니다.', type: 'danger' });
+            toast.success('필터가 삭제되었습니다.');
             onClose();
         } catch {
-            showAlert({ message: '필터 삭제에 실패했습니다.', type: 'danger' });
+            toast.error('필터 삭제에 실패했습니다.');
         }
     };
 
@@ -140,7 +136,7 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
     const handleSubmit = async (e) => {
 
         if (!validateParentheses()) {
-            showAlert({ message: '❌ 괄호 짝이 맞지 않습니다.', type: 'danger' });
+            toast.error('❌ 괄호 짝이 맞지 않습니다.');
             return;
         }
 
@@ -149,39 +145,32 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
             (token.field === '' || token.operator === '' || token.value === '')
         );
         if (hasInvalid) {
-            showAlert({ message: '❌ 조건에 빈 값이 있습니다. 모든 필드, 연산자, 값을 입력해주세요.', type: 'danger' });
+            toast.error('❌ 조건에 빈 값이 있습니다. 모든 필드, 연산자, 값을 입력해주세요.');
             return;
         }
         const conditions = toApiConditions(tokens);
 
         try {
             await updateFilterRule(filterId, { name, conditions, isActive: active });
-            showOutAlert({ message: '저장되었습니다.', type: 'success' });
+            toast.success('저장되었습니다.');
             onClose();
         } catch {
-            showAlert({ message: '에러가 발생했습니다.', type: 'danger' });
+            toast.error('에러가 발생했습니다.');
         }
     };
 
     return (
-        <div className="container mt-5" style={{ maxWidth: 950 }}>
-            {/* Alert 메시지 */}
-            {alert && (
-                <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">
-                    {alert.message}
-                </div>
-            )}
-
+        <div className="container mt-5 log-filter-detail-container">
             <div className="mb-2">
-                <h4 className="fw-bold text-primary">필터 수정</h4>
+                <h4 className="admin-detail-title">필터 수정</h4>
                 <hr />
             </div>
 
 
             {/* 현재 표현식 */}
-            <div className="bg-light rounded-4 shadow-sm p-3 mb-4" style={{ fontSize: 17 }}>
+            <div className="bg-light rounded-4 shadow-sm p-3 mb-4 log-expression-box">
                 <strong className="me-2">현재 표현식:</strong>
-                <code className="text-break" style={{ fontSize: 16 }}>
+                <code className="text-break log-expression-code">
                     {buildExpression()}
                 </code>
             </div>
@@ -199,26 +188,15 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
                                 onChange={e => setName(e.target.value)}
                             />
                         </div>
-                        <div className="mb-4">
+                        <div>
                             <label className="form-label fw-semibold">조건 추가</label>
                             <div className="d-flex gap-2">
-                                <button className="btn btn-outline-secondary" onClick={addParenAndConditionWithAnd}>
+                                <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm" onClick={addParenAndConditionWithAnd}>
                                     ( + 조건
                                 </button>
-                                <button className="btn btn-outline-secondary" onClick={addRightParen}>)</button>
-                                <button className="btn btn-outline-success" onClick={addCondition}>조건</button>
+                                <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm" onClick={addRightParen}>)</button>
+                                <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm" onClick={addCondition}>조건</button>
                             </div>
-                        </div>
-                        <div className="mb-3">
-                            <button className={`btn ${active ? "btn-success" : "btn-outline-success"} w-100 rounded-pill`}
-                                onClick={() => setActive(!active)}>
-                                <span className="fw-bold">활성화: {active ? "ON" : "OFF"}</span>
-                            </button>
-                        </div>
-                        <div className="d-flex gap-2">
-                            <button className="btn btn-primary flex-fill rounded-3" onClick={handleSubmit}>수정</button>
-                            <button className="btn btn-danger flex-fill rounded-3" onClick={removeFilter}>삭제</button>
-                            <button className="btn btn-outline-dark flex-fill rounded-3" onClick={onClose}>닫기</button>
                         </div>
                     </div>
                 </div>
@@ -247,7 +225,7 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
                                                 return (
                                                     <div className="d-flex justify-content-center mb-2" key={i}>
                                                         <button
-                                                            className="btn btn-outline-primary rounded-pill px-4"
+                                                            className="btn admin-btn admin-btn-outline px-4"
                                                             onClick={() => updateToken(tokenIndex, 'value', t.value === '&&' ? '||' : '&&')}
                                                         >
                                                             {t.value === '&&' ? 'AND' : 'OR'}
@@ -261,34 +239,32 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
                                                 if (nextToken?.type === 'condition') {
                                                     const condIndex = tokens.findIndex(tok => tok === nextToken);
                                                     return (
-                                                        <div className="d-flex align-items-center justify-content-center py-2 border-bottom" key={i}
-                                                            style={{ background: '#f8f9fa', borderRadius: 8, marginBottom: 6 }}>
+                                                        <div className="d-flex align-items-center justify-content-center py-2 border-bottom log-condition-row" key={i}>
                                                             <span className="fs-4 fw-bold text-primary me-2">(</span>
-                                                            <select className="form-select me-2" style={{ width: 150 }}
+                                                            <select className="form-select me-2 log-select-field-lg"
                                                                 value={nextToken.field}
                                                                 onChange={(e) => updateToken(condIndex, 'field', e.target.value)}>
                                                                 <option value="">필드 선택</option>
                                                                 {fieldList.map((f) => <option key={f} value={f}>{f}</option>)}
                                                             </select>
-                                                            <select className="form-select me-2" style={{ width: 100 }}
+                                                            <select className="form-select me-2 log-select-operator-lg"
                                                                 value={nextToken.operator}
                                                                 onChange={(e) => updateToken(condIndex, 'operator', e.target.value)}>
                                                                 {operatorOptions.map((op) => <option key={op} value={op}>{op}</option>)}
                                                             </select>
                                                             <input
                                                                 type="text"
-                                                                className="form-control me-2"
-                                                                style={{ width: 130 }}
+                                                                className="form-control me-2 log-input-value-lg"
                                                                 value={nextToken.value}
                                                                 onChange={(e) => updateToken(condIndex, 'value', e.target.value)}
                                                             />
                                                             {groupId !== 0 && (
                                                                 <>
-                                                                    <button className="btn btn-outline-danger btn-sm me-1" onClick={() => deleteGroup(groupId)} title="삭제">
+                                                                    <button className="btn admin-btn-icon admin-btn-danger me-1" onClick={() => deleteGroup(groupId)} title="삭제">
                                                                         <i className="bi bi-x-lg"></i>
                                                                     </button>
-                                                                    <button className="btn btn-outline-dark btn-sm me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
-                                                                    <button className="btn btn-outline-dark btn-sm" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
+                                                                    <button className="btn admin-btn-icon admin-btn-ghost me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
+                                                                    <button className="btn admin-btn-icon admin-btn-ghost" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
                                                                 </>
                                                             )}
                                                         </div>
@@ -298,30 +274,28 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
 
                                             if (t.type === 'condition' && group[i - 1]?.type !== 'left-paren') {
                                                 return (
-                                                    <div className="d-flex align-items-center justify-content-center py-2 border-bottom" key={i}
-                                                        style={{ background: '#f8f9fa', borderRadius: 8, marginBottom: 6 }}>
-                                                        <select className="form-select me-2" style={{ width: 150 }}
+                                                    <div className="d-flex align-items-center justify-content-center py-2 border-bottom log-condition-row" key={i}>
+                                                        <select className="form-select me-2 log-select-field-lg"
                                                             value={t.field}
                                                             onChange={(e) => updateToken(tokenIndex, 'field', e.target.value)}>
                                                             <option value="">필드 선택</option>
                                                             {fieldList.map((f) => <option key={f} value={f}>{f}</option>)}
                                                         </select>
-                                                        <select className="form-select me-2" style={{ width: 100 }}
+                                                        <select className="form-select me-2 log-select-operator-lg"
                                                             value={t.operator}
                                                             onChange={(e) => updateToken(tokenIndex, 'operator', e.target.value)}>
                                                             {operatorOptions.map((op) => <option key={op} value={op}>{op}</option>)}
                                                         </select>
-                                                        <input type="text" className="form-control me-2"
-                                                            style={{ width: 130 }}
+                                                        <input type="text" className="form-control me-2 log-input-value-lg"
                                                             value={t.value}
                                                             onChange={(e) => updateToken(tokenIndex, 'value', e.target.value)} />
                                                         {groupId !== 0 && (
                                                             <>
-                                                                <button className="btn btn-outline-danger btn-sm me-1" onClick={() => deleteGroup(groupId)} title="삭제">
+                                                                <button className="btn admin-btn-icon admin-btn-danger me-1" onClick={() => deleteGroup(groupId)} title="삭제">
                                                                     <i className="bi bi-x-lg"></i>
                                                                 </button>
-                                                                <button className="btn btn-outline-dark btn-sm me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
-                                                                <button className="btn btn-outline-dark btn-sm" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
+                                                                <button className="btn admin-btn-icon admin-btn-ghost me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
+                                                                <button className="btn admin-btn-icon admin-btn-ghost" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
                                                             </>
                                                         )}
                                                     </div>
@@ -330,16 +304,15 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
 
                                             if (t.type === 'right-paren') {
                                                 return (
-                                                    <div className="d-flex align-items-center justify-content-center py-2 border-bottom" key={i}
-                                                        style={{ background: '#f8f9fa', borderRadius: 8, marginBottom: 6 }}>
+                                                    <div className="d-flex align-items-center justify-content-center py-2 border-bottom log-condition-row" key={i}>
                                                         <span className="fs-4 fw-bold text-primary me-2">)</span>
                                                         {groupId !== 0 && (
                                                             <>
-                                                                <button className="btn btn-outline-danger btn-sm me-1" onClick={() => deleteGroup(groupId)} title="삭제">
+                                                                <button className="btn admin-btn-icon admin-btn-danger me-1" onClick={() => deleteGroup(groupId)} title="삭제">
                                                                     <i className="bi bi-x-lg"></i>
                                                                 </button>
-                                                                <button className="btn btn-outline-dark btn-sm me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
-                                                                <button className="btn btn-outline-dark btn-sm" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
+                                                                <button className="btn admin-btn-icon admin-btn-ghost me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
+                                                                <button className="btn admin-btn-icon admin-btn-ghost" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
                                                             </>
                                                         )}
                                                     </div>
@@ -353,6 +326,21 @@ const DetailFilter = ({ onClose, processId, filterId, showOutAlert }) => {
                             })}
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div className="admin-form-footer">
+                <button
+                    className={`btn btn-sm admin-toggle ${active ? "admin-toggle-on" : "admin-toggle-off"}`}
+                    onClick={() => setActive(!active)}
+                    type="button"
+                >
+                    활성화: {active ? "ON" : "OFF"}
+                </button>
+                <div className="admin-form-footer-actions">
+                    <button type="button" className="btn admin-btn admin-btn-primary" onClick={handleSubmit}>수정</button>
+                    <button type="button" className="btn admin-btn admin-btn-danger" onClick={removeFilter}>삭제</button>
+                    <button type="button" className="btn admin-btn admin-btn-outline" onClick={onClose}>닫기</button>
                 </div>
             </div>
         </div>

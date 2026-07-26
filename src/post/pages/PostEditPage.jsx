@@ -1,5 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getPost } from '../../api/postSearchApi';
@@ -10,6 +8,7 @@ import {
     CATEGORY_LABEL_TO_CODE, CATEGORY_CODE_TO_LABEL,
     REGION_LABEL_TO_CODE, REGION_CODE_TO_LABEL,
 } from '../../constants/categoryRegion';
+import { trackPostUpdate, trackPostRemove } from '../../analytics/events';
 
 const IMAGE_BASE_URL = process.env.REACT_APP_IMAGE_BASE_URL || '';
 
@@ -34,7 +33,7 @@ const uploadImageToS3 = async (file) => {
 
 const PostEditPage = () => {
     const [searchParams] = useSearchParams();
-    const no = searchParams.get('no');
+    const postId = searchParams.get('postId');
     const navigate = useNavigate();
     const [post, setPost] = useState({
         title: '',
@@ -53,7 +52,7 @@ const PostEditPage = () => {
 
     const loadPost = async () => {
         try {
-            const { data } = await getPost(no);
+            const { data } = await getPost(postId);
             const postData = data.result;
             setPost({
                 title: postData.title,
@@ -71,7 +70,12 @@ const PostEditPage = () => {
 
     const removePost = async () => {
         try {
-            await deletePost(no);
+            await deletePost(postId);
+            trackPostRemove({
+                postId,
+                category: CATEGORY_LABEL_TO_CODE[post.category] ?? post.category,
+                region: REGION_LABEL_TO_CODE[post.region] ?? post.region,
+            });
             showAlert("삭제 성공", "success");
             setTimeout(() => navigate('/post/list'), 500);
         } catch {
@@ -87,7 +91,7 @@ const PostEditPage = () => {
             return;
         }
         loadPost();
-    }, [no]);
+    }, [postId]);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -126,12 +130,15 @@ const PostEditPage = () => {
             const uploadedImageKeys = await Promise.all(newImageFiles.map(uploadImageToS3));
             // 이미지 정렬 순서는 배열 순서 자체로 전달 (기존 이미지 → 신규 이미지 순)
             const images = [...existingImages.map((img) => img.imageKey), ...uploadedImageKeys];
-            await updatePost(no, {
+            const category = CATEGORY_LABEL_TO_CODE[post.category] ?? post.category;
+            const region = REGION_LABEL_TO_CODE[post.region] ?? post.region;
+            await updatePost(postId, {
                 ...post,
-                category: CATEGORY_LABEL_TO_CODE[post.category] ?? post.category,
-                region: REGION_LABEL_TO_CODE[post.region] ?? post.region,
+                category,
+                region,
                 images,
             });
+            trackPostUpdate({ postId, category, region });
             showAlert("글 수정이 완료되었습니다.", "success");
             setTimeout(() => navigate('/post/list'), 500);
         } catch {
@@ -144,35 +151,33 @@ const PostEditPage = () => {
     const imageSection = (
         <div className="mb-4">
             <label className="form-label fw-semibold">
-                사진 첨부 <span className="text-secondary" style={{ fontSize: "0.95em" }}>(여러 장 첨부 가능)</span>
+                사진 첨부 <span className="text-secondary post-image-hint">(여러 장 첨부 가능)</span>
             </label>
             <div className="bg-light rounded-4 p-3 px-4 border">
                 <input type="file" accept="image/*" multiple onChange={handleNewImageChange} className="form-control mb-3" />
                 <div className="d-flex flex-wrap gap-3">
                     {existingImages.map((img, idx) => (
-                        <div key={`exist-${idx}`} style={{ position: 'relative' }}>
+                        <div key={`exist-${idx}`} className="position-relative">
                             <img
                                 src={`${IMAGE_BASE_URL}/${img.imageKey}`}
                                 alt={`existing-${idx}`}
-                                style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 14, border: '1px solid #eee', boxShadow: "0 2px 6px rgba(0,0,0,0.06)" }}
+                                className="post-image-preview"
                             />
                             <button
-                                type="button" className="btn btn-danger btn-sm"
-                                style={{ position: 'absolute', top: 5, right: 5, borderRadius: '50%', padding: '2px 7px', fontSize: "1.05rem" }}
+                                type="button" className="btn btn-danger btn-sm post-image-remove-btn"
                                 onClick={() => handleExistingImageRemove(idx)}
                             >×</button>
                         </div>
                     ))}
                     {newImagePreviews.map((src, idx) => (
-                        <div key={`new-${idx}`} style={{ position: 'relative' }}>
+                        <div key={`new-${idx}`} className="position-relative">
                             <img
                                 src={src}
                                 alt={`new-${idx}`}
-                                style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 14, border: '1px solid #eee', boxShadow: "0 2px 6px rgba(0,0,0,0.06)" }}
+                                className="post-image-preview"
                             />
                             <button
-                                type="button" className="btn btn-danger btn-sm"
-                                style={{ position: 'absolute', top: 5, right: 5, borderRadius: '50%', padding: '2px 7px', fontSize: "1.05rem" }}
+                                type="button" className="btn btn-danger btn-sm post-image-remove-btn"
                                 onClick={() => handleNewImageRemove(idx)}
                             >×</button>
                         </div>

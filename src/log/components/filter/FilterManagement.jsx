@@ -1,21 +1,16 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Modal } from 'react-bootstrap';
 import { getFilterRules } from '../../../api/log/filterApi';
+import { formatDate } from '../../../utils/dateUtils';
+import AdminPageHeader from '../../../admin/AdminPageHeader';
+import AdminPipelineNav from '../../../admin/AdminPipelineNav';
 import DetailFilter from './DetailFilter';
 import ConditionBuilder from './ConditionBuilder';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const FilterManagement = ({ processId, onMenuClick }) => {
     const [filterList, setFilterList] = useState([]);
     const [detailComp, setDetailComp] = useState(0);
     const [builderComp, setBuilderComp] = useState(false);
-    const [alert, setAlert] = useState(null);
-
-    // 자동 사라지는 경고창
-    const showAlert = useCallback(({ type, message, duration = 1800 }) => {
-        setAlert({ type, message });
-        if (duration > 0) setTimeout(() => setAlert(null), duration);
-    }, []);
 
     const getFilters = async () => {
         try {
@@ -28,76 +23,23 @@ const FilterManagement = ({ processId, onMenuClick }) => {
 
     useEffect(() => { getFilters(); }, [processId, builderComp, detailComp]);
 
-    // 모달 스크롤 방지
-    useEffect(() => {
-        if (builderComp) document.body.style.overflow = 'hidden';
-        else document.body.style.overflow = '';
-        return () => { document.body.style.overflow = ''; };
-    }, [builderComp]);
-
-    const filterDate = (isoString) => {
-        if (!isoString) return "-";
-        return isoString.substring(0, 16).replace("T", " ");
-    };
-
     return (
-        <div style={{ marginTop: '80px' }}>
-            <style>{`
-                .format-name-hover {
-                    font-weight: bold;
-                    cursor: pointer;
-                    text-decoration: none;
-                    transition: text-decoration 0.13s;
-                }
-                .format-name-hover:hover {
-                    text-decoration: underline;
-                }
-                .custom-alert-center {
-                    position: fixed;
-                    top: 64px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    z-index: 3000;
-                    min-width: 220px;
-                    max-width: 380px;
-                    border-radius: 0.95rem;
-                    box-shadow: 0 3px 12px 0 rgba(0,0,0,0.14);
-                    font-size: 1.06rem;
-                    padding: 0.7rem 2rem;
-                    pointer-events: none;
-                }
-            `}</style>
+        <div className="log-page-spacer">
+            <AdminPageHeader title="필터링 관리">
+                <button className="btn admin-btn admin-btn-primary" onClick={() => setBuilderComp(true)}>+ 필터 추가</button>
+            </AdminPageHeader>
 
-            {/* 화면 중앙 위 고정 알림 */}
-            {alert && (
-                <div className={`alert alert-${alert.type} fw-semibold mb-0 text-center custom-alert-center`}>
-                    {alert.message}
-                </div>
-            )}
+            <AdminPipelineNav active="filter" onNavigate={onMenuClick} />
 
-            <h2 className="fw-bold mb-4">필터링 관리</h2>
-
-            <div className="d-flex justify-content-end mb-3">
-                <button className="btn btn-primary me-2" onClick={() => setBuilderComp(true)}>
-                    필터 추가
-                </button>
-                <button className="btn btn-secondary me-2" onClick={() => onMenuClick('format')}>
-                    ⬅ 포맷 관리
-                </button>
-                <button className="btn btn-secondary" onClick={() => onMenuClick('deduplication')}>
-                    중복제거 관리 ➡
-                </button>
-            </div>
-
-            <div className="card shadow-sm rounded-4 mb-4" style={{ border: 0 }}>
-                <table className="table table-bordered text-center align-middle mb-0">
-                    <thead className="table-light">
+            <div className="admin-table-card mb-4">
+                <table className="table admin-table text-center align-middle mb-0">
+                    <thead>
                         <tr>
-                            <th style={{ width: '10%' }}>ID</th>
-                            <th className="text-start" style={{ width: '30%' }}>이름</th>
+                            <th className="log-col-10">ID</th>
+                            <th className="text-start log-col-30">이름</th>
                             <th>생성 날짜</th>
                             <th>수정 날짜</th>
-                            <th style={{ width: '10%' }}>활성화</th>
+                            <th className="log-col-10">활성화</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -119,24 +61,23 @@ const FilterManagement = ({ processId, onMenuClick }) => {
                                             {filter.name}
                                         </span>
                                     </td>
-                                    <td>{filterDate(filter.createdAt)}</td>
-                                    <td>{filterDate(filter.updatedAt)}</td>
+                                    <td>{formatDate(filter.createdAt)}</td>
+                                    <td>{formatDate(filter.updatedAt)}</td>
                                     <td>
                                         <button
-                                            className={`btn btn-sm ${filter.isActive ? 'btn-success' : 'btn-outline-success'}`}
+                                            className={`btn btn-sm admin-toggle ${filter.isActive ? 'admin-toggle-on' : 'admin-toggle-off'}`}
                                         >
                                             {filter.isActive ? 'ON' : 'OFF'}
                                         </button>
                                     </td>
                                 </tr>
                                 {detailComp === filter.filterRuleId && (
-                                    <tr>
-                                        <td colSpan="5" className="text-center bg-light">
+                                    <tr className="admin-table-detail-row">
+                                        <td colSpan="5" className="text-center">
                                             <DetailFilter
                                                 onClose={() => setDetailComp(0)}
                                                 filterId={filter.filterRuleId}
                                                 processId={processId}
-                                                showOutAlert={showAlert}
                                             />
                                         </td>
                                     </tr>
@@ -147,26 +88,14 @@ const FilterManagement = ({ processId, onMenuClick }) => {
                 </table>
             </div>
 
-            {builderComp && (
-                <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                    <div className="modal-dialog modal-lg" role="document">
-                        <div className="modal-content rounded-4">
-                            <div className="modal-header">
-                                <h5 className="modal-title">필터 추가</h5>
-                                <button type="button" className="btn-close" aria-label="Close"
-                                    onClick={() => setBuilderComp(false)}></button>
-                            </div>
-                            <div className="modal-body">
-                                <ConditionBuilder
-                                    onClose={() => setBuilderComp(false)}
-                                    processId={processId}
-                                    showOutAlert={showAlert}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <Modal show={builderComp} onHide={() => setBuilderComp(false)} size="lg" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>필터 추가</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <ConditionBuilder onClose={() => setBuilderComp(false)} processId={processId} />
+                </Modal.Body>
+            </Modal>
         </div>
     );
 };

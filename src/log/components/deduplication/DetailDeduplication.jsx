@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { getDedupRule, updateDedupRule, deleteDedupRule } from '../../../api/log/deduplicationApi';
 import DeduplicationRow from './DeduplicationRow';
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 const initialRow = {
     conditions: [{ field: '', value: '', matchType: 'Exact' }],
@@ -25,7 +24,7 @@ const toApiRules = (rows) => rows.map(row => ({
     expirationTime: { days: row.days, hours: row.hours, minutes: row.minutes, seconds: row.seconds },
 }));
 
-const DetailDeduplication = ({ processId, id, onClose, showOutAlert }) => {
+const DetailDeduplication = ({ processId, id, onClose }) => {
     const [rows, setRows] = useState([]);
     const [name, setName] = useState('');
     const [active, setActive] = useState(false);
@@ -38,7 +37,7 @@ const DetailDeduplication = ({ processId, id, onClose, showOutAlert }) => {
             setName(result.name);
             setActive(result.isActive);
         } catch {
-            showOutAlert({ message: "view error", type: "danger" });
+            toast.error("중복 제거 정보를 불러오지 못했습니다.");
         }
     };
 
@@ -63,20 +62,20 @@ const DetailDeduplication = ({ processId, id, onClose, showOutAlert }) => {
     const handleSubmit = async () => {
         try {
             await updateDedupRule(id, { name, isActive: active, rules: toApiRules(rows) });
-            showOutAlert({ message: '수정되었습니다.', type: "success" });
+            toast.success('수정되었습니다.');
             setTimeout(() => onClose(true));
         } catch {
-            showOutAlert({ message: '에러 발생', type: 'danger' });
+            toast.error('에러 발생');
         }
     };
 
     const handleRemove = async () => {
         try {
             await deleteDedupRule(id);
-            showOutAlert({ message: '삭제되었습니다.', type: "danger" });
+            toast.success('삭제되었습니다.');
             setTimeout(() => onClose(true));
         } catch {
-            showOutAlert({ message: '에러 발생', type: 'danger' });
+            toast.error('에러 발생');
         }
     };
 
@@ -87,11 +86,9 @@ const DetailDeduplication = ({ processId, id, onClose, showOutAlert }) => {
 
     return (
         <div className="container mt-5">
-            {/* alert 없음 */}
-
-            <h3 className="mb-4">중복 제거 설정 수정</h3>
-            <div className="mb-3">
-                <label className="form-label">중복 이름</label>
+            <h4 className="mb-4 admin-detail-title">중복 제거 설정 수정</h4>
+            <div className="mb-4 text-start">
+                <label className="form-label fw-semibold">중복 이름</label>
                 <input type="text" className="form-control"
                     value={name} onChange={e => setName(e.target.value)} />
             </div>
@@ -107,18 +104,22 @@ const DetailDeduplication = ({ processId, id, onClose, showOutAlert }) => {
                 />
             ))}
 
-            <div className="d-flex justify-content-between mt-3">
-                <button className="btn btn-success" onClick={handleAddRow}>+ 조건 추가</button>
+            <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm" onClick={handleAddRow}>
+                + 규칙 추가
+            </button>
+
+            <div className="admin-form-footer">
                 <button
-                    className={`btn btn-sm ${active ? 'btn-success' : 'btn-outline-success'}`}
+                    className={`btn btn-sm admin-toggle ${active ? 'admin-toggle-on' : 'admin-toggle-off'}`}
                     onClick={() => setActive(!active)}
                     type="button"
                 >
-                    활성화: {active ? "On" : "Off"}
+                    활성화: {active ? "ON" : "OFF"}
                 </button>
-                <div className="d-flex justify-content-end">
-                    <button className="btn btn-primary" onClick={handleSubmit}>수정</button>
-                    <button className="btn btn-danger" onClick={handleRemove}>삭제</button>
+                <div className="admin-form-footer-actions">
+                    <button type="button" className="btn admin-btn admin-btn-primary" onClick={handleSubmit}>수정</button>
+                    <button type="button" className="btn admin-btn admin-btn-danger" onClick={handleRemove}>삭제</button>
+                    <button type="button" className="btn admin-btn admin-btn-outline" onClick={() => onClose(false)}>닫기</button>
                 </div>
             </div>
         </div>

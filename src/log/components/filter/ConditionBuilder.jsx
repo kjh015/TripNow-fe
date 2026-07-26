@@ -1,24 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { getActiveFormatRuleFields } from '../../../api/log/formatApi';
 import { createFilterRule } from '../../../api/log/filterApi';
 
 const operatorOptions = ['>', '<', '>=', '<=', '==', '!=', 'Equals'];
 
-const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
+const ConditionBuilder = ({ onClose, processId }) => {
     const [fieldList, setFieldList] = useState([]);
     const [name, setName] = useState('');
     const [active, setActive] = useState(false);
     const [tokens, setTokens] = useState([
         { type: 'condition', field: '', operator: '>', value: '', groupId: 0 }
     ]);
-
-    // alert 상태
-    const [alert, setAlert] = useState(null);
-
-    const showAlert = useCallback(({ type, message }) => {
-        setAlert({ type, message });
-    }, []);
-
 
     useEffect(() => {
         const load = async () => {
@@ -119,7 +112,7 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
 
     const handleSubmit = async (e) => {
         if (!validateParentheses()) {
-            showAlert({ message: "❌ 괄호 짝이 맞지 않습니다.", type: 'danger' });
+            toast.error("❌ 괄호 짝이 맞지 않습니다.");
             return;
         }
 
@@ -128,7 +121,7 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
             (token.field === '' || token.operator === '' || token.value === '')
         );
         if (hasInvalid) {
-            showAlert({ message: '❌ 조건에 빈 값이 있습니다. 모든 필드, 연산자, 값을 입력해주세요.', type: 'danger' });
+            toast.error('❌ 조건에 빈 값이 있습니다. 모든 필드, 연산자, 값을 입력해주세요.');
             return;
         }
 
@@ -136,47 +129,44 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
 
         try {
             await createFilterRule(processId, { name, conditions, isActive: active });
-            showOutAlert({ message: '필터 추가 성공', type: 'success' });
+            toast.success('필터 추가 성공');
             onClose();
         } catch {
-            showAlert({ message: '에러가 발생했습니다.', type: 'danger' });
+            toast.error('에러가 발생했습니다.');
         }
     };
 
     return (
-        <div className="container mt-4 text-center" style={{ maxWidth: '400px', margin: '0 auto' }}>
-            {/* Alert 메시지 */}
-            {alert && (
-                <div className={`alert alert-${alert.type} alert-dismissible fade show`} role="alert">
-                    {alert.message}
+        <div className="text-start">
+            <div className="mb-4">
+                <label className="form-label fw-semibold">필터 이름</label>
+                <input type="text" className="form-control" placeholder="filter name" value={name} onChange={e => setName(e.target.value)} />
+            </div>
 
+            <div className="mb-4">
+                <label className="form-label fw-semibold">조건 추가</label>
+                <div className="d-flex gap-2">
+                    <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm" onClick={addParenAndConditionWithAnd}>( + 조건</button>
+                    <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm" onClick={addRightParen}>)</button>
+                    <button type="button" className="btn admin-btn admin-btn-outline admin-btn-sm" onClick={addCondition}>조건</button>
                 </div>
-            )}
-
-            <h5>필터 추가</h5>
-            <div className="mb-3">
-                <label className="form-label">필터 이름</label>
-                <input type="text" className="form-control" placeholder="필터 이름" value={name} onChange={e => setName(e.target.value)} />
             </div>
 
-            <div className="mt-3">
-                <label>추가:  </label>
-                <button className="btn btn-secondary me-2" onClick={addParenAndConditionWithAnd}>(</button>
-                <button className="btn btn-secondary me-2" onClick={addRightParen}>)</button>
-                <button className="btn btn-success me-2" onClick={addCondition}>조건</button>
+            <div className="bg-light rounded-4 shadow-sm p-3 mb-4 log-expression-box">
+                <strong className="me-2">현재 표현식:</strong>
+                <code className="text-break log-expression-code">{buildExpression()}</code>
             </div>
 
-            <div className="mt-4">
-                <strong>현재 표현식: </strong>
-                <div style={{ marginTop: '10px' }}></div>
-                <code>{buildExpression()}</code>
-            </div>
-
+            <div className="admin-section-box p-3">
+                <div className="mb-2 d-flex align-items-center">
+                    <i className="bi bi-funnel fs-5 me-2 text-primary"></i>
+                    <span className="fw-semibold">조건 목록</span>
+                </div>
             {getGroups(tokens).map((group, idx) => {
                 const groupId = group[0].groupId;
                 return (
-                    <div className="d-flex justify-content-center mb-3" key={groupId}>
-                        <div className="d-flex flex-column align-items-start">
+                    <div key={groupId}>
+                        <div>
                             {group.map((t, i) => {
                                 const tokenIndex = tokens.findIndex(tok => tok === t);
 
@@ -184,7 +174,7 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
                                     return (
                                         <div className="w-100 text-center mb-2" key={i}>
                                             <button
-                                                className="btn btn-outline-primary"
+                                                className="btn admin-btn admin-btn-outline admin-btn-sm px-4"
                                                 onClick={() =>
                                                     updateToken(tokenIndex, 'value', t.value === '&&' ? '||' : '&&')
                                                 }
@@ -200,27 +190,27 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
                                     if (nextToken?.type === 'condition') {
                                         const condIndex = tokens.findIndex(tok => tok === nextToken);
                                         return (
-                                            <div className="d-flex align-items-center" key={i}>
-                                                <h2 className="me-2">(</h2>
-                                                <select className="form-select me-2" style={{ width: '120px' }}
+                                            <div className="d-flex align-items-center py-2 border-bottom log-condition-row px-2" key={i}>
+                                                <span className="fs-4 fw-bold text-primary me-2">(</span>
+                                                <select className="form-select me-2 log-select-field"
                                                     value={nextToken.field}
                                                     onChange={(e) => updateToken(condIndex, 'field', e.target.value)}>
                                                     <option value="">필드 선택</option>
                                                     {fieldList.map((f) => <option key={f} value={f}>{f}</option>)}
                                                 </select>
-                                                <select className="form-select me-2" style={{ width: '80px' }}
+                                                <select className="form-select me-2 log-select-operator"
                                                     value={nextToken.operator}
                                                     onChange={(e) => updateToken(condIndex, 'operator', e.target.value)}>
                                                     {operatorOptions.map((op) => <option key={op} value={op}>{op}</option>)}
                                                 </select>
-                                                <input type="text" className="form-control me-2" style={{ width: '100px' }}
+                                                <input type="text" className="form-control me-2 log-input-value"
                                                     value={nextToken.value}
                                                     onChange={(e) => updateToken(condIndex, 'value', e.target.value)} />
                                                 {groupId !== 0 && (
                                                     <>
-                                                        <button className="btn btn-danger btn-sm me-2" onClick={() => deleteGroup(groupId)}>X</button>
-                                                        <button className="btn btn-outline-dark btn-sm me-1" onClick={() => moveGroup(groupId, 'up')}>⬆</button>
-                                                        <button className="btn btn-outline-dark btn-sm" onClick={() => moveGroup(groupId, 'down')}>⬇</button>
+                                                        <button className="btn admin-btn-icon admin-btn-danger me-2" onClick={() => deleteGroup(groupId)} title="삭제">✕</button>
+                                                        <button className="btn admin-btn-icon admin-btn-ghost me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
+                                                        <button className="btn admin-btn-icon admin-btn-ghost" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
                                                     </>
                                                 )}
                                             </div>
@@ -230,26 +220,26 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
 
                                 if (t.type === 'condition' && group[i - 1]?.type !== 'left-paren') {
                                     return (
-                                        <div className="d-flex align-items-center" key={i}>
-                                            <select className="form-select me-2" style={{ width: '120px' }}
+                                        <div className="d-flex align-items-center py-2 border-bottom log-condition-row px-2" key={i}>
+                                            <select className="form-select me-2 log-select-field"
                                                 value={t.field}
                                                 onChange={(e) => updateToken(tokenIndex, 'field', e.target.value)}>
                                                 <option value="">필드 선택</option>
                                                 {fieldList.map((f) => <option key={f} value={f}>{f}</option>)}
                                             </select>
-                                            <select className="form-select me-2" style={{ width: '80px' }}
+                                            <select className="form-select me-2 log-select-operator"
                                                 value={t.operator}
                                                 onChange={(e) => updateToken(tokenIndex, 'operator', e.target.value)}>
                                                 {operatorOptions.map((op) => <option key={op} value={op}>{op}</option>)}
                                             </select>
-                                            <input type="text" className="form-control me-2" style={{ width: '100px' }}
+                                            <input type="text" className="form-control me-2 log-input-value"
                                                 value={t.value}
                                                 onChange={(e) => updateToken(tokenIndex, 'value', e.target.value)} />
                                             {groupId !== 0 && (
                                                 <>
-                                                    <button className="btn btn-danger btn-sm me-2" onClick={() => deleteGroup(groupId)}>X</button>
-                                                    <button className="btn btn-outline-dark btn-sm me-1" onClick={() => moveGroup(groupId, 'up')}>⬆</button>
-                                                    <button className="btn btn-outline-dark btn-sm" onClick={() => moveGroup(groupId, 'down')}>⬇</button>
+                                                    <button className="btn admin-btn-icon admin-btn-danger me-2" onClick={() => deleteGroup(groupId)} title="삭제">✕</button>
+                                                    <button className="btn admin-btn-icon admin-btn-ghost me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
+                                                    <button className="btn admin-btn-icon admin-btn-ghost" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
                                                 </>
                                             )}
                                         </div>
@@ -258,13 +248,13 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
 
                                 if (t.type === 'right-paren') {
                                     return (
-                                        <div className="d-flex align-items-center" key={i}>
-                                            <h2 className="me-2">)</h2>
+                                        <div className="d-flex align-items-center py-2 border-bottom log-condition-row px-2" key={i}>
+                                            <span className="fs-4 fw-bold text-primary me-2">)</span>
                                             {groupId !== 0 && (
                                                 <>
-                                                    <button className="btn btn-danger btn-sm me-2" onClick={() => deleteGroup(groupId)}>X</button>
-                                                    <button className="btn btn-outline-dark btn-sm me-1" onClick={() => moveGroup(groupId, 'up')}>⬆</button>
-                                                    <button className="btn btn-outline-dark btn-sm" onClick={() => moveGroup(groupId, 'down')}>⬇</button>
+                                                    <button className="btn admin-btn-icon admin-btn-danger me-2" onClick={() => deleteGroup(groupId)} title="삭제">✕</button>
+                                                    <button className="btn admin-btn-icon admin-btn-ghost me-1" onClick={() => moveGroup(groupId, 'up')} title="위로">⬆</button>
+                                                    <button className="btn admin-btn-icon admin-btn-ghost" onClick={() => moveGroup(groupId, 'down')} title="아래로">⬇</button>
                                                 </>
                                             )}
                                         </div>
@@ -277,15 +267,21 @@ const ConditionBuilder = ({ onClose, processId, showOutAlert }) => {
                     </div>
                 );
             })}
-            <button
-                className={`btn btn-sm ${active ? 'btn-success' : 'btn-outline-success'}`}
-                onClick={() => setActive(!active)}
-                type="button"
-            >
-                활성화: {active ? "On" : "Off"}
-            </button>
-            <button className="btn btn-primary me-2" onClick={handleSubmit}>추가</button>
-            <button className="btn btn-danger" onClick={onClose}>닫기</button>
+            </div>
+
+            <div className="admin-form-footer">
+                <button
+                    className={`btn btn-sm admin-toggle ${active ? 'admin-toggle-on' : 'admin-toggle-off'}`}
+                    onClick={() => setActive(!active)}
+                    type="button"
+                >
+                    활성화: {active ? "ON" : "OFF"}
+                </button>
+                <div className="admin-form-footer-actions">
+                    <button type="button" className="btn admin-btn admin-btn-outline" onClick={onClose}>닫기</button>
+                    <button type="button" className="btn admin-btn admin-btn-primary" onClick={handleSubmit}>추가</button>
+                </div>
+            </div>
         </div>
     );
 };

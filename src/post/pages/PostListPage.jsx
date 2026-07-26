@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { getPostListBySearch } from "../../api/postSearchApi";
 import PostSearch from "../components/PostSearch";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import PostListCard from "../components/PostListCard";
 import useAlert from "../../hooks/useAlert";
+import { trackSearchResult, trackListItemClick, trackError } from "../../analytics/events";
 
 const PostListPage = () => {
   const [posts, setPosts] = useState([]);
@@ -59,8 +59,13 @@ const PostListPage = () => {
       setPosts(result.content ?? []);
       setPagination({ totalPages: result.totalPages ?? 0, isFirst: result.isFirst ?? true, isLast: result.isLast ?? true });
       setRetryCount(0);
+      trackSearchResult({
+        keyword, category, region,
+        resultCount: result.totalElements ?? (result.content?.length ?? 0),
+      });
     } catch (e) {
       setError(e);
+      trackError({ errorType: "api", message: e.message, path: window.location.pathname });
     } finally {
       setLoading(false);
     }
@@ -99,24 +104,17 @@ const PostListPage = () => {
   };
 
   return (
-    <div className="bg-light min-vh-100 py-4" style={{ overflowX: "hidden" }}>
-      <div style={{ marginTop: "3rem" }} />
+    <div className="min-vh-100 py-4 post-list-page">
+      <div className="mt-5" />
       <PostSearch selectedCategory={category} selectedRegion={region} />
-      <div
-        style={{
-          height: "3.5px", width: "60px", margin: "0.7rem auto 1.1rem auto",
-          borderRadius: "2rem", background: "linear-gradient(90deg,#bdaafc 20%, #92e0f6 90%)",
-          opacity: 0.88, marginTop: "1rem", marginBottom: "5rem"
-        }}
-      />
-      <div className="container py-3" style={{ maxWidth: 850 }}>
+      <div className="post-list-divider" />
+      <div className="container py-3 post-list-container">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div>
-            <h3 className="fw-bold mb-1"
-              style={{ color: "#6c45e0", fontFamily: "'Montserrat', 'Gowun Dodum', sans-serif", fontSize: "2rem" }}>
+            <h3 className="fw-bold mb-1 page-title">
               여행지 목록
             </h3>
-            <div className="text-secondary" style={{ fontSize: "1.07rem" }}>
+            <div className="text-secondary post-subtitle">
               인기 여행지의 다양한 후기를 만나보세요!
             </div>
           </div>
@@ -137,8 +135,7 @@ const PostListPage = () => {
             </div>
             {isLoggedIn && (
               <button
-                className="btn fw-bold px-4"
-                style={{ background: "linear-gradient(90deg, #a084ee 30%, #7c3aed 100%)", color: "#fff", border: "none" }}
+                className="btn fw-bold px-4 post-write-btn"
                 onClick={goToWrite}
               >글쓰기</button>
             )}
@@ -162,12 +159,13 @@ const PostListPage = () => {
           </div>
         ) : (
           <div className="d-flex flex-column gap-4">
-            {posts.map((post) => (
+            {posts.map((post, idx) => (
               <PostListCard
                 key={post.postId}
                 post={post}
-                navigateTo={`/post/detail?no=${post.postId}`}
+                navigateTo={`/post/detail?postId=${post.postId}`}
                 navigateState={{ from: location.search }}
+                onCardClick={() => trackListItemClick({ postId: post.postId, position: idx + 1, keyword })}
               />
             ))}
           </div>
@@ -185,9 +183,8 @@ const PostListPage = () => {
           {Array.from({ length: pagination.totalPages }, (_, i) => i).map(num => (
             <button
               key={num}
-              className={`btn mx-1 px-3 ${page === num ? 'btn-primary' : 'btn-outline-primary'}`}
+              className={`btn mx-1 px-3 ${page === num ? 'btn-primary fw-bold' : 'btn-outline-primary'}`}
               onClick={() => handlePage(num)}
-              style={{ fontWeight: page === num ? 'bold' : undefined }}
             >
               {num + 1}
             </button>
@@ -202,20 +199,6 @@ const PostListPage = () => {
           </button>
         </div>
       </div>
-      <style>
-        {`
-.post-list-card {
-  transition: box-shadow 0.18s, transform 0.16s, background 0.16s, border 0.13s;
-}
-.post-list-card:hover, .post-list-card:focus {
-  box-shadow: 0 6px 24px 0 rgba(123,82,255,0.14), 0 1.5px 10px rgba(60,0,128,0.04);
-  border-color: #a084ee;
-  background: #faf8ff;
-  transform: translateY(-2px) scale(1.012);
-  cursor: pointer;
-}
-        `}
-      </style>
     </div>
   );
 };

@@ -1,0 +1,584 @@
+/* 메인(main) 도메인: 랭킹 카드, 관리자 게시글 목록 */
+
+/* 랭킹 카드 hover (MainPageCard variant="primary"|"category" / MyCommentsPage 공통) */
+.mainpage-card-hover:hover {
+  transform: scale(1.035);
+  box-shadow: 0 12px 36px 0 rgba(100, 100, 150, 0.19);
+  z-index: 2; /* 왕관 배지(99)보다 낮아야 함 */
+}
+
+/* 랭킹 리스트 카드 hover (MainPageCard variant="secondary") */
+.mainpage-card2-hover:hover {
+  transform: scale(1.035);
+  box-shadow: 0 8px 32px 0 rgba(100, 100, 150, 0.19);
+  z-index: 2; /* 순위 뱃지(99)보다 낮거나 같게 유지 */
+}
+
+/* 1등 왕관 배지 (MainPageCard variant="primary"|"category" 공통) — 카드보다 항상 위, 클릭 방해 X */
+.main-rank-crown {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  background: linear-gradient(135deg, #ffd700 70%, #fff9c4 100%);
+  color: #725b10;
+  font-weight: 900;
+  border-radius: 50%;
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  box-shadow: 0 4px 12px rgba(180, 140, 20, 0.13);
+  border: 3px solid #fffbe8;
+  z-index: 99;
+  pointer-events: none;
+}
+
+.main-rank-crown span {
+  font-size: 2.2rem;
+  margin-top: -4px;
+}
+
+/* 순위 뱃지 (MainPageCard variant="secondary") — 배경색은 rank별 런타임 값이라 인라인 유지 */
+.main-rank-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  color: #fff;
+  font-weight: 900;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+  z-index: 99;
+  pointer-events: none;
+}
+
+/* 관리자 게시글 테이블/모달 (AdminPostManagement) */
+.admin-post-title-btn {
+  display: inline-block;
+  background: none;
+  border: none;
+  padding: 0;
+  font-weight: 600;
+  color: var(--page-title-color);
+  max-width: 320px;
+  text-align: left;
+}
+
+.admin-post-title-btn:hover,
+.admin-post-title-btn:focus {
+  text-decoration: underline;
+}
+
+.admin-post-detail-content {
+  white-space: pre-wrap;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.admin-post-detail-thumb {
+  width: 96px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: var(--radius-card-sm);
+  border: 1px solid var(--admin-border);
+}
+
+.admin-comment-content {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== 관리자 페이지 공통 (AdminPage / AdminPostManagement) ===== */
+.admin-page-spacer {
+  margin-top: 80px;
+}
+
+.admin-post-container {
+  max-width: 1500px;
+  padding-bottom: 40px;
+}
+
+.admin-modal-backdrop {
+  background: rgba(22, 22, 37, 0.40);
+  backdrop-filter: blur(2px);
+  z-index: 1050;
+}
+
+.admin-modal-content {
+  border-radius: var(--radius-card-lg);
+  box-shadow: 0 6px 32px 0 rgba(80, 55, 255, 0.08);
+}
+
+.admin-modal-close-icon {
+  filter: invert(0.5);
+}
+
+/* ===== 지역/카테고리 선택 위젯 (RegionCard / CategoryCard) ===== */
+.selector-panel {
+  min-width: 240px;
+  max-width: 350px;
+}
+
+.selector-heading {
+  color: #1565c0;
+  font-size: 1.18rem;
+}
+
+.selector-icon-gradient {
+  font-size: 1.3rem;
+  background: linear-gradient(90deg, #42a5f5 10%, #7e57c2 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.region-card-btn,
+.category-card-btn {
+  border-radius: var(--radius-card);
+  cursor: pointer;
+  padding: 14px 0;
+  outline: none;
+  font-weight: 500;
+  color: #7b8da3;
+  transition: all 0.16s cubic-bezier(.5, 1.7, .76, 1.18);
+}
+
+.region-card-btn {
+  background: #fff;
+  box-shadow: 0 2px 7px 0 rgba(90, 120, 180, 0.08);
+}
+
+.category-card-btn {
+  background: #f7fafd;
+  box-shadow: 0 2px 7px 0 rgba(90, 120, 180, 0.06);
+}
+
+.region-card-active,
+.category-card-active {
+  background: linear-gradient(90deg, #e3f2fd 70%, #ede7f6 100%);
+  color: #1760c6;
+  font-weight: 700;
+  transform: scale(1.07);
+}
+
+.region-card-active {
+  box-shadow: 0 4px 16px 0 rgba(33, 150, 243, 0.12);
+}
+
+.category-card-active {
+  box-shadow: 0 4px 16px 0 rgba(33, 150, 243, 0.10);
+}
+
+/* ===== 랭킹 카드 본문 (MainPageCard variant="primary"|"category" 공통) ===== */
+.mainpage-card-body {
+  background: rgba(250, 250, 255, 0.96);
+  box-shadow: var(--card-shadow-lg);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s cubic-bezier(.19, 1, .22, 1), box-shadow 0.22s;
+  cursor: pointer;
+  z-index: 1; /* 왕관보다 낮음 */
+}
+
+.mainpage-card-image-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.mainpage-card-image {
+  height: 390px;
+  width: 100%;
+  object-fit: cover;
+  filter: brightness(98%);
+  display: block;
+}
+
+.mainpage-card-image-placeholder {
+  height: 390px;
+  background: #f3f3f8;
+}
+
+.rank-card-image {
+  height: 200px;
+  width: 100%;
+  object-fit: cover;
+  filter: brightness(98%);
+  display: block;
+}
+
+.rank-card-image-placeholder {
+  height: 200px;
+  background: #f3f3f8;
+}
+
+.mainpage-card-overlay-badge {
+  position: absolute;
+  bottom: 18px;
+  left: 20px;
+  background: rgba(30, 30, 55, 0.56);
+  color: #fff;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-badge);
+  font-weight: 600;
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
+  box-shadow: var(--shadow-badge);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.mainpage-card-overlay-label {
+  color: #e0c3fc;
+  font-weight: 700;
+}
+
+.mainpage-card-title {
+  font-size: 1.09rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.mainpage-card-nickname {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 220px;
+}
+
+.mainpage-card-nickname-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+  max-width: 90px;
+  display: inline-block;
+}
+
+/* ===== 랭킹 리스트 카드 (MainPageCard variant="secondary") ===== */
+.mainpage-card2-wrap {
+  min-height: 112px;
+}
+
+.mainpage-card2-body {
+  height: 100%;
+  width: 100%;
+  border-radius: var(--radius-card-lg);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  transition: transform 0.22s cubic-bezier(.19, 1, .22, 1), box-shadow 0.18s;
+  cursor: pointer;
+  z-index: 1; /* 뱃지보다 낮게 */
+}
+
+.mainpage-card2-image-wrap {
+  width: 40%;
+  height: 100%;
+}
+
+.mainpage-card2-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-top-left-radius: var(--radius-card-lg);
+  border-bottom-left-radius: var(--radius-card-lg);
+}
+
+.mainpage-card2-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #e9e5fa;
+}
+
+.mainpage-card2-content {
+  width: 60%;
+}
+
+.mainpage-card2-title {
+  color: #6247aa;
+  font-size: 1.09rem;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mainpage-card2-score {
+  color: #555;
+  font-size: 0.97rem;
+  height: 2.3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== 인기 랭킹 레이아웃 (PostRankingCards) ===== */
+.mainpage-layout-row {
+  min-height: 520px;
+  gap: 36px;
+  width: 100%;
+  margin-top: 48px;
+}
+
+.mainpage-layout-primary {
+  width: 720px;
+  height: 520px;
+  display: flex;
+  align-items: stretch;
+}
+
+.mainpage-layout-primary-motion {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.mainpage-layout-crown-glow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: none;
+  box-shadow: none;
+}
+
+.mainpage-layout-secondary {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 520px;
+  width: 360px;
+  gap: 18px;
+}
+
+.mainpage-layout-secondary-item {
+  height: calc((100% - 54px) / 4);
+  min-height: 0;
+  display: flex;
+}
+
+/* 좁은 화면 대응 — 720px+360px 고정폭이 뷰포트를 넘어가 잘리는 문제 수정 */
+@media (max-width: 1180px) {
+  .mainpage-layout-row {
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .mainpage-layout-primary {
+    width: 100%;
+    height: 420px;
+  }
+
+  .mainpage-layout-secondary {
+    width: 100%;
+    height: auto;
+  }
+
+  .mainpage-layout-secondary-item {
+    height: 160px;
+  }
+
+  .mainpage-layout-primary .mainpage-card-image,
+  .mainpage-layout-primary .mainpage-card-image-placeholder {
+    height: 260px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mainpage-layout-primary {
+    height: 320px;
+  }
+
+  .mainpage-layout-secondary-item {
+    height: 130px;
+  }
+
+  .mainpage-layout-primary .mainpage-card-image,
+  .mainpage-layout-primary .mainpage-card-image-placeholder {
+    height: 190px;
+  }
+}
+
+/* ===== 인기 카테고리/지역 레이아웃 (CategoryRegionRankingCards) ===== */
+.mainpage-ranking-cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: 24px;
+  padding: 8px 0;
+}
+
+.mainpage-ranking-cards-card {
+  width: 100%;
+  height: 200px;
+  border-radius: var(--radius-card-md);
+  overflow: hidden;
+  background: var(--card-bg);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.09);
+  display: flex;
+  align-items: stretch;
+}
+
+.mainpage-ranking-cards-badge {
+  background: rgba(30, 30, 55, 0.56);
+  color: #fff;
+  padding: 1.75rem 0 0.2rem 4.75rem;
+  border-radius: var(--radius-badge);
+  font-weight: 600;
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
+  box-shadow: var(--shadow-badge);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: -25px;
+}
+
+.mainpage-ranking-cards-badge span {
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ===== 메인 히어로/섹션 (MainPage) ===== */
+.mainpage-root {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  margin-top: -1px;
+}
+
+.mainpage-hero {
+  width: 100%;
+  min-height: 500px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.mainpage-hero-content {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.mainpage-hero-panel {
+  text-align: center;
+  position: relative;
+  display: inline-block;
+  padding: 1rem 4.5rem 10rem 4.5rem;
+  background: rgba(255, 255, 255, 0.65);
+  box-shadow: 0 6px 36px rgba(80, 60, 180, 0.08);
+  backdrop-filter: blur(4px);
+  border: 1.5px solid rgba(190, 180, 255, 0.13);
+  z-index: 3;
+  min-width: 320px;
+  max-width: 94vw;
+}
+
+.mainpage-hero-title {
+  font-size: 3.42rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  background: var(--brand-badge-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 1px 10px rgba(160, 160, 220, 0.09);
+  margin: 0;
+  font-family: var(--font-display);
+}
+
+.mainpage-hero-divider {
+  height: 3.5px;
+  width: 60px;
+  margin: 0.7rem auto 1.1rem auto;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, #bdaafc 20%, #92e0f6 90%);
+  opacity: 0.88;
+}
+
+.mainpage-hero-subtext {
+  color: #5B4B9A;
+  font-weight: 500;
+  font-size: 1.16rem;
+  margin: 0.7rem 0 0 0;
+  text-shadow: 0 2px 8px rgba(255, 255, 255, 0.09);
+}
+
+.mainpage-hero-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100px;
+  background: linear-gradient(180deg, rgba(245, 245, 255, 0) 0%, rgba(245, 245, 255, 0.84) 100%);
+  z-index: 2;
+}
+
+.mainpage-body-container {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1020px;
+  z-index: 2;
+  padding: 0 16px;
+  margin-top: -265px;
+}
+
+.mainpage-section-title {
+  text-align: start;
+  width: 100%;
+  font-family: var(--font-display);
+  color: #a68eff;
+  font-weight: 900;
+  font-size: 2.35rem;
+  margin: 0 0 26px 0;
+  letter-spacing: -0.03em;
+  text-shadow: 0 2px 16px rgba(92, 67, 226, 0.08);
+  transform: translateY(28px);
+}
+
+.mainpage-top5-section {
+  margin-bottom: 32px;
+  margin-top: 5rem;
+}
+
+.mainpage-category-section {
+  margin-top: 8rem;
+}
+
+.mainpage-region-section {
+  margin-top: 6rem;
+}
+
+.mainpage-subsection-title {
+  max-width: 1400px;
+  margin: 0 auto 1.4rem auto;
+  text-align: left;
+  font-family: var(--font-display);
+  color: #b7aaff;
+  font-weight: 700;
+  font-size: 1.55rem;
+  letter-spacing: -0.03em;
+}

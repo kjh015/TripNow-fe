@@ -1,27 +1,31 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // sign
-import SignUpPage from '../sign/component/SignUpPage';
-import SignUpdatePage from "../sign/component/SignUpdatePage";
-import SignInPage from "../sign/component/SignInPage";
-import PasswordChangePage from "../sign/component/PasswordChangePage";
+import SignUpPage from '../sign/components/SignUpPage';
+import SignUpdatePage from "../sign/components/SignUpdatePage";
+import SignInPage from "../sign/components/SignInPage";
+import OAuth2RedirectPage from "../sign/components/OAuth2RedirectPage";
+import SocialProfilePage from "../sign/components/SocialProfilePage";
+import PasswordChangePage from "../sign/components/PasswordChangePage";
+import MyPage from '../sign/components/MyPage';
 
-// board/main
-import MainPage from "../board/component/page/MainPage";
-import AdmnPage from "./AdmnPage";
-import MyPage from '../common/MyPage';
-import CampaignPlan from "../board/component/page/CampaignPlan";
-import LikeListPage from "./LikeListPage";
-import CheckMyArt from "./CheckMyArt";
+// main
+import MainPage from "../main/pages/MainPage";
+
+// admin
+import AdminPage from "../admin/AdminPage";
+import CampaignPlan from "../admin/CampaignPlan";
 
 // post
 import PostDetailPage from "../post/pages/PostDetailPage";
 import PostListPage from "../post/pages/PostListPage";
 import PostWritePage from "../post/pages/PostWritePage";
 import PostEditPage from "../post/pages/PostEditPage";
+import FavoriteListPage from "../post/pages/FavoriteListPage";
+import MyPostsPage from "../post/pages/MyPostsPage";
 
 // comment
-import ChckMyCom from "./ChckMyCom";
+import MyCommentsPage from "../comment/pages/MyCommentsPage";
 
 // log
 import FormatManagement from "../log/components/format/FormatManagement";
@@ -44,22 +48,24 @@ const PageRouter = () => {
                     <Route path="/" element={<MainPage />} />
                     <Route path="/post/list" element={<PostListPage />} />
                     <Route path="/post/detail" element={<PostDetailPage />} />
-                    <Route path="/sign/component/SignInPage" element={<SignInPage />} />
-                    <Route path="/sign/component/SignUpPage" element={<SignUpPage />} />
-                    <Route path="/component/campaignplan" element={<CampaignPlan />} />
+                    <Route path="/sign/in" element={<SignInPage />} />
+                    <Route path="/sign/up" element={<SignUpPage />} />
+                    <Route path="/oauth2/redirect" element={<OAuth2RedirectPage />} />
+                    <Route path="/campaign-plan" element={<CampaignPlan />} />
 
                     {/* 로그인 필요 */}
                     <Route path="/post/write" element={<PrivateRoute><PostWritePage /></PrivateRoute>} />
                     <Route path="/post/edit" element={<PrivateRoute><PostEditPage /></PrivateRoute>} />
-                    <Route path="/post/favorite-list" element={<PrivateRoute><LikeListPage /></PrivateRoute>} />
-                    <Route path="/post/my-article" element={<PrivateRoute><CheckMyArt /></PrivateRoute>} />
-                    <Route path="/common/MyPage" element={<PrivateRoute><MyPage /></PrivateRoute>} />
+                    <Route path="/post/favorite-list" element={<PrivateRoute><FavoriteListPage /></PrivateRoute>} />
+                    <Route path="/post/my-article" element={<PrivateRoute><MyPostsPage /></PrivateRoute>} />
+                    <Route path="/mypage" element={<PrivateRoute><MyPage /></PrivateRoute>} />
+                    <Route path="/sign/social-profile" element={<PrivateRoute><SocialProfilePage /></PrivateRoute>} />
                     <Route path="/sign/update" element={<PrivateRoute><SignUpdatePage /></PrivateRoute>} />
                     <Route path="/sign/update/password" element={<PrivateRoute><PasswordChangePage /></PrivateRoute>} />
-                    <Route path="/page/chckmycom" element={<PrivateRoute><ChckMyCom /></PrivateRoute>} />
+                    <Route path="/comment/my-comments" element={<PrivateRoute><MyCommentsPage /></PrivateRoute>} />
 
                     {/* 어드민 필요 */}
-                    <Route path="/component/admnpage" element={<PrivateRoute adminOnly><AdmnPage /></PrivateRoute>} />
+                    <Route path="/admin" element={<PrivateRoute adminOnly><AdminPage /></PrivateRoute>} />
                     <Route path="/log/format" element={<PrivateRoute adminOnly><FormatManagement /></PrivateRoute>} />
                     <Route path="/log/process" element={<PrivateRoute adminOnly><ProcessManagement /></PrivateRoute>} />
                     <Route path="/log/filter" element={<PrivateRoute adminOnly><FilterManagement /></PrivateRoute>} />

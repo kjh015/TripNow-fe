@@ -1,20 +1,193 @@
-# React Travel Project — API 정합성 리팩토링 시스템 프롬프트
+# React Travel Project — Matomo 트래킹 개선 시스템 프롬프트
 
 ## 프로젝트 개요
 
 여행 커뮤니티 + 로그 관리 시스템을 결합한 React 애플리케이션.
-**현재 리팩토링 목표**: 프론트엔드 API 통신 Endpoint 및 Request/Response 필드명을 백엔드 Swagger 명세에 완전히 일치시킨다.
+
+- **완료된 작업**
+  - API 정합성 리팩토링 (Phase A~D) — 모든 Endpoint/Request/Response 필드명이 백엔드 Swagger 명세와 일치. develop 머지 완료.
+  - 스타일 구조 리팩토링 (Phase 1~4) — 인라인 스타일 제거, `tokens.css` 디자인 토큰 도입, JSX `<style>` 태그 제거, bootstrap import 통합(`index.js` 1곳), 컴포넌트 통합 완료. develop 머지 완료.
+  - 디자인 버그 수정 + 관리자 페이지 리디자인 (이슈 A~D, #56~#68) — 푸터/랭킹 카드/날짜 NaN 수정, 관리자 화면 toast·formatDate·Modal 패턴 통일. develop 머지 완료.
+- **현재 목표**: Matomo 분석 트래킹 코드 정비 (아래 이슈 M0~M4)
+  - 핵심 방향: **이벤트를 조정·유지보수하기 쉬운 구조**. 어떤 이벤트가 어느 페이지·어느 코드에서 발화되는지 한눈에 파악되고, 이벤트에 수집 데이터를 추가하는 작업이 파일 1곳 수정으로 끝나야 한다.
 
 ---
 
 ## 핵심 원칙
 
-1. **Swagger 절대 우선** — 모든 API Endpoint, HTTP Method, Request 필드명, Response 필드명은 Swagger를 유일한 기준으로 삼는다. 기존 프론트 코드가 다르면 무조건 Swagger에 맞춰 수정한다.
-2. **파생 문제 전부 수정** — API 변경으로 발생하는 컴포넌트 데이터 바인딩 불일치(필드명, 구조 차이 등)는 모두 백엔드 스펙에 맞게 수정한다.
-3. **기능 동일성 보장** — 리팩토링 전후 사용자가 경험하는 기능은 반드시 동일해야 한다.
-4. **환경변수 사용** — 하드코딩된 값(서버 URL, 포트 등)은 모두 `.env`로 분리한다.
-5. **단계적 작업** — 작업 순서: 이슈 생성 → 브랜치 생성 → 커밋/푸시 → PR 생성.
-6. **필요한 것만 변경** — API 정합성 범위 외의 기능은 건드리지 않는다.
+1. **기능 불변** — 트래킹 정비가 목적이다. 상태 관리, API 호출, 라우팅, UI는 건드리지 않는다. 기존에 발화되던 이벤트는 (스키마를 고치더라도) 발화 자체를 없애지 않는다.
+2. **분석 코드 단일 레이어** — `window._mtm` / `window.dataLayer` 직접 접근은 `src/analytics/` 안에서만 허용. 컴포넌트는 이벤트별 트래커 함수만 호출한다. (아래 "Matomo 분석 아키텍처" 참조)
+3. **API 레이어 불변** — `src/api/` 및 API 필드명 바인딩은 수정하지 않는다. 트래킹 페이로드에 필요한 값은 화면이 이미 들고 있는 상태에서 꺼내 쓴다.
+4. **단계적 작업** — 이슈 생성 → 브랜치 생성 → 커밋/푸시 → PR 생성. 이슈 단위로 PR을 쪼갠다.
+5. **스타일 규칙 준수** — Phase 1~4에서 확립한 스타일 아키텍처(아래)를 새 코드에도 그대로 적용한다. (이번 작업에서 UI 변경은 원칙적으로 없음)
+
+---
+
+## Matomo 분석 아키텍처 (목표 구조)
+
+### 파일 구조
+
+```
+src/analytics/
+├── analytics.js   # 데이터 레이어 접근 유일 창구: pushEvent, setUserAttributes, resetUser
+│                  # 공통 필드(isLoggedIn, userId 등) 자동 주입도 이 파일에서만
+└── events.js      # 이벤트 카탈로그: 이벤트별 트래커 함수 + 이벤트명 상수
+                   # 함수마다 JSDoc으로 [발화 시점 / 호출 위치 / 페이로드 필드] 명시
+```
+
+### 유지보수성 규칙 (이 작업의 존재 이유 — 반드시 준수)
+
+- **트래커 함수는 이벤트당 1개** — `trackDetailPageview(post)`, `trackSearch({...})` 형태. 호출부는 항상 1줄이고, 페이로드 조립은 전부 `events.js` 안에서 한다.
+  - → 이벤트에 새 데이터를 추가할 때 **`events.js`의 함수 1개만 수정**하면 되고, 호출부는 손대지 않아도 되는 구조가 목표.
+- **JSDoc 필수** — 모든 트래커 함수에 아래 3가지를 주석으로 명시한다. 호출 위치가 바뀌면 주석도 갱신한다.
+  ```js
+  /**
+   * 게시글 상세 진입 시 1회 발화.
+   * 호출 위치: src/post/pages/PostDetailPage.jsx
+   * 페이로드: postId(number), category, region, title
+   */
+  export const trackDetailPageview = (post) => { ... };
+  ```
+- **이벤트명은 상수로만** — 문자열 리터럴로 이벤트명을 쓰지 않는다. `events.js` 상단에 `EVENT_NAMES` 객체로 모은다.
+- **공통 필드는 헬퍼가 주입** — `isLoggedIn`, `userId` 등 모든 이벤트에 실리는 필드는 `analytics.js`의 `pushEvent`가 자동으로 붙인다. 화면 코드에서 반복 조립 금지.
+- **페이로드 필드 규칙** — 게시글 ID는 항상 `postId`(number). `boardId` 금지. 값이 없으면 `"없음"` 같은 매직 문자열 대신 `null`. Matomo가 기본 수집하는 값(referrer, 방문 시각)은 페이로드에 넣지 않는다.
+- **CLAUDE.md 이벤트 카탈로그 동기화** — 이벤트를 추가/변경/삭제하면 아래 "이벤트 카탈로그" 표를 같은 PR에서 갱신한다.
+
+### 이벤트 추가/수정 절차 (3단계)
+
+```
+1. src/analytics/events.js 에 트래커 함수 추가 또는 수정 (JSDoc 포함)
+2. 호출할 화면에서 함수 1줄 호출 (기존 이벤트에 필드만 추가하는 경우 이 단계 생략)
+3. CLAUDE.md 이벤트 카탈로그 표 갱신
+```
+
+---
+
+## 이벤트 카탈로그
+
+### 유저 식별/속성 (M1에서 `analytics.js`의 `setUserAttributes` 경유로 이관, M2에서 userId 갱신/리셋 연결, M3에서 부팅 push 정리 완료)
+
+| 데이터 | 시점 | 호출 위치 | 필드 |
+|---|---|---|---|
+| userId (토큰 sub 또는 익명 UUID) — `initAnalytics` 내부 | 앱 부팅 1회 (컨테이너 삽입 직전) | `src/analytics/analytics.js` (호출: `src/index.js`) | userId만 — gender/ageGroup/role은 부팅 시점에 알 수 없어 미전송 (M3에서 age -1·role "user" 매직 값 제거) |
+| 로그인 유저 속성 (`setLoggedInUserAttributes`) | 로그인 성공 (일반·카카오 소셜 공통) + 소셜 추가 정보 입력 완료 | `src/hooks/useLoginSuccess.js` (SignInPage·OAuth2RedirectPage 공유), `src/hooks/useSocialProfileForm.js` (이슈 #85) | userId(토큰 식별자로 전환), gender(백엔드 "NONE"은 null 정규화), ageGroup(연령대 구간, 예: "20대"), role — **개인정보 방침(M2 결정): nickname·age 원값 미전송** |
+| 유저 속성 리셋 (`resetUser`) | 로그아웃 | `src/common/Navbar.jsx` | userId(익명 UUID로 복귀), gender/ageGroup null, role "user" |
+
+### 현재 이벤트 (M1에서 `events.js` 트래커 → `_mtm` push로 이관 완료, 이슈 #73)
+
+| 이벤트 | 발화 시점 | 트래커 함수 (`src/analytics/events.js`) / 호출 위치 | 페이로드 | 남은 문제 |
+|---|---|---|---|---|
+| `travel_main_view` | 메인 페이지 진입 | `trackMainView` / `src/main/pages/MainPage.jsx` | (공통 필드만) | — |
+| `travel_search_click` | 검색 버튼 클릭 | `trackSearchClick` / `src/post/components/PostSearch.jsx` | category, region, keyword (빈 값 null) | — (M4에서 keyword 추가) |
+| `travel_detail_pageview` | 상세 데이터 로드 후 (postId당 1회 가드) | `trackDetailPageview` / `src/post/pages/PostDetailPage.jsx` | postId(number), category, region, title | — (M2에서 중복 발화 수정) |
+| `travel_detail_exit` | 상세 이탈 (effect cleanup + `pagehide` 보완) | `trackDetailExit` / `src/post/pages/PostDetailPage.jsx` | postId(number), staySeconds, title | — (M2에서 과다 발화·staySeconds 왜곡 수정) |
+| `travel_favorite_add` / `_remove` | 찜 토글 | `trackFavoriteAdd` / `trackFavoriteRemove` / `src/post/pages/PostDetailPage.jsx` | postId(number), category, region, title | — |
+| `travel_comment_add` / `_remove` | 댓글 등록/삭제 | `trackCommentAdd` / `trackCommentRemove` / `src/comment/components/CommentPage.jsx` | postId(number), category, region, title, star(add만, number) | — (M4에서 star 추가) |
+
+### 신규 이벤트 (M4에서 추가 완료, 이슈 #81)
+
+| 이벤트 | 발화 시점 | 트래커 함수 (`src/analytics/events.js`) / 호출 위치 | 페이로드 | 목적 |
+|---|---|---|---|---|
+| `travel_signup_complete` | 회원가입 성공 (일반: signUp 성공, 소셜: 추가 정보 입력 완료) | `trackSignupComplete` / `src/hooks/useSignUpForm.js`(일반)·`src/hooks/useSocialProfileForm.js`(소셜, 이슈 #85) | gender, ageGroup(연령대 구간 — 개인정보 방침에 따라 age 원값 미전송) | 가입 퍼널 |
+| `travel_login` / `travel_login_fail` | 로그인 성공/실패 (일반·카카오 소셜 공통) | `trackLogin` / `trackLoginFail` / 성공: `src/hooks/useLoginSuccess.js`, 실패: `src/sign/components/SignInPage.jsx`·`OAuth2RedirectPage.jsx` | 성공 시 role("admin"\|"user"), 실패 시 공통 필드만 | 로그인 퍼널 |
+| `travel_post_add` | 게시글 작성 성공 | `trackPostAdd` / `src/post/pages/PostWritePage.jsx` | postId(생성 응답에서 확보, 없으면 null), category, region (코드값) | 콘텐츠 생산 지표 |
+| `travel_post_update` / `_remove` | 게시글 수정/삭제 성공 | `trackPostUpdate` / `trackPostRemove` / `src/post/pages/PostEditPage.jsx` | postId, category, region (코드값) | 콘텐츠 생산 지표 |
+| `travel_search_result` | 검색 결과 로드 성공 (정렬/페이지 이동 포함 매 로드) | `trackSearchResult` / `src/post/pages/PostListPage.jsx` | keyword, category, region, resultCount(totalElements, 없으면 페이지 건수) | **0건 검색 = 콘텐츠 갭** |
+| `travel_list_item_click` | 검색 결과 카드 → 상세 클릭 | `trackListItemClick` / `src/post/pages/PostListPage.jsx` (`PostListCard`의 `onCardClick` prop 경유) | postId, position(페이지 내 순번 1~), keyword | 검색 CTR |
+| `travel_ranking_click` | 메인 랭킹 카드 클릭 | `trackRankingClick` / `src/main/components/MainPageCard/MainPageCard.jsx` | rankType("post"\|"region"\|"category"), rank(1~5), label(post는 제목, 그 외 코드값), postId(post일 때만) | 랭킹 기능 효용 검증 |
+| `travel_error` | 렌더 크래시 / 목록 로드 실패(에러 화면 노출) | `trackError` / `src/components/ErrorBoundary.jsx`(render) · `src/post/pages/PostListPage.jsx`(api) | errorType("render"\|"api"), message, path | 사용자 체감 장애 |
+
+> 공통 필드(`isLoggedIn`, `userId`)는 `pushEvent`가 모든 이벤트에 자동 주입하므로 표에서 생략.
+> `processId`(로그 파이프라인 프로세스 id)도 표에서 생략 — `events.js`의 `EVENT_PROCESS_IDS` 매핑(조회/체류 5 `travel-view`, 검색 6 `travel-search`, 전환/액션 7 `travel-action`, 에러 8 `travel-error`, 검색 결과 카드 클릭 9 `travel-list-click`, 랭킹 클릭 10 `travel-ranking`)으로 `pushCatalogEvent`가 자동 주입한다. 백엔드 로그 프로세스 id가 바뀌면 `events.js`의 `LOG_PROCESS_IDS` 상수만 갱신.
+> 프로세스 분리 기준: Matomo `e_n`/`e_v` 슬롯 의미가 프로세스 내에서 동일해야 Format 규칙이 성립한다 — `list_item_click`(e_v=position)과 `ranking_click`(e_n=label, e_v=rank)은 이 이유로 `travel-search`(e_n=keyword, e_v=resultCount)에서 분리됨.
+
+---
+
+## 작업 이슈 목록 (2026-07-07 진단 결과)
+
+### 이슈 M0 — 데이터 레이어 이원화 확인 (선행 조사, 🐛) — ✅ 완료 (이슈 #72)
+
+> 결과: 컨테이너는 `_mtm`만 상시 수신 → push 대상 `_mtm` 통일 확정. 컨테이너 ID는 `container_2yv5mH8U.js`로 교체됨. 컨테이너는 아직 태그/트리거 미구성·미게시 상태로, 사용자가 MTM에서 travel_* Custom Event 트리거 + History Change 트리거 구성 후 게시 필요.
+
+**진단**
+- 초기화·로그인은 `window._mtm`, 이벤트 5곳은 `window.dataLayer`에 push. MTM(Matomo Tag Manager)의 기본 데이터 레이어는 `_mtm`이므로, 컨테이너에 커스텀 설정이 없다면 `dataLayer` 이벤트는 Matomo에 도달하지 않을 수 있음.
+
+**해결 방향**
+- Matomo 대시보드(또는 MTM 프리뷰 모드)에서 `travel_*` 이벤트 수신 여부 확인이 1순위. 컨테이너 트리거 설정(History Change 트리거 포함 — SPA 라우트 pageview)도 함께 확인.
+- 확인 결과에 따라 M1에서 push 대상을 한쪽으로 통일. 코드만으로 판단 불가하므로 **작업 시작 전 사용자에게 확인 결과를 물어볼 것**.
+
+### 이슈 M1 — `src/analytics/` 모듈 도입 + 기존 이벤트 이관 (중형, ♻️) — ✅ 완료 (이슈 #73)
+
+**진단**
+- `window.dataLayer = window.dataLayer || []; push(...)` 보일러플레이트가 5개 파일에 복붙됨.
+- 페이로드 스키마 불일치: `boardId` vs `postId`, postId 문자열/숫자 혼재, `"없음"` 매직 문자열, Matomo 기본 수집값 중복(visit_time, referrer).
+
+**해결 방향**
+- 위 "Matomo 분석 아키텍처" 구조대로 `analytics.js` + `events.js` 생성, 기존 발화 지점 5곳을 트래커 함수 호출로 교체.
+- 이 과정에서 스키마 통일(boardId→postId, Number 캐스팅, null 처리, 중복 필드 제거).
+- `getUserIdForMatomo` 등 분석 전용 로직은 `tokenUtils.js`에서 `analytics.js`로 이동 검토 (토큰 디코딩 자체는 tokenUtils에 유지).
+
+### 이슈 M2 — 트래킹 버그 수정 (소형, 🐛) — ✅ 완료 (이슈 #75)
+
+> 결과: exit 추적을 `no`만 의존하는 별도 effect로 분리(+`pagehide`/`pageshow` 보완), pageview는 ref로 postId당 1회 가드. 로그인 시 `setLoggedInUserAttributes`(userId 포함), 로그아웃 시 `resetUser` 연결. 개인정보 방침 결정: nickname 미전송, age는 `ageGroup` 연령대 구간("20대" 등)으로 변환 전송. Heartbeat Timer는 컨테이너 설정 이슈로 미포함.
+
+**진단**
+- `travel_detail_exit`: `PostDetailPage.jsx` useEffect deps가 `[no, liked, commentFlag]` → 찜 토글/댓글마다 cleanup 실행되어 이탈이 아닌데 발화, `enterTime`도 리셋되어 staySeconds가 "마지막 상호작용 후 경과 시간"이 됨. 체류시간 데이터 신뢰 불가.
+- `travel_detail_pageview`: deps에 `post` 객체 → loadPost 재실행마다 새 객체로 재발화. 상호작용 많은 글일수록 조회 집계 부풀려짐.
+- userId 미갱신: 익명→로그인 시 userId push 없음(익명 UUID로 계속 집계), 로그아웃(`Navbar.jsx` handleLogout) 시 유저 속성 리셋 없음.
+
+**해결 방향**
+- exit 추적을 `no`만 의존하는 별도 effect로 분리. 탭 닫기 미포착 보완은 `pagehide` 리스너 또는 Matomo Heartbeat Timer 활성화로 검토(후자는 컨테이너 설정 이슈로 분리 가능).
+- pageview는 postId 기준 1회 발화 가드(ref로 마지막 발화 postId 기억).
+- 로그인 성공 시 `setUserAttributes`(userId 포함), 로그아웃 시 `resetUser` 호출. nickname·gender·age 원값 전송은 개인정보 관점에서 재검토(연령대 구간화 등) 후 결정.
+
+### 이슈 M3 — 하드코딩 제거 + 스크립트 삽입 정리 (소형, 📦) — ✅ 완료 (이슈 #79)
+
+> 결과: 컨테이너 삽입 로직을 `analytics.js`의 `initAnalytics()`로 이동(`index.js`는 1줄 호출), `innerHTML` 주입 → `script.src` 직접 설정으로 전환. `REACT_APP_MATOMO_CONTAINER_ID` env 도입, fallback URL 제거(env 미설정 시 삽입 스킵 + console.error). 부팅 push의 `age: -1`·`role: "user"` 매직 값 제거(userId만 전송).
+
+**진단**
+- `index.js`에 컨테이너 파일명 `container_5uzHzMcX.js`과 fallback `http://localhost:9080` 하드코딩. 스크립트를 `innerHTML` 문자열로 주입(불필요한 간접 실행).
+- `index.js`의 `age: -1`, `role: "user"` 매직 값.
+
+**해결 방향**
+- `REACT_APP_MATOMO_CONTAINER_ID` 환경변수 추가(.env.example 갱신), fallback URL 제거 또는 env 필수화.
+- `innerHTML` 대신 index.js에서 동일 로직 직접 실행. 삽입 로직 자체를 `analytics.js`의 `initAnalytics()`로 이동.
+
+### 이슈 M4 — 신규 이벤트 추가 (중형, ✨) — ✅ 완료 (이슈 #81)
+
+> 결과: 신규 이벤트 10종 추가(위 "신규 이벤트" 표) + 기존 2종 확장(search_click keyword, comment_add star). 개인정보 방침에 따라 signup은 age 원값 대신 ageGroup 전송. `travel_error`는 ErrorBoundary(render)와 PostListPage 목록 로드 실패(api) 2곳 연결 — `src/api/` 수정 금지 원칙 때문에 axios 인터셉터 방식은 쓰지 않음. Web Vitals → Matomo 전송은 별도 이슈로 분리(미착수). MTM 컨테이너에 신규 travel_* Custom Event 트리거 등록·게시는 사용자 대시보드 작업으로 남음.
+
+### 작업 순서
+
+```
+M0 (확인) → M1 (모듈 도입, 이후 작업의 토대) → M2 (버그) → M3 (하드코딩) → M4 (신규 이벤트, 표의 우선순위 순)
+```
+
+---
+
+## 스타일 아키텍처 (Phase 1~4 확립, 준수 필수)
+
+### CSS 파일 구조
+```
+src/css/
+├── tokens.css      # CSS 변수: 색상, 그라디언트, shadow, radius, z-index, 폰트
+├── index.css       # 리셋 + body 기본
+├── common.css      # Navbar, Footer, 공통 카드/뱃지/페이지 헤더 패턴
+├── post.css        # post 도메인 화면
+├── main.css        # 메인(main) 화면, 랭킹 카드
+├── sign.css        # 로그인/회원가입/마이페이지
+├── comment.css     # 댓글
+└── log.css         # 로그 관리 Admin 화면
+```
+
+### 스타일 작성 규칙
+- **JSX 내 `<style>` 태그 금지** — hover/transition/미디어쿼리는 CSS 파일의 클래스로 작성
+- **인라인 style은 런타임 계산 값만 허용** (예: rank별 색상, 동적 width). 정적 스타일은 전부 클래스로
+- 클래스 네이밍: 케밥 케이스 + 도메인 접두사 (`post-card`, `main-rank-badge`, `admin-page-header`)
+- 색상/그라디언트/shadow/radius는 반드시 `var(--토큰명)` 참조, hex 직접 입력 금지 (신규 값 필요 시 tokens.css에 토큰 추가 후 사용)
+- 레이아웃(간격, flex, 정렬)은 Bootstrap 유틸리티 클래스 우선 사용
+- `bootstrap.min.css`, `bootstrap.bundle.min.js`, `bootstrap-icons` import는 **`src/index.js` 1곳에서만**
+- `constants/colorMaps.js`(Bootstrap variant 매핑)는 그대로 유지
 
 ---
 
@@ -22,16 +195,16 @@
 
 ### 작업 순서
 ```
-1. GitHub 이슈 생성 (작업 단위별)
+1. GitHub 이슈 생성 (이슈 M0~M4 단위)
 2. 이슈 번호 기반 브랜치 생성
 3. 작업 단위로 커밋 및 푸시
-4. PR 생성 (이슈 연결)
+4. PR 생성 (이슈 연결, base: develop)
 ```
 
 ### 브랜치 네이밍
 ```
 feat/#<이슈번호>-<작업명>       예) feat/#1-post-component
-refactor/#<이슈번호>-<작업명>   예) refactor/#2-api-client
+refactor/#<이슈번호>-<작업명>   예) refactor/#2-css-tokens
 fix/#<이슈번호>-<작업명>        예) fix/#3-auth-token
 chore/#<이슈번호>-<작업명>      예) chore/#4-env-setup
 ```
@@ -47,6 +220,7 @@ chore/#<이슈번호>-<작업명>      예) chore/#4-env-setup
 🔒 Security: 보안 관련 수정
 📝 Docs: 문서 수정
 ```
+> M1은 `♻️ Refactor:`, M2 버그 수정은 `🐛 Fix:`, M3은 `📦 Chore:`, M4 신규 이벤트는 `✨ Feat:` 사용.
 
 ### PR 본문 형식
 ```markdown
@@ -60,339 +234,16 @@ closes #<이슈번호>
 - 구현 방법 설명
 
 ## 테스트
-- 테스트한 기능 목록
+- 테스트한 기능 목록 (트래킹 변경은 MTM 프리뷰/브라우저 콘솔에서 push 페이로드 캡처 첨부)
 ```
 
 ---
 
-## Swagger 명세 정보
+## API 참고 (수정 금지 영역)
 
-- **API 문서 JSON**: `http://localhost:8000/api/v1/web-api/v3/api-docs/web-api-service`
-- **Swagger UI**: `http://localhost:8000/swagger-ui/index.html`
-- 작업 전 반드시 Swagger에서 해당 Endpoint 확인 후 진행
-- Request/Response 스펙이 기존 코드와 다를 경우 **무조건 Swagger 기준으로 수정**
-
----
-
-## 전체 API Endpoint 목록 (Swagger 기준)
-
-### Auth API
-| Method | Path | 설명 |
-|--------|------|------|
-| POST | `/api/v1/auth/login` | 일반 로그인 |
-| POST | `/api/v1/auth/logout` | 로그아웃 |
-| POST | `/api/v1/auth/tokens/refresh` | 토큰 재발급 |
-| POST | `/api/v1/auth/oauth2/tokens` | 소셜 로그인 토큰 발급 |
-
-### Member API
-| Method | Path | 설명 |
-|--------|------|------|
-| POST | `/api/v1/members` | 회원 가입 |
-| GET | `/api/v1/members/me` | 내 프로필 조회 |
-| PATCH | `/api/v1/members/me` | 내 정보 수정 |
-| DELETE | `/api/v1/members/me` | 회원 탈퇴 |
-| PATCH | `/api/v1/members/me/password` | 비밀번호 변경 |
-| GET | `/api/v1/members/availability/nickname` | 닉네임 중복 확인 |
-| GET | `/api/v1/members/availability/login-id` | 로그인 ID 중복 확인 |
-| GET | `/api/v1/members/availability/email` | 이메일 중복 확인 |
-
-### Post API (CUD)
-| Method | Path | 설명 |
-|--------|------|------|
-| POST | `/api/v1/posts` | 게시글 생성 |
-| PATCH | `/api/v1/posts/{postId}` | 게시글 수정 |
-| DELETE | `/api/v1/posts/{postId}` | 게시글 삭제 |
-| GET | `/api/v1/posts/images/presigned-url` | 이미지 업로드용 Presigned URL 발급 |
-
-### Post Search API (Read)
-| Method | Path | 설명 |
-|--------|------|------|
-| GET | `/api/v1/search/posts` | 게시글 통합 검색 |
-| GET | `/api/v1/search/posts/{postId}` | 게시글 상세 조회 |
-| GET | `/api/v1/search/posts/me` | 내 게시글 검색 |
-| GET | `/api/v1/search/posts/autocomplete` | 검색어 자동완성 |
-
-### Comment API
-| Method | Path | 설명 |
-|--------|------|------|
-| POST | `/api/v1/comments` | 댓글 작성 |
-| PATCH | `/api/v1/comments/{commentId}` | 댓글 수정 |
-| DELETE | `/api/v1/comments/{commentId}` | 댓글 삭제 |
-| GET | `/api/v1/search/comments` | 게시글별 댓글 조회 |
-| GET | `/api/v1/search/comments/me` | 내가 쓴 댓글 조회 |
-
-### Like API
-| Method | Path | 설명 |
-|--------|------|------|
-| POST | `/api/v1/likes` | 좋아요 등록 |
-| DELETE | `/api/v1/likes` | 좋아요 취소 |
-| GET | `/api/v1/search/likes/me` | 내가 좋아요 한 게시글 목록 |
-
-### Ranking API (SSE)
-| Method | Path | 설명 |
-|--------|------|------|
-| GET | `/api/v1/rankings/live` | 실시간 랭킹 스트림 구독 |
-
-### Admin API
-| Method | Path | 설명 |
-|--------|------|------|
-| GET | `/api/v1/admin/members` | 전체 회원 목록 조회 |
-| GET | `/api/v1/admin/members/{memberId}` | 회원 상세 정보 조회 |
-| PATCH | `/api/v1/admin/members/{memberId}/role` | 관리자 권한 부여 |
-| DELETE | `/api/v1/admin/members/{memberId}` | 회원 강제 탈퇴 |
-
-### Log Process Admin API
-| Method | Path | 설명 |
-|--------|------|------|
-| GET | `/api/v1/admin/log-processes` | 로그 프로세스 목록 |
-| POST | `/api/v1/admin/log-processes` | 로그 프로세스 생성 |
-| PATCH | `/api/v1/admin/log-processes/{logProcessId}` | 로그 프로세스 수정 |
-| DELETE | `/api/v1/admin/log-processes/{logProcessId}` | 로그 프로세스 삭제 |
-| GET | `/api/v1/admin/log-processes/{logProcessId}/format-rules` | 포맷 규칙 목록 |
-| POST | `/api/v1/admin/log-processes/{logProcessId}/format-rules` | 포맷 규칙 생성 |
-| GET | `/api/v1/admin/log-processes/{logProcessId}/format-rules/fields` | 활성 포맷 규칙 필드 |
-| GET | `/api/v1/admin/log-processes/{logProcessId}/filter-rules` | 필터 규칙 목록 |
-| POST | `/api/v1/admin/log-processes/{logProcessId}/filter-rules` | 필터 규칙 생성 |
-| GET | `/api/v1/admin/log-processes/{logProcessId}/dedup-rules` | 중복제거 규칙 목록 |
-| POST | `/api/v1/admin/log-processes/{logProcessId}/dedup-rules` | 중복제거 규칙 생성 |
-| GET | `/api/v1/admin/format-rules/{formatRuleId}` | 포맷 규칙 상세 |
-| PATCH | `/api/v1/admin/format-rules/{formatRuleId}` | 포맷 규칙 수정 |
-| DELETE | `/api/v1/admin/format-rules/{formatRuleId}` | 포맷 규칙 삭제 |
-| GET | `/api/v1/admin/filter-rules/{filterRuleId}` | 필터 규칙 상세 |
-| PATCH | `/api/v1/admin/filter-rules/{filterRuleId}` | 필터 규칙 수정 |
-| DELETE | `/api/v1/admin/filter-rules/{filterRuleId}` | 필터 규칙 삭제 |
-| GET | `/api/v1/admin/dedup-rules/{dedupRuleId}` | 중복제거 규칙 상세 |
-| PATCH | `/api/v1/admin/dedup-rules/{dedupRuleId}` | 중복제거 규칙 수정 |
-| DELETE | `/api/v1/admin/dedup-rules/{dedupRuleId}` | 중복제거 규칙 삭제 |
-| GET | `/api/v1/admin/histories` | 처리 기록 목록 |
-| GET | `/api/v1/admin/histories/{historyId}` | 처리 기록 상세 |
-
----
-
-## Request / Response 필드 명세 (Swagger 기준)
-
-> 프론트 코드의 필드명이 아래와 다르면 **아래 기준으로 수정**한다.
-> `*` 표시는 required 필드.
-
-### Auth
-
-**POST `/api/v1/auth/login`** Request
-```json
-{ "loginId": "string*", "password": "string*" }
-```
-
-**POST `/api/v1/auth/login`** Response (`result`)
-```json
-{ "memberId": integer, "nickname": "string" }
-```
-
-**POST `/api/v1/auth/oauth2/tokens`** Request
-```json
-{ "code": "string*" }
-```
-
-### Member
-
-**POST `/api/v1/members`** Request (회원가입)
-```json
-{
-  "loginId": "string*",
-  "password": "string*",
-  "email": "string*",
-  "nickname": "string*",
-  "gender": "string*",
-  "birthDate": "string*"
-}
-```
-
-**GET `/api/v1/members/me`** Response (`result`)
-```json
-{
-  "memberId": integer,
-  "loginId": "string",
-  "email": "string",
-  "nickname": "string",
-  "gender": "string",
-  "birthDate": "string",
-  "age": integer,
-  "roles": ["string"]
-}
-```
-
-**PATCH `/api/v1/members/me`** Request
-```json
-{ "nickname": "string*" }
-```
-
-**PATCH `/api/v1/members/me/password`** Request
-```json
-{ "curPassword": "string*", "newPassword": "string*" }
-```
-
-### Post
-
-**POST `/api/v1/posts`** / **PATCH `/api/v1/posts/{postId}`** Request
-```json
-{
-  "title": "string*",
-  "content": "string*",
-  "travelPlace": "string*",
-  "address": "string*",
-  "category": "string*",
-  "region": "string*",
-  "images": ["imageKey (string)"]
-}
-```
-> `images`는 `imageKey` 문자열 배열이다 (객체 아님). 정렬 순서는 배열 순서로 결정된다 (응답의 `images[].sortOrder`와는 다른 형태이니 혼동 주의).
-
-**GET `/api/v1/search/posts`** Query Parameters
-```
-keyword, category, region, sort, direction, page (integer), size (integer)
-```
-
-**GET `/api/v1/search/posts`** / **`/me`** / **`/search/likes/me`** Response (`result.content[]`)
-```json
-{
-  "postId": integer,
-  "memberId": integer,
-  "memberNickname": "string",
-  "title": "string",
-  "category": "string",
-  "region": "string",
-  "starAvg": number,
-  "viewCount": integer,
-  "likeCount": integer,
-  "commentCount": integer,
-  "popularityScore": integer,
-  "updatedAt": "string"
-}
-```
-
-**GET `/api/v1/search/posts/{postId}`** Response (`result`)
-```json
-{
-  "postId": integer,
-  "memberId": integer,
-  "memberNickname": "string",
-  "title": "string",
-  "content": "string",
-  "travelPlace": "string",
-  "address": "string",
-  "category": "string",
-  "region": "string",
-  "starAvg": number,
-  "viewCount": integer,
-  "likeCount": integer,
-  "commentCount": integer,
-  "updatedAt": "string",
-  "images": [{ "imageKey": "string", "sortOrder": integer }]
-}
-```
-
-**GET `/api/v1/posts/images/presigned-url`** Query Parameters (모두 필수)
-```
-fileName (영문/숫자/./_/- 만 허용, 확장자 포함), contentType (image/jpeg|png|gif|webp)
-```
-
-**GET `/api/v1/posts/images/presigned-url`** Response (`result`)
-```json
-{ "url": "string", "imageKey": "string" }
-```
-
-### Comment
-
-**POST `/api/v1/comments`** Request
-```json
-{ "postId": integer*, "content": "string*", "star": integer* }
-```
-
-**PATCH `/api/v1/comments/{commentId}`** Request
-```json
-{ "content": "string*", "star": integer* }
-```
-
-**GET `/api/v1/search/comments`** Query Parameters
-```
-postId (integer, required), page, size, sort
-```
-
-**GET `/api/v1/search/comments`** / **`/me`** Response (`result.content[]`)
-```json
-{
-  "commentId": integer,
-  "postId": integer,
-  "memberId": integer,
-  "memberNickname": "string",
-  "content": "string",
-  "star": integer
-}
-```
-
-### Like
-
-**POST `/api/v1/likes`** Request
-```json
-{ "postId": integer* }
-```
-
-**DELETE `/api/v1/likes`** Request
-```json
-{ "postId": integer* }
-```
-
-### 공통 Response Wrapper 구조
-
-모든 API는 아래 구조로 응답한다:
-```json
-{
-  "success": boolean,
-  "code": "string",
-  "message": "string",
-  "result": { ... }
-}
-```
-
-페이지네이션 응답 (`result` 내부):
-```json
-{
-  "content": [...],
-  "currentPage": integer,
-  "size": integer,
-  "totalElements": integer,
-  "totalPages": integer,
-  "isFirst": boolean,
-  "isLast": boolean
-}
-```
-
----
-
-## API 통신 규칙
-
-### axios 클라이언트 구조
-- `src/api/client.js`에 axios 인스턴스를 생성하고 인터셉터로 토큰 처리
-- 기존 `AuthFetch.js`의 토큰 갱신 로직을 axios 인터셉터로 마이그레이션
-- 모든 API 모듈은 이 클라이언트를 사용
-
-```javascript
-const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL,
-  withCredentials: true,
-});
-
-// 요청 인터셉터: accessToken 자동 주입
-apiClient.interceptors.request.use(...);
-
-// 응답 인터셉터: 401 시 토큰 갱신 후 재시도
-apiClient.interceptors.response.use(...);
-```
-
-### API 모듈 작성 규칙
-- 각 도메인별 API 함수를 `src/api/` 파일 단위로 분리
-- 클래스 대신 함수형으로 작성
-- 모든 API 함수는 async/await 사용 (Promise 체이닝 `.then().then()` 금지)
-- 에러는 인터셉터에서 1차 처리, 컴포넌트에서 try/catch로 2차 처리
-- API 응답에서 데이터 접근 시 `response.data.result` 또는 `response.data.result.content` 패턴 사용
+- API 통신은 Swagger 정합 완료 상태. 기준 문서: `http://localhost:8000/swagger-ui/index.html`
+- 응답 접근 패턴: `response.data.result` / `response.data.result.content` (공통 래퍼 `{ success, code, message, result }`)
+- API 필드명, Endpoint, 데이터 바인딩 로직을 변경하지 않는다. 트래킹 페이로드용 필드명은 Swagger 필드명을 그대로 따른다 (단, 카탈로그에서 정한 `postId` 통일은 예외).
 
 ---
 
@@ -402,153 +253,52 @@ apiClient.interceptors.response.use(...);
 # API
 REACT_APP_API_BASE_URL=http://localhost:8000
 
+# 이미지 (S3/CDN)
+REACT_APP_IMAGE_BASE_URL=<이미지 베이스 URL>
+
+# Matomo
+REACT_APP_MATOMO_URL=http://localhost:9080
+REACT_APP_MATOMO_CONTAINER_ID=<MTM 컨테이너 ID>   # 예) container_2yv5mH8U — 미설정 시 컨테이너 삽입 스킵 (M3에서 도입, fallback 없음)
+
+# Kibana (관리자 > 모니터링 화면 임베드)
+REACT_APP_KIBANA_URL=http://localhost:8085
+REACT_APP_KIBANA_DASHBOARD_ID=<대시보드 UUID>      # 둘 중 하나라도 없으면 iframe 대신 설정 안내 노출 (fallback 없음)
+
 # 앱
-REACT_APP_APP_NAME=Travel Project
+REACT_APP_APP_NAME=TripNow
 ```
 
-- `.env`는 `.gitignore`에 포함
-- `.env.example` 파일로 필요한 변수 목록 문서화
-
----
-
-## 디렉토리 구조 (목표)
-
-```
-src/
-├── api/
-│   ├── client.js               # axios 인스턴스 + 인터셉터
-│   ├── postApi.js              # Post CUD + Presigned URL
-│   ├── postSearchApi.js        # Post Search (Read)
-│   ├── commentApi.js           # Comment CUD + Search
-│   ├── likeApi.js              # Like 등록/취소/조회
-│   ├── authApi.js              # 로그인/로그아웃/토큰
-│   ├── memberApi.js            # 회원 CRUD + 중복확인
-│   ├── rankingApi.js           # SSE 랭킹
-│   └── log/
-│       ├── logProcessApi.js
-│       ├── formatApi.js
-│       ├── filterApi.js
-│       ├── deduplicationApi.js
-│       └── historyApi.js
-│
-├── constants/
-│   ├── colorMaps.js
-│   ├── sizes.js
-│   └── routes.js
-│
-├── hooks/
-│   ├── useAlert.js
-│   ├── usePost.js
-│   ├── useAuth.js
-│   └── usePagination.js
-│
-├── utils/
-│   ├── dateUtils.js
-│   └── tokenUtils.js
-│
-├── components/
-│   ├── LoadingSpinner.jsx
-│   ├── AlertMessage.jsx
-│   ├── PrivateRoute.jsx
-│   ├── ErrorBoundary.jsx
-│   └── layout/
-│       ├── RootLayout.jsx
-│       └── AdminLayout.jsx
-│
-├── post/
-│   ├── components/
-│   │   ├── PostListCard.jsx
-│   │   ├── PostFilter.jsx
-│   │   └── PostForm.jsx
-│   └── pages/
-│       ├── PostListPage.jsx
-│       ├── PostDetailPage.jsx
-│       ├── PostWritePage.jsx
-│       └── PostEditPage.jsx
-│
-├── comment/
-├── sign/
-├── log/
-├── sse/
-│
-├── common/
-│   ├── Navbar.jsx
-│   ├── Footers.jsx
-│   ├── GlobalNavigator.jsx
-│   ├── MyPage.jsx
-│   ├── LikeListPage.jsx
-│   ├── CheckMyArt.jsx
-│   ├── ChckMyCom.jsx
-│   └── PageRouter.jsx
-│
-├── css/
-├── App.js
-└── index.js
-```
+- `.env`는 `.gitignore`에 포함, `.env.example`로 변수 목록 문서화
+- 하드코딩된 서버 URL/포트/컨테이너 ID 발견 시 환경변수로 대체
 
 ---
 
 ## 코드 작성 규칙
 
 ### 공통
-- 하드코딩된 서버 URL, 포트 번호는 모두 환경변수로 대체
 - `console.log`는 개발용으로만 허용, `console.error`는 에러 처리 시 사용
-- 매직 넘버/문자열은 `src/constants/`에 상수로 정의
+- 매직 넘버/문자열은 `src/constants/`에 상수로 정의 (이벤트명은 예외적으로 `src/analytics/events.js`에 위치)
+- Promise 체이닝(`.then().then()`) 금지, async/await + try/catch로 통일
+- 날짜 포맷은 `src/utils/dateUtils.js`의 공용 함수만 사용
+
+### 분석(Analytics)
+- `window._mtm` / `window.dataLayer` 직접 접근은 `src/analytics/` 내부에서만 — 컴포넌트는 트래커 함수만 호출
+- 트래커 함수는 이벤트당 1개, JSDoc(발화 시점/호출 위치/페이로드) 필수
+- 트래킹 실패가 기능을 깨면 안 됨 — `pushEvent`는 내부에서 예외를 삼키고 `console.error`만 남긴다
+- 이벤트 추가/변경 시 CLAUDE.md 이벤트 카탈로그 표 동기화
 
 ### 컴포넌트
 - 단일 책임 원칙: 한 컴포넌트는 하나의 역할만 수행
-- API 응답 필드명을 컴포넌트에서 직접 참조할 때 Swagger 기준 필드명 사용
 - props에 PropTypes 정의
-
-### async/await
-- Promise 체이닝(`.then().then()`) 사용 금지, async/await로 통일
-- 모든 API 호출에 try/catch 필수
-
----
-
-## 주요 작업 목록
-
-### Phase A — API Endpoint 수정
-- [ ] `src/api/client.js` baseURL 및 인터셉터 정비
-- [ ] `authApi.js`: `/api/v1/auth/login`, `/logout`, `/tokens/refresh` 로 수정
-- [ ] `memberApi.js`: `/api/v1/members/**` 로 수정, 필드명 정합
-- [ ] `postApi.js`: CUD → `/api/v1/posts/**`, Read → `/api/v1/search/posts/**`
-- [ ] `commentApi.js`: CUD → `/api/v1/comments/**`, Read → `/api/v1/search/comments/**`
-- [ ] `likeApi.js`: `/api/v1/likes` (POST/DELETE), `/api/v1/search/likes/me` (GET)
-- [ ] `rankingApi.js`: SSE → `/api/v1/rankings/live`
-
-### Phase B — Request 필드명 수정
-- [ ] 로그인: `username` → `loginId` (있는 경우)
-- [ ] 게시글: 기존 필드명 → `title, content, travelPlace, address, category, region, images`
-- [ ] 댓글: 기존 필드명 → `postId, content, star`
-- [ ] 비밀번호 변경: → `curPassword, newPassword`
-
-### Phase C — Response 필드명 수정 (컴포넌트 바인딩)
-- [ ] 게시글 목록: `postId, memberNickname, starAvg, viewCount, likeCount, commentCount, popularityScore, updatedAt`
-- [ ] 게시글 상세: + `travelPlace, address, content, images[].imageKey, images[].sortOrder`
-- [ ] 댓글: `commentId, postId, memberId, memberNickname, content, star`
-- [ ] 내 프로필: `memberId, loginId, email, nickname, gender, birthDate, age, roles`
-- [ ] 페이지네이션: `result.content`, `result.currentPage`, `result.totalPages`, `result.totalElements`, `result.isFirst`, `result.isLast`
-- [ ] 공통 응답 래퍼: `response.data.result` 로 데이터 접근
-
-### Phase D — 기존 리팩토링 완료 항목 유지
-- [x] `src/api/client.js` axios 인스턴스 생성
-- [x] `src/constants/colorMaps.js`
-- [x] `src/utils/dateUtils.js`, `tokenUtils.js`
-- [x] `src/components/LoadingSpinner.jsx`
-- [x] `src/hooks/useAlert.js`
-- [x] Board → Post 네이밍 전환
-- [x] 컴포넌트 분리 (Phase 5)
-- [x] 스타일/UX 개선 (Phase 6)
+- API 응답 필드명은 Swagger 기준 필드명 그대로 사용 (변경 금지)
+- 알림은 `react-toastify`로 통일 (화면별 자체 alert 구현 금지)
 
 ---
 
 ## 주의사항
 
-- `src/log/` 하위 로그 관리 Admin API는 `/api/v1/admin/log-processes/**` 기준으로 수정
-- SSE (`src/sse/`, `rankingApi.js`) 기능은 `/api/v1/rankings/live` 로 변경, 실시간 연결이므로 신중하게 테스트
-- 댓글 `star` 필드: 별점 기능이 현재 UI에 없으면 백엔드 required이므로 기본값(예: 0) 처리 필요
-- 이미지 업로드: Presigned URL 발급(`GET /api/v1/posts/images/presigned-url`) → S3 업로드 → `imageKey`를 Post 요청에 포함하는 플로우
-- 좋아요 취소(DELETE `/api/v1/likes`)는 `postId`를 쿼리 파라미터로 포함 (`?postId=integer`, body 아님 — 실제 Swagger 기준 확인됨)
-- 게시글/검색 `category`, `region` 필드는 한글 라벨이 아닌 Swagger enum 값(`FESTIVAL`, `SEOUL` 등) 사용. 화면 표시용 한글 라벨 ↔ enum 변환은 `src/constants/categoryRegion.js` 참고
-- Matomo 분석 트래킹 코드(`window.dataLayer`)는 위치 변경 가능하나 제거 금지
+- **기존 이벤트 발화 제거 금지** — 이관·스키마 수정은 가능하나, 어떤 시점에 발화되던 이벤트를 없애지 않는다 (M2에서 "잘못 추가 발화되던 것"을 막는 것은 버그 수정이므로 예외).
+- **M0 확인 전에 M1 이후 작업 착수 금지** — push 대상(`_mtm` vs `dataLayer`)이 정해져야 헬퍼 구현이 확정된다.
+- SSE (`src/sse/`, `rankingApi.js`)는 실시간 연결 — 랭킹 카드 클릭 이벤트(M4) 추가 시 연결 동작 확인.
+- 트래킹 변경 검증: 브라우저 콘솔에서 `window._mtm`/`window.dataLayer` 내용 확인 + MTM 프리뷰 모드. 페이로드 캡처를 PR에 첨부.
+- 이벤트 스키마 변경(boardId→postId 등)은 Matomo 쪽 대시보드/세그먼트 설정에 영향 — 변경 목록을 PR 본문에 명시해 백엔드/분석 담당이 후속 조치할 수 있게 한다.

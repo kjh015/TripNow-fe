@@ -1,0 +1,191 @@
+/* sign 도메인: 로그인/회원가입/마이페이지 */
+
+/* ===== 로그인/회원가입/정보수정/비밀번호변경 ===== */
+/* 메인 히어로 톤 그라디언트 — 끝 색이 --page-bg라 푸터와 색이 이어짐 */
+.sign-page-bg {
+  background: var(--page-hero-gradient);
+}
+
+.sign-page-bg-full {
+  width: 100vw;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ===== 로그인 소셜 버튼 (SignInPage) ===== */
+.kakao-login-btn {
+  background: var(--kakao-yellow);
+  color: var(--kakao-label);
+  border: none;
+  font-weight: 600;
+}
+
+.kakao-login-btn:hover,
+.kakao-login-btn:focus,
+.kakao-login-btn:active {
+  background: var(--kakao-yellow-hover);
+  color: var(--kakao-label);
+}
+
+.kakao-login-symbol {
+  vertical-align: -0.2em;
+  margin-right: 0.5rem;
+}
+
+/* ===== 회원 정보수정 / 비밀번호 변경 공통 카드 ===== */
+.sign-card {
+  max-width: 420px;
+  width: 95%;
+  margin: 40px auto;
+  padding: 40px 34px 32px 34px;
+  background: rgba(255, 255, 255, 0.97);
+  border-radius: var(--radius-modal);
+  box-shadow: 0 6px 36px 0 rgba(54, 69, 79, 0.13);
+}
+
+.sign-card-title {
+  font-weight: bold;
+  font-size: 2rem;
+  background: #000000;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 30px;
+}
+
+.sign-card-input-box {
+  width: 100%;
+  margin-bottom: 22px;
+}
+
+.sign-card-btn {
+  font-weight: bold;
+  font-size: 1.07rem;
+  letter-spacing: 0.03em;
+  border-radius: var(--radius-pill);
+  margin-top: 0;
+}
+
+/* ===== 회원가입 카드 (SignUpPage) ===== */
+.signup-card {
+  max-width: 410px;
+  width: 95%;
+  margin: 3rem auto;
+  border-radius: var(--radius-modal);
+  box-shadow: 0 6px 32px 0 rgba(54, 69, 79, 0.13);
+  border: none;
+}
+
+.signup-card-title {
+  font-weight: bold;
+  font-size: 2.05rem;
+  background: #000000;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 24px;
+}
+
+.signup-submit-btn {
+  font-weight: bold;
+  font-size: 1.08rem;
+  letter-spacing: 0.03em;
+  border-radius: var(--radius-pill);
+  padding: 0.75rem;
+  margin-top: 12px;
+  background: #3f51b5;
+  border: none;
+}
+
+/* Bootstrap .btn:disabled의 투명 배경이 덮어써 흰 버튼+흰 글자가 되는 문제 방지 */
+.signup-submit-btn:disabled {
+  background-color: #3f51b5;
+  opacity: 0.5;
+}
+
+/* ===== 회원 관리 (MemberManagement) ===== */
+.sign-page-spacer {
+  margin-top: 80px;
+}
+
+/* ===== 마이페이지 (MyPage) ===== */
+.mypage-root {
+  min-height: 100vh;
+  padding-top: 110px;
+  padding-bottom: 36px;
+}
+
+.mypage-alert {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 200px;
+  z-index: var(--z-alert);
+}
+
+.mypage-modal-backdrop {
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.mypage-card {
+  background: #fffdfcf2;
+}
+
+.mypage-avatar {
+  width: 108px;
+  height: 108px;
+  object-fit: cover;
+  background: #f4f6fa;
+  border: 4px solid #e3e8ee;
+}
+
+.mypage-nickname {
+  color: #274071;
+  letter-spacing: 1px;
+}
+
+.mypage-email-value {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+  text-align: right;
+}
+
+.mypage-divider {
+  margin-top: 2rem;
+}
+
+/* ===== 마이페이지 하위 목록 (FavoriteListPage / MyPostsPage 공통) ===== */
+.mypage-list-page {
+  overflow-x: hidden;
+}
+
+.mypage-list-container {
+  max-width: 850px;
+}
+
+/* ===== 작성 댓글 목록 (MyCommentsPage) ===== */
+.mypage-comment-star {
+  font-size: 1.15rem;
+}
+
+.mypage-comment-loading {
+  margin-top: 100px;
+}
+
+.mypage-comment-page {
+  margin-top: 70px;
+}
+
+.mypage-comment-card {
+  max-width: 520px;
+  background: #fafdffcc;
+}
+
+.mypage-comment-header-gap {
+  gap: 1.1rem;
+}
+
+.mypage-comment-count {
+  font-size: 1rem;
+}

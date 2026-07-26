@@ -1,0 +1,337 @@
+/* post 도메인: 여행지 목록/상세/작성 */
+
+/* ===== 공통 ===== */
+.post-viewport {
+  min-height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.post-subtitle {
+  font-size: 1.07rem;
+}
+
+/* ===== 여행지 목록 (PostListPage) ===== */
+.post-list-page {
+  overflow-x: hidden;
+}
+
+.post-list-container {
+  max-width: 850px;
+}
+
+.post-list-divider {
+  height: 3.5px;
+  width: 60px;
+  margin: 1rem auto 5rem auto;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, #bdaafc 20%, #92e0f6 90%);
+  opacity: 0.88;
+}
+
+.post-write-btn,
+.post-write-btn:hover,
+.post-write-btn:focus,
+.post-write-btn:active {
+  background: linear-gradient(90deg, #a084ee 30%, #7c3aed 100%);
+  color: #fff;
+  border: none;
+}
+
+/* ===== 목록 카드 (PostListCard — FavoriteListPage / MyPostsPage 공통 재사용) ===== */
+.post-list-card {
+  background: var(--card-bg);
+  min-height: 88px;
+  box-shadow: var(--card-shadow);
+  position: relative;
+  transition: box-shadow 0.18s, transform 0.16s, background 0.16s, border 0.13s;
+}
+
+.post-list-card:hover,
+.post-list-card:focus {
+  box-shadow: 0 6px 24px 0 rgba(123, 82, 255, 0.14), 0 1.5px 10px rgba(60, 0, 128, 0.04);
+  border-color: #a084ee;
+  background: #faf8ff;
+  transform: translateY(-2px) scale(1.012);
+  cursor: pointer;
+}
+
+.post-list-card-title-row {
+  font-size: 1.12rem;
+  margin-bottom: 6px;
+}
+
+.post-list-card-title {
+  max-width: 75%;
+}
+
+.post-list-card-title-text {
+  color: #222;
+  font-weight: bold;
+  font-family: var(--font-display);
+}
+
+.post-list-card-date {
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.post-list-card-meta {
+  font-size: 0.97rem;
+}
+
+.post-list-card-author {
+  color: #222;
+}
+
+.post-list-card-stat {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.post-list-card-star {
+  color: #ffc107;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* ===== 검색 (PostSearch) ===== */
+.post-search-card {
+  max-width: 700px;
+  padding: 32px 36px;
+  background: var(--card-bg);
+}
+
+.post-search-input {
+  height: 40px;
+  flex-grow: 1;
+  z-index: 11;
+}
+
+.post-search-btn {
+  white-space: nowrap;
+  padding: 0.2rem 0.35rem;
+  height: 40px;
+}
+
+.post-search-suggestions {
+  position: absolute;
+  top: 44px;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 0 0 var(--radius-card-sm) var(--radius-card-sm);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  list-style: none;
+  max-height: 260px;
+  overflow-y: auto;
+  min-width: 200px;
+  transition: box-shadow 0.2s;
+}
+
+.post-search-suggestion {
+  padding: 12px 16px;
+  cursor: pointer;
+  color: #333;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: 17px;
+  transition: background 0.1s;
+}
+
+.post-search-suggestion:last-child {
+  border-bottom: none;
+}
+
+.post-search-suggestion.active {
+  background: #f8f9fa;
+  font-weight: bold;
+}
+
+.post-search-suggestion-empty {
+  padding: 12px 16px;
+  color: #bbb;
+  font-style: italic;
+}
+
+.post-search-highlight {
+  background: #ffe066;
+  padding: 0;
+}
+
+/* ===== 상세 (PostDetailPage) ===== */
+.post-detail-alert {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  z-index: var(--z-floating);
+  min-width: 260px;
+}
+
+.post-detail-container {
+  min-height: 100vh;
+  max-width: var(--container-detail-max-width);
+}
+
+.post-detail-row {
+  display: flex;
+  gap: 32px;
+  width: 95%;
+  margin: 0 auto;
+  align-items: stretch;
+}
+
+.post-detail-comment-card {
+  border-radius: var(--radius-card);
+  width: 70%;
+  min-width: 0;
+  background: var(--card-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.post-detail-comment-body {
+  flex: 1;
+}
+
+.post-detail-fab {
+  position: fixed;
+  bottom: 36px;
+  right: 48px;
+  z-index: var(--z-floating);
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px #0002;
+  font-size: 2rem;
+}
+
+/* ===== 상세 본문 (PostContent) ===== */
+.post-content-card {
+  border-radius: var(--radius-card);
+  width: 100%;
+  min-width: 0;
+  background: var(--card-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.post-content-body {
+  flex: 1;
+}
+
+.post-content-carousel {
+  max-width: 800px;
+  margin: 0 auto 24px auto;
+  border-radius: var(--radius-card-md);
+  overflow: hidden;
+  box-shadow: 0 6px 18px #0001;
+}
+
+.post-content-image {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  display: block;
+  background: #eee;
+}
+
+.post-content-badge {
+  font-size: 1rem;
+}
+
+.post-content-body-card {
+  background: #f7fafc;
+  border: none;
+}
+
+.post-content-body-text {
+  min-height: 50px;
+  font-size: 1.08rem;
+  white-space: pre-line;
+}
+
+/* ===== 작성/수정 폼 (PostForm) ===== */
+.post-form-alert {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 240px;
+  z-index: var(--z-form-alert);
+}
+
+.post-form-container {
+  max-width: var(--container-form-max-width);
+}
+
+.post-form-card {
+  background: #ffffffeb;
+}
+
+.post-form-title {
+  letter-spacing: 2px;
+}
+
+.post-form-author-label {
+  font-size: 1.08rem;
+  color: #222;
+  margin-right: 6px;
+}
+
+.post-form-author-value {
+  font-size: 1.08rem;
+  min-width: 80px;
+  display: inline-block;
+}
+
+.post-form-textarea {
+  min-height: 140px;
+}
+
+.post-form-action-btn {
+  min-width: 140px;
+  letter-spacing: 1px;
+}
+
+/* ===== 이미지 첨부 (PostWritePage / PostEditPage) ===== */
+.post-image-hint {
+  font-size: 0.95em;
+}
+
+.post-image-preview {
+  width: var(--thumbnail-size);
+  height: var(--thumbnail-size);
+  object-fit: cover;
+  border-radius: var(--radius-thumbnail);
+  border: 1px solid #eee;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.post-image-remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border-radius: 50%;
+  padding: 2px 7px;
+  font-size: 1.05rem;
+}
+
+/* ===== 찜(하트) 버튼 (PostContent) ===== */
+.heart-btn {
+  font-size: 1.7rem;
+  color: #b0b0b0;
+  transition: color 0.15s;
+}
+
+.heart-btn.liked,
+.heart-btn:hover {
+  color: #e64980 !important;
+}

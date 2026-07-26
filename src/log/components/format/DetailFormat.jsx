@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { getFormatRule, updateFormatRule, deleteFormatRule } from '../../../api/log/formatApi';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const
-    DetailFormat = ({ onClose, formatId, showAlert }) => {
+    DetailFormat = ({ onClose, formatId }) => {
         const [defaultEntry, setDefaultEntry] = useState([{ key: '', value: '' }]);
         const [formatEntry, setFormatEntry] = useState([{ key: '', value: '' }]);
         const [name, setName] = useState('');
@@ -35,7 +34,7 @@ const
                 setName(result.name);
                 setActive(result.isActive);
             } catch {
-                showAlert("danger", "포맷 정보를 불러오지 못했습니다.");
+                toast.error("포맷 정보를 불러오지 못했습니다.");
             }
         };
 
@@ -43,10 +42,10 @@ const
         const removeFormat = async () => {
             try {
                 await deleteFormatRule(formatId);
-                showAlert("danger", "포맷 삭제 성공!");
+                toast.success("포맷 삭제 성공!");
                 onClose();
             } catch {
-                showAlert("danger", "포맷 삭제 실패");
+                toast.error("포맷 삭제 실패");
             }
         };
 
@@ -66,10 +65,10 @@ const
 
             try {
                 await updateFormatRule(formatId, { name, isActive: active, defaultValues, fieldMappings });
-                showAlert("success", "포맷 수정 성공!");
+                toast.success("포맷 수정 성공!");
                 onClose();
             } catch {
-                showAlert("danger", "포맷 수정 실패");
+                toast.error("포맷 수정 실패");
             }
         };
 
@@ -79,24 +78,14 @@ const
         }, []);
 
         return (
-            <div style={{
-                padding: '24px',
-                borderRadius: '12px',
-                maxWidth: '900px',
-                margin: '30px auto',
-                background: '#fff',
-                boxShadow: '0 2px 10px #eee'
-            }}>
-                <h2 className="mb-4">포맷 상세 화면</h2>
+            <div className="log-format-detail-container">
+                <h4 className="mb-4 admin-detail-title">포맷 상세</h4>
                 <form onSubmit={handleSubmit}>
-                    <div className="mb-4">
-                        <label className="fw-bold mb-2">포맷 이름</label>
-                    </div>
-                    <div>
+                    <div className="mb-4 text-start">
+                        <label className="form-label fw-semibold">포맷 이름</label>
                         <input
                             type="text"
-                            style={{ width: "415px", transform: "translateY(-28px)" }}
-                            className="form-control-center"
+                            className="form-control log-format-detail-name-input"
                             placeholder="format name"
                             value={name}
                             onChange={e => setName(e.target.value)}
@@ -106,7 +95,7 @@ const
                     <div className="row">
                         {/* Default Entry */}
                         <div className="col-md-6 mb-3">
-                            <div className="border rounded p-3 h-100">
+                            <div className="admin-section-box p-3 h-100">
                                 <h5 className="mb-3">기본 정보</h5>
                                 {defaultEntry.map((entry, index) => (
                                     <div key={`default-${index}`} className="d-flex align-items-center mb-2">
@@ -117,8 +106,7 @@ const
                                             onChange={e =>
                                                 handleEntryChange(setDefaultEntry, defaultEntry, index, 'key', e.target.value)
                                             }
-                                            className="form-control me-2"
-                                            style={{ flex: '1' }}
+                                            className="form-control me-2 log-format-flex-1"
                                         />
                                         <input
                                             type="text"
@@ -127,12 +115,11 @@ const
                                             onChange={e =>
                                                 handleEntryChange(setDefaultEntry, defaultEntry, index, 'value', e.target.value)
                                             }
-                                            className="form-control me-2"
-                                            style={{ flex: '2' }}
+                                            className="form-control me-2 log-format-flex-2"
                                         />
                                         <button
                                             type="button"
-                                            className="btn btn-danger"
+                                            className="btn admin-btn-icon admin-btn-danger"
                                             onClick={() => removeEntry(setDefaultEntry, defaultEntry, index)}
                                         >✕</button>
                                     </div>
@@ -140,13 +127,13 @@ const
                                 <button
                                     type="button"
                                     onClick={() => addEntry(setDefaultEntry, defaultEntry)}
-                                    className="btn btn-outline-success mt-2"
+                                    className="btn admin-btn admin-btn-outline admin-btn-sm mt-2"
                                 >+ 항목 추가</button>
                             </div>
                         </div>
                         {/* Format Entry */}
                         <div className="col-md-6 mb-3">
-                            <div className="border rounded p-3 h-100">
+                            <div className="admin-section-box p-3 h-100">
                                 <h5 className="mb-3">포맷 정보</h5>
                                 {formatEntry.map((entry, index) => (
                                     <div key={`format-${index}`} className="d-flex align-items-center mb-2">
@@ -157,8 +144,7 @@ const
                                             onChange={e =>
                                                 handleEntryChange(setFormatEntry, formatEntry, index, 'key', e.target.value)
                                             }
-                                            className="form-control me-2"
-                                            style={{ flex: '1' }}
+                                            className="form-control me-2 log-format-flex-1"
                                         />
                                         <span className="mx-1">⬅</span>
                                         <input
@@ -168,12 +154,11 @@ const
                                             onChange={e =>
                                                 handleEntryChange(setFormatEntry, formatEntry, index, 'value', e.target.value)
                                             }
-                                            className="form-control me-2"
-                                            style={{ flex: '2' }}
+                                            className="form-control me-2 log-format-flex-2"
                                         />
                                         <button
                                             type="button"
-                                            className="btn btn-danger"
+                                            className="btn admin-btn-icon admin-btn-danger"
                                             onClick={() => removeEntry(setFormatEntry, formatEntry, index)}
                                         >✕</button>
                                     </div>
@@ -181,26 +166,24 @@ const
                                 <button
                                     type="button"
                                     onClick={() => addEntry(setFormatEntry, formatEntry)}
-                                    className="btn btn-outline-success mt-2"
+                                    className="btn admin-btn admin-btn-outline admin-btn-sm mt-2"
                                 >+ 항목 추가</button>
                             </div>
                         </div>
                     </div>
                     {/* 하단 버튼 */}
-                    <div className="mt-4 d-flex justify-content-between align-items-center">
-                        <div className="d-flex align-items-center">
-                            <button
-                                className={`btn btn-sm ${active ? 'btn-success' : 'btn-outline-success'}`}
-                                onClick={() => setActive(!active)}
-                                type="button"
-                            >
-                                활성화: {active ? "On" : "Off"}
-                            </button>
-                        </div>
-                        <div>
-                            <button type="submit" className="btn btn-primary me-2">수정</button>
-                            <button type="button" onClick={removeFormat} className="btn btn-danger me-2">삭제</button>
-                            <button type="button" onClick={onClose} className="btn btn-outline-secondary">닫기</button>
+                    <div className="admin-form-footer">
+                        <button
+                            className={`btn btn-sm admin-toggle ${active ? 'admin-toggle-on' : 'admin-toggle-off'}`}
+                            onClick={() => setActive(!active)}
+                            type="button"
+                        >
+                            활성화: {active ? "ON" : "OFF"}
+                        </button>
+                        <div className="admin-form-footer-actions">
+                            <button type="submit" className="btn admin-btn admin-btn-primary">수정</button>
+                            <button type="button" onClick={removeFormat} className="btn admin-btn admin-btn-danger">삭제</button>
+                            <button type="button" onClick={onClose} className="btn admin-btn admin-btn-outline">닫기</button>
                         </div>
                     </div>
                 </form>
