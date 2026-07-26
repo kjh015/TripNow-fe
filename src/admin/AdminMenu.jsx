@@ -8,7 +8,7 @@ const MENU_ITEMS = [
     { key: 'member', label: '회원 관리', icon: <FaUsers /> },
     { key: 'process', label: '프로세스 관리', icon: <FaCogs /> },
     { key: 'log', label: '로그 DB', icon: <FaDatabase /> },
-    { key: 'monitoring', label: 'Monitoring', icon: <FaChartLine /> },
+    { key: 'monitoring', label: '모니터링', icon: <FaChartLine /> },
 ];
 
 const AdminMenu = ({ onMenuClick, activeMenu }) => {
@@ -25,12 +25,6 @@ const AdminMenu = ({ onMenuClick, activeMenu }) => {
                     {item.label}
                 </button>
             ))}
-            {/* <button className="list-group-item list-group-item-action" onClick={() => window.open(process.env.REACT_APP_MATOMO_URL)}>
-                Matomo
-            </button>
-            <button className="list-group-item list-group-item-action" onClick={() => window.open('http://14.63.178.160:8085')}>
-                Kibana
-            </button> */}
         </div>
     );
 };

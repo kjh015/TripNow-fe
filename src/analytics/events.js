@@ -5,7 +5,9 @@ import { pushEvent, toAgeGroup } from "./analytics";
  * - 이벤트명은 반드시 이 상수로만 사용한다 (문자열 리터럴 금지).
  * - 트래커 함수는 이벤트당 1개. 페이로드 조립은 전부 이 파일 안에서 하고,
  *   호출부는 항상 1줄 호출만 한다.
- * - 공통 필드(isLoggedIn, userId)는 pushEvent가 자동 주입하므로 여기서 넣지 않는다.
+ * - 공통 필드(isLoggedIn, userId)는 pushEvent가 자동 주입하고,
+ *   processId(로그 파이프라인 프로세스 id)는 아래 EVENT_PROCESS_IDS 매핑으로
+ *   pushCatalogEvent가 자동 주입하므로 트래커에서 직접 넣지 않는다.
  * - 값이 없으면 null을 보낸다 ("없음" 같은 매직 문자열 금지).
  */
 export const EVENT_NAMES = {
@@ -28,6 +30,48 @@ export const EVENT_NAMES = {
   RANKING_CLICK: "travel_ranking_click",
   ERROR: "travel_error",
 };
+
+/**
+ * 로그 파이프라인 프로세스 ID. 백엔드 로그 관리 시스템의 log-processes와 1:1 대응한다.
+ * 백엔드에서 프로세스를 재생성해 id가 바뀌면 이 상수만 갱신한다.
+ */
+export const LOG_PROCESS_IDS = {
+  VIEW: 5, // travel-view: 조회/체류
+  SEARCH: 6, // travel-search: 검색 (search_click·search_result — e_n=keyword, e_v=resultCount)
+  ACTION: 7, // travel-action: 전환/액션
+  ERROR: 8, // travel-error: 에러
+  LIST_CLICK: 9, // travel-list-click: 검색 결과 카드 클릭 (e_v=position이라 travel-search에서 분리)
+  RANKING: 10, // travel-ranking: 메인 랭킹 카드 클릭 (e_n=label·e_v=rank라 travel-search에서 분리)
+};
+
+/** 이벤트 → 로그 프로세스 매핑. 이벤트를 추가하면 여기에도 반드시 등록한다. */
+const EVENT_PROCESS_IDS = {
+  [EVENT_NAMES.MAIN_VIEW]: LOG_PROCESS_IDS.VIEW,
+  [EVENT_NAMES.DETAIL_PAGEVIEW]: LOG_PROCESS_IDS.VIEW,
+  [EVENT_NAMES.DETAIL_EXIT]: LOG_PROCESS_IDS.VIEW,
+  [EVENT_NAMES.SEARCH_CLICK]: LOG_PROCESS_IDS.SEARCH,
+  [EVENT_NAMES.SEARCH_RESULT]: LOG_PROCESS_IDS.SEARCH,
+  [EVENT_NAMES.LIST_ITEM_CLICK]: LOG_PROCESS_IDS.LIST_CLICK,
+  [EVENT_NAMES.RANKING_CLICK]: LOG_PROCESS_IDS.RANKING,
+  [EVENT_NAMES.SIGNUP_COMPLETE]: LOG_PROCESS_IDS.ACTION,
+  [EVENT_NAMES.LOGIN]: LOG_PROCESS_IDS.ACTION,
+  [EVENT_NAMES.LOGIN_FAIL]: LOG_PROCESS_IDS.ACTION,
+  [EVENT_NAMES.POST_ADD]: LOG_PROCESS_IDS.ACTION,
+  [EVENT_NAMES.POST_UPDATE]: LOG_PROCESS_IDS.ACTION,
+  [EVENT_NAMES.POST_REMOVE]: LOG_PROCESS_IDS.ACTION,
+  [EVENT_NAMES.FAVORITE_ADD]: LOG_PROCESS_IDS.ACTION,
+  [EVENT_NAMES.FAVORITE_REMOVE]: LOG_PROCESS_IDS.ACTION,
+  [EVENT_NAMES.COMMENT_ADD]: LOG_PROCESS_IDS.ACTION,
+  [EVENT_NAMES.COMMENT_REMOVE]: LOG_PROCESS_IDS.ACTION,
+  [EVENT_NAMES.ERROR]: LOG_PROCESS_IDS.ERROR,
+};
+
+/**
+ * processId를 주입해 push한다. 이 파일의 모든 트래커는 pushEvent 대신 이 함수를 쓴다.
+ * 매핑에 없는 이벤트는 null로 보내 파이프라인 미등록 이벤트를 드러낸다.
+ */
+const pushCatalogEvent = (eventName, payload = {}) =>
+  pushEvent(eventName, { processId: EVENT_PROCESS_IDS[eventName] ?? null, ...payload });
 
 /** 게시글 ID는 항상 number로 보낸다. 캐스팅 불가하면 null. */
 const toPostId = (value) => {
@@ -53,7 +97,7 @@ const buildPostPayload = (post) => ({
  * 페이로드: 없음 (visit_time·referrer는 Matomo 기본 수집과 중복이라 보내지 않는다)
  */
 export const trackMainView = () => {
-  pushEvent(EVENT_NAMES.MAIN_VIEW);
+  pushCatalogEvent(EVENT_NAMES.MAIN_VIEW);
 };
 
 /**
@@ -62,7 +106,7 @@ export const trackMainView = () => {
  * 페이로드: category(string|null), region(string|null), keyword(string|null)
  */
 export const trackSearchClick = ({ category, region, keyword }) => {
-  pushEvent(EVENT_NAMES.SEARCH_CLICK, {
+  pushCatalogEvent(EVENT_NAMES.SEARCH_CLICK, {
     category: orNull(category),
     region: orNull(region),
     keyword: orNull(keyword),
@@ -75,7 +119,7 @@ export const trackSearchClick = ({ category, region, keyword }) => {
  * 페이로드: postId(number|null), category, region, title
  */
 export const trackDetailPageview = (post) => {
-  pushEvent(EVENT_NAMES.DETAIL_PAGEVIEW, buildPostPayload(post));
+  pushCatalogEvent(EVENT_NAMES.DETAIL_PAGEVIEW, buildPostPayload(post));
 };
 
 /**
@@ -84,7 +128,7 @@ export const trackDetailPageview = (post) => {
  * 페이로드: postId(number|null), staySeconds(number), title
  */
 export const trackDetailExit = ({ postId, staySeconds, title }) => {
-  pushEvent(EVENT_NAMES.DETAIL_EXIT, { postId: toPostId(postId), staySeconds, title: orNull(title) });
+  pushCatalogEvent(EVENT_NAMES.DETAIL_EXIT, { postId: toPostId(postId), staySeconds, title: orNull(title) });
 };
 
 /**
@@ -93,7 +137,7 @@ export const trackDetailExit = ({ postId, staySeconds, title }) => {
  * 페이로드: postId(number|null), category, region, title
  */
 export const trackFavoriteAdd = (post) => {
-  pushEvent(EVENT_NAMES.FAVORITE_ADD, buildPostPayload(post));
+  pushCatalogEvent(EVENT_NAMES.FAVORITE_ADD, buildPostPayload(post));
 };
 
 /**
@@ -102,7 +146,7 @@ export const trackFavoriteAdd = (post) => {
  * 페이로드: postId(number|null), category, region, title
  */
 export const trackFavoriteRemove = (post) => {
-  pushEvent(EVENT_NAMES.FAVORITE_REMOVE, buildPostPayload(post));
+  pushCatalogEvent(EVENT_NAMES.FAVORITE_REMOVE, buildPostPayload(post));
 };
 
 /**
@@ -111,7 +155,7 @@ export const trackFavoriteRemove = (post) => {
  * 페이로드: postId(number|null), category, region, title, star(number|null — 별점 1~5)
  */
 export const trackCommentAdd = ({ postId, category, region, title, star }) => {
-  pushEvent(EVENT_NAMES.COMMENT_ADD, {
+  pushCatalogEvent(EVENT_NAMES.COMMENT_ADD, {
     ...buildPostPayload({ postId, category, region, title }),
     star: Number.isFinite(Number(star)) && star !== null && star !== "" ? Number(star) : null,
   });
@@ -123,7 +167,7 @@ export const trackCommentAdd = ({ postId, category, region, title, star }) => {
  * 페이로드: postId(number|null), category, region, title
  */
 export const trackCommentRemove = ({ postId, category, region, title }) => {
-  pushEvent(EVENT_NAMES.COMMENT_REMOVE, buildPostPayload({ postId, category, region, title }));
+  pushCatalogEvent(EVENT_NAMES.COMMENT_REMOVE, buildPostPayload({ postId, category, region, title }));
 };
 
 /** 생년월일(yyyy-MM-dd)로 만 나이를 계산한다. 파싱 불가하면 null. */
@@ -146,7 +190,7 @@ const toAgeFromBirthDate = (birthDate) => {
  * 페이로드: gender(string|null), ageGroup(string|null — 예: "20대")
  */
 export const trackSignupComplete = ({ gender, birthDate }) => {
-  pushEvent(EVENT_NAMES.SIGNUP_COMPLETE, {
+  pushCatalogEvent(EVENT_NAMES.SIGNUP_COMPLETE, {
     gender: orNull(gender),
     ageGroup: toAgeGroup(toAgeFromBirthDate(birthDate)),
   });
@@ -158,7 +202,7 @@ export const trackSignupComplete = ({ gender, birthDate }) => {
  * 페이로드: role("admin"|"user")
  */
 export const trackLogin = ({ role }) => {
-  pushEvent(EVENT_NAMES.LOGIN, { role: orNull(role) });
+  pushCatalogEvent(EVENT_NAMES.LOGIN, { role: orNull(role) });
 };
 
 /**
@@ -167,7 +211,7 @@ export const trackLogin = ({ role }) => {
  * 페이로드: 없음 (공통 필드만)
  */
 export const trackLoginFail = () => {
-  pushEvent(EVENT_NAMES.LOGIN_FAIL);
+  pushCatalogEvent(EVENT_NAMES.LOGIN_FAIL);
 };
 
 /**
@@ -176,7 +220,7 @@ export const trackLoginFail = () => {
  * 페이로드: postId(number|null — 생성 응답에서 확보), category, region (코드값)
  */
 export const trackPostAdd = ({ postId, category, region }) => {
-  pushEvent(EVENT_NAMES.POST_ADD, {
+  pushCatalogEvent(EVENT_NAMES.POST_ADD, {
     postId: toPostId(postId),
     category: orNull(category),
     region: orNull(region),
@@ -189,7 +233,7 @@ export const trackPostAdd = ({ postId, category, region }) => {
  * 페이로드: postId(number|null), category, region (코드값)
  */
 export const trackPostUpdate = ({ postId, category, region }) => {
-  pushEvent(EVENT_NAMES.POST_UPDATE, {
+  pushCatalogEvent(EVENT_NAMES.POST_UPDATE, {
     postId: toPostId(postId),
     category: orNull(category),
     region: orNull(region),
@@ -202,7 +246,7 @@ export const trackPostUpdate = ({ postId, category, region }) => {
  * 페이로드: postId(number|null), category, region (코드값)
  */
 export const trackPostRemove = ({ postId, category, region }) => {
-  pushEvent(EVENT_NAMES.POST_REMOVE, {
+  pushCatalogEvent(EVENT_NAMES.POST_REMOVE, {
     postId: toPostId(postId),
     category: orNull(category),
     region: orNull(region),
@@ -216,7 +260,7 @@ export const trackPostRemove = ({ postId, category, region }) => {
  * 페이로드: keyword, category, region, resultCount(number — 전체 건수, 서버가 안 주면 현재 페이지 건수)
  */
 export const trackSearchResult = ({ keyword, category, region, resultCount }) => {
-  pushEvent(EVENT_NAMES.SEARCH_RESULT, {
+  pushCatalogEvent(EVENT_NAMES.SEARCH_RESULT, {
     keyword: orNull(keyword),
     category: orNull(category),
     region: orNull(region),
@@ -230,7 +274,7 @@ export const trackSearchResult = ({ keyword, category, region, resultCount }) =>
  * 페이로드: postId(number|null), position(number — 현재 페이지 내 순번, 1부터), keyword
  */
 export const trackListItemClick = ({ postId, position, keyword }) => {
-  pushEvent(EVENT_NAMES.LIST_ITEM_CLICK, {
+  pushCatalogEvent(EVENT_NAMES.LIST_ITEM_CLICK, {
     postId: toPostId(postId),
     position,
     keyword: orNull(keyword),
@@ -244,7 +288,7 @@ export const trackListItemClick = ({ postId, position, keyword }) => {
  *           label(string|null — post는 제목, region/category는 코드값), postId(number|null — post일 때만)
  */
 export const trackRankingClick = ({ rankType, rank, label, postId }) => {
-  pushEvent(EVENT_NAMES.RANKING_CLICK, {
+  pushCatalogEvent(EVENT_NAMES.RANKING_CLICK, {
     rankType,
     rank: Number.isFinite(Number(rank)) && rank !== null && rank !== undefined ? Number(rank) : null,
     label: orNull(label),
@@ -259,7 +303,7 @@ export const trackRankingClick = ({ rankType, rank, label, postId }) => {
  * 페이로드: errorType("render"|"api"), message(string|null), path(string — window.location.pathname)
  */
 export const trackError = ({ errorType, message, path }) => {
-  pushEvent(EVENT_NAMES.ERROR, {
+  pushCatalogEvent(EVENT_NAMES.ERROR, {
     errorType: orNull(errorType),
     message: orNull(message),
     path: orNull(path),

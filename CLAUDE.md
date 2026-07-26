@@ -98,6 +98,8 @@ src/analytics/
 | `travel_error` | 렌더 크래시 / 목록 로드 실패(에러 화면 노출) | `trackError` / `src/components/ErrorBoundary.jsx`(render) · `src/post/pages/PostListPage.jsx`(api) | errorType("render"\|"api"), message, path | 사용자 체감 장애 |
 
 > 공통 필드(`isLoggedIn`, `userId`)는 `pushEvent`가 모든 이벤트에 자동 주입하므로 표에서 생략.
+> `processId`(로그 파이프라인 프로세스 id)도 표에서 생략 — `events.js`의 `EVENT_PROCESS_IDS` 매핑(조회/체류 5 `travel-view`, 검색 6 `travel-search`, 전환/액션 7 `travel-action`, 에러 8 `travel-error`, 검색 결과 카드 클릭 9 `travel-list-click`, 랭킹 클릭 10 `travel-ranking`)으로 `pushCatalogEvent`가 자동 주입한다. 백엔드 로그 프로세스 id가 바뀌면 `events.js`의 `LOG_PROCESS_IDS` 상수만 갱신.
+> 프로세스 분리 기준: Matomo `e_n`/`e_v` 슬롯 의미가 프로세스 내에서 동일해야 Format 규칙이 성립한다 — `list_item_click`(e_v=position)과 `ranking_click`(e_n=label, e_v=rank)은 이 이유로 `travel-search`(e_n=keyword, e_v=resultCount)에서 분리됨.
 
 ---
 
@@ -257,6 +259,10 @@ REACT_APP_IMAGE_BASE_URL=<이미지 베이스 URL>
 # Matomo
 REACT_APP_MATOMO_URL=http://localhost:9080
 REACT_APP_MATOMO_CONTAINER_ID=<MTM 컨테이너 ID>   # 예) container_2yv5mH8U — 미설정 시 컨테이너 삽입 스킵 (M3에서 도입, fallback 없음)
+
+# Kibana (관리자 > 모니터링 화면 임베드)
+REACT_APP_KIBANA_URL=http://localhost:8085
+REACT_APP_KIBANA_DASHBOARD_ID=<대시보드 UUID>      # 둘 중 하나라도 없으면 iframe 대신 설정 안내 노출 (fallback 없음)
 
 # 앱
 REACT_APP_APP_NAME=TripNow

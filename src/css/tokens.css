@@ -46,6 +46,7 @@
 
   /* 타이포그래피 */
   --font-display: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Malgun Gothic', sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   --page-title-color: #6c45e0;
 
   /* 소셜 로그인 — 카카오 브랜드 가이드 고정 색상 (임의 변경 금지) */
