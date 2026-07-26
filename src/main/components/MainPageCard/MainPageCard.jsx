@@ -86,6 +86,7 @@ const MainPageCard = ({ variant = 'primary', rank, postId, score, data, type }) 
               {/* start prop을 주면 react-countup이 렌더 중 ref가 붙기 전 인스턴스를 생성해 크래시 — preserveValue가 이전 값 유지를 담당 */}
               <CountUp
                 end={score ?? 0}
+                decimals={1}
                 duration={0.5}
                 separator=","
                 preserveValue // 리렌더링 중간값 유지
@@ -137,6 +138,7 @@ const MainPageCard = ({ variant = 'primary', rank, postId, score, data, type }) 
                 {/* start prop을 주면 react-countup이 렌더 중 ref가 붙기 전 인스턴스를 생성해 크래시 — preserveValue가 이전 값 유지를 담당 */}
                 <CountUp
                   end={score ?? 0}
+                  decimals={1}
                   duration={0.5}
                   separator=","
                   preserveValue // 리렌더링 중간값 유지

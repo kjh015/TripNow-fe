@@ -25,7 +25,7 @@ const CategoryRegionRankingCards = ({ top5Data }) => {
                     </div>
                     <div className="mainpage-ranking-cards-badge">
                         <span>
-                            Score: {data.score}
+                            Score: {data.score?.toFixed(1) ?? 0}
                         </span>
                     </div>
                 </div>
