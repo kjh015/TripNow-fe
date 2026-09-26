@@ -1,4 +1,5 @@
 import { pushEvent, toAgeGroup } from "./analytics";
+import { CATEGORY_LABEL_TO_CODE, REGION_LABEL_TO_CODE } from "../constants/categoryRegion";
 
 /**
  * 이벤트 카탈로그.
@@ -6,7 +7,7 @@ import { pushEvent, toAgeGroup } from "./analytics";
  * - 트래커 함수는 이벤트당 1개. 페이로드 조립은 전부 이 파일 안에서 하고,
  *   호출부는 항상 1줄 호출만 한다.
  * - 공통 필드(isLoggedIn, userId)는 pushEvent가 자동 주입하고,
- *   processId(로그 파이프라인 프로세스 id)는 아래 EVENT_PROCESS_IDS 매핑으로
+ *   processCode(로그 파이프라인 프로세스 코드)는 아래 EVENT_PROCESS_CODES 매핑으로
  *   pushCatalogEvent가 자동 주입하므로 트래커에서 직접 넣지 않는다.
  * - 값이 없으면 null을 보낸다 ("없음" 같은 매직 문자열 금지).
  */
@@ -32,46 +33,46 @@ export const EVENT_NAMES = {
 };
 
 /**
- * 로그 파이프라인 프로세스 ID. 백엔드 로그 관리 시스템의 log-processes와 1:1 대응한다.
- * 백엔드에서 프로세스를 재생성해 id가 바뀌면 이 상수만 갱신한다.
+ * 로그 파이프라인 프로세스 코드. 백엔드 log_process 테이블의 name과 1:1 대응한다.
+ * ID가 아니라 이름을 보내는 이유는 ID가 DB가 발급하는 값이라 환경마다 달라지기 때문이다.
  */
-export const LOG_PROCESS_IDS = {
-  VIEW: 5, // travel-view: 조회/체류
-  SEARCH: 6, // travel-search: 검색 (search_click·search_result — e_n=keyword, e_v=resultCount)
-  ACTION: 7, // travel-action: 전환/액션
-  ERROR: 8, // travel-error: 에러
-  LIST_CLICK: 9, // travel-list-click: 검색 결과 카드 클릭 (e_v=position이라 travel-search에서 분리)
-  RANKING: 10, // travel-ranking: 메인 랭킹 카드 클릭 (e_n=label·e_v=rank라 travel-search에서 분리)
+export const LOG_PROCESS_CODES = {
+  VIEW: "View", // 조회/체류
+  SEARCH: "Search", // 검색 (search_click·search_result — e_n=keyword, e_v=resultCount)
+  ACTION: "Action", // 전환/액션
+  ERROR: "Error", // 에러
+  LIST_CLICK: "ListClick", // 검색 결과 카드 클릭 (e_v=position이라 Search에서 분리)
+  RANKING: "Ranking", // 메인 랭킹 카드 클릭 (e_n=label·e_v=rank라 Search에서 분리)
 };
 
 /** 이벤트 → 로그 프로세스 매핑. 이벤트를 추가하면 여기에도 반드시 등록한다. */
-const EVENT_PROCESS_IDS = {
-  [EVENT_NAMES.MAIN_VIEW]: LOG_PROCESS_IDS.VIEW,
-  [EVENT_NAMES.DETAIL_PAGEVIEW]: LOG_PROCESS_IDS.VIEW,
-  [EVENT_NAMES.DETAIL_EXIT]: LOG_PROCESS_IDS.VIEW,
-  [EVENT_NAMES.SEARCH_CLICK]: LOG_PROCESS_IDS.SEARCH,
-  [EVENT_NAMES.SEARCH_RESULT]: LOG_PROCESS_IDS.SEARCH,
-  [EVENT_NAMES.LIST_ITEM_CLICK]: LOG_PROCESS_IDS.LIST_CLICK,
-  [EVENT_NAMES.RANKING_CLICK]: LOG_PROCESS_IDS.RANKING,
-  [EVENT_NAMES.SIGNUP_COMPLETE]: LOG_PROCESS_IDS.ACTION,
-  [EVENT_NAMES.LOGIN]: LOG_PROCESS_IDS.ACTION,
-  [EVENT_NAMES.LOGIN_FAIL]: LOG_PROCESS_IDS.ACTION,
-  [EVENT_NAMES.POST_ADD]: LOG_PROCESS_IDS.ACTION,
-  [EVENT_NAMES.POST_UPDATE]: LOG_PROCESS_IDS.ACTION,
-  [EVENT_NAMES.POST_REMOVE]: LOG_PROCESS_IDS.ACTION,
-  [EVENT_NAMES.FAVORITE_ADD]: LOG_PROCESS_IDS.ACTION,
-  [EVENT_NAMES.FAVORITE_REMOVE]: LOG_PROCESS_IDS.ACTION,
-  [EVENT_NAMES.COMMENT_ADD]: LOG_PROCESS_IDS.ACTION,
-  [EVENT_NAMES.COMMENT_REMOVE]: LOG_PROCESS_IDS.ACTION,
-  [EVENT_NAMES.ERROR]: LOG_PROCESS_IDS.ERROR,
+const EVENT_PROCESS_CODES = {
+  [EVENT_NAMES.MAIN_VIEW]: LOG_PROCESS_CODES.VIEW,
+  [EVENT_NAMES.DETAIL_PAGEVIEW]: LOG_PROCESS_CODES.VIEW,
+  [EVENT_NAMES.DETAIL_EXIT]: LOG_PROCESS_CODES.VIEW,
+  [EVENT_NAMES.SEARCH_CLICK]: LOG_PROCESS_CODES.SEARCH,
+  [EVENT_NAMES.SEARCH_RESULT]: LOG_PROCESS_CODES.SEARCH,
+  [EVENT_NAMES.LIST_ITEM_CLICK]: LOG_PROCESS_CODES.LIST_CLICK,
+  [EVENT_NAMES.RANKING_CLICK]: LOG_PROCESS_CODES.RANKING,
+  [EVENT_NAMES.SIGNUP_COMPLETE]: LOG_PROCESS_CODES.ACTION,
+  [EVENT_NAMES.LOGIN]: LOG_PROCESS_CODES.ACTION,
+  [EVENT_NAMES.LOGIN_FAIL]: LOG_PROCESS_CODES.ACTION,
+  [EVENT_NAMES.POST_ADD]: LOG_PROCESS_CODES.ACTION,
+  [EVENT_NAMES.POST_UPDATE]: LOG_PROCESS_CODES.ACTION,
+  [EVENT_NAMES.POST_REMOVE]: LOG_PROCESS_CODES.ACTION,
+  [EVENT_NAMES.FAVORITE_ADD]: LOG_PROCESS_CODES.ACTION,
+  [EVENT_NAMES.FAVORITE_REMOVE]: LOG_PROCESS_CODES.ACTION,
+  [EVENT_NAMES.COMMENT_ADD]: LOG_PROCESS_CODES.ACTION,
+  [EVENT_NAMES.COMMENT_REMOVE]: LOG_PROCESS_CODES.ACTION,
+  [EVENT_NAMES.ERROR]: LOG_PROCESS_CODES.ERROR,
 };
 
 /**
- * processId를 주입해 push한다. 이 파일의 모든 트래커는 pushEvent 대신 이 함수를 쓴다.
+ * processCode를 주입해 push한다. 이 파일의 모든 트래커는 pushEvent 대신 이 함수를 쓴다.
  * 매핑에 없는 이벤트는 null로 보내 파이프라인 미등록 이벤트를 드러낸다.
  */
 const pushCatalogEvent = (eventName, payload = {}) =>
-  pushEvent(eventName, { processId: EVENT_PROCESS_IDS[eventName] ?? null, ...payload });
+  pushEvent(eventName, { processCode: EVENT_PROCESS_CODES[eventName] ?? null, ...payload });
 
 /** 게시글 ID는 항상 number로 보낸다. 캐스팅 불가하면 null. */
 const toPostId = (value) => {
@@ -83,11 +84,19 @@ const toPostId = (value) => {
 /** 빈 문자열/undefined를 null로 통일한다. */
 const orNull = (value) => (value ? value : null);
 
+/**
+ * 분류 값은 항상 코드값(FESTIVAL, BUSAN 등)으로 보낸다.
+ * 검색 화면은 한글 라벨을, API 응답·메인 랭킹 링크는 코드값을 쓰므로 호출부마다 표기가 다르다.
+ * 라벨이면 코드로 바꾸고, 이미 코드이거나 매핑에 없는 값은 그대로 둔다.
+ */
+const toCategoryCode = (value) => orNull(CATEGORY_LABEL_TO_CODE[value] ?? value);
+const toRegionCode = (value) => orNull(REGION_LABEL_TO_CODE[value] ?? value);
+
 /** 게시글 계열 이벤트의 공통 페이로드. */
 const buildPostPayload = (post) => ({
   postId: toPostId(post.postId),
-  category: orNull(post.category),
-  region: orNull(post.region),
+  category: toCategoryCode(post.category),
+  region: toRegionCode(post.region),
   title: orNull(post.title),
 });
 
@@ -103,12 +112,13 @@ export const trackMainView = () => {
 /**
  * 검색 버튼 클릭 시 발화.
  * 호출 위치: src/post/components/PostSearch.jsx
- * 페이로드: category(string|null), region(string|null), keyword(string|null)
+ * 페이로드: category(코드값|null), region(코드값|null), keyword(string|null)
+ *   — 검색 화면은 한글 라벨을 들고 있으므로 여기서 코드값으로 바꾼다.
  */
 export const trackSearchClick = ({ category, region, keyword }) => {
   pushCatalogEvent(EVENT_NAMES.SEARCH_CLICK, {
-    category: orNull(category),
-    region: orNull(region),
+    category: toCategoryCode(category),
+    region: toRegionCode(region),
     keyword: orNull(keyword),
   });
 };
@@ -116,7 +126,7 @@ export const trackSearchClick = ({ category, region, keyword }) => {
 /**
  * 게시글 상세 데이터 로드 후 발화.
  * 호출 위치: src/post/pages/PostDetailPage.jsx
- * 페이로드: postId(number|null), category, region, title
+ * 페이로드: postId(number|null), category(코드값), region(코드값), title
  */
 export const trackDetailPageview = (post) => {
   pushCatalogEvent(EVENT_NAMES.DETAIL_PAGEVIEW, buildPostPayload(post));
@@ -134,7 +144,7 @@ export const trackDetailExit = ({ postId, staySeconds, title }) => {
 /**
  * 찜 추가 성공 시 발화.
  * 호출 위치: src/post/pages/PostDetailPage.jsx
- * 페이로드: postId(number|null), category, region, title
+ * 페이로드: postId(number|null), category(코드값), region(코드값), title
  */
 export const trackFavoriteAdd = (post) => {
   pushCatalogEvent(EVENT_NAMES.FAVORITE_ADD, buildPostPayload(post));
@@ -143,7 +153,7 @@ export const trackFavoriteAdd = (post) => {
 /**
  * 찜 삭제 성공 시 발화.
  * 호출 위치: src/post/pages/PostDetailPage.jsx
- * 페이로드: postId(number|null), category, region, title
+ * 페이로드: postId(number|null), category(코드값), region(코드값), title
  */
 export const trackFavoriteRemove = (post) => {
   pushCatalogEvent(EVENT_NAMES.FAVORITE_REMOVE, buildPostPayload(post));
@@ -152,7 +162,7 @@ export const trackFavoriteRemove = (post) => {
 /**
  * 댓글 등록 시 발화.
  * 호출 위치: src/comment/components/CommentPage.jsx
- * 페이로드: postId(number|null), category, region, title, star(number|null — 별점 1~5)
+ * 페이로드: postId(number|null), category(코드값), region(코드값), title, star(number|null — 별점 1~5)
  */
 export const trackCommentAdd = ({ postId, category, region, title, star }) => {
   pushCatalogEvent(EVENT_NAMES.COMMENT_ADD, {
@@ -164,7 +174,7 @@ export const trackCommentAdd = ({ postId, category, region, title, star }) => {
 /**
  * 댓글 삭제 성공 시 발화.
  * 호출 위치: src/comment/components/CommentPage.jsx
- * 페이로드: postId(number|null), category, region, title
+ * 페이로드: postId(number|null), category(코드값), region(코드값), title
  */
 export const trackCommentRemove = ({ postId, category, region, title }) => {
   pushCatalogEvent(EVENT_NAMES.COMMENT_REMOVE, buildPostPayload({ postId, category, region, title }));
@@ -222,8 +232,8 @@ export const trackLoginFail = () => {
 export const trackPostAdd = ({ postId, category, region }) => {
   pushCatalogEvent(EVENT_NAMES.POST_ADD, {
     postId: toPostId(postId),
-    category: orNull(category),
-    region: orNull(region),
+    category: toCategoryCode(category),
+    region: toRegionCode(region),
   });
 };
 
@@ -235,8 +245,8 @@ export const trackPostAdd = ({ postId, category, region }) => {
 export const trackPostUpdate = ({ postId, category, region }) => {
   pushCatalogEvent(EVENT_NAMES.POST_UPDATE, {
     postId: toPostId(postId),
-    category: orNull(category),
-    region: orNull(region),
+    category: toCategoryCode(category),
+    region: toRegionCode(region),
   });
 };
 
@@ -248,8 +258,8 @@ export const trackPostUpdate = ({ postId, category, region }) => {
 export const trackPostRemove = ({ postId, category, region }) => {
   pushCatalogEvent(EVENT_NAMES.POST_REMOVE, {
     postId: toPostId(postId),
-    category: orNull(category),
-    region: orNull(region),
+    category: toCategoryCode(category),
+    region: toRegionCode(region),
   });
 };
 
@@ -257,13 +267,15 @@ export const trackPostRemove = ({ postId, category, region }) => {
  * 검색 결과 로드 성공 시 발화. resultCount 0 = 콘텐츠 갭 신호.
  * 정렬/페이지 이동도 결과 로드이므로 매 로드마다 발화된다.
  * 호출 위치: src/post/pages/PostListPage.jsx
- * 페이로드: keyword, category, region, resultCount(number — 전체 건수, 서버가 안 주면 현재 페이지 건수)
+ * 페이로드: keyword, category(코드값), region(코드값),
+ *           resultCount(number — 전체 건수, 서버가 안 주면 현재 페이지 건수)
+ *   — URL 파라미터는 검색 화면에서 오면 한글 라벨, 메인 랭킹에서 오면 코드값이라 여기서 코드값으로 통일한다.
  */
 export const trackSearchResult = ({ keyword, category, region, resultCount }) => {
   pushCatalogEvent(EVENT_NAMES.SEARCH_RESULT, {
     keyword: orNull(keyword),
-    category: orNull(category),
-    region: orNull(region),
+    category: toCategoryCode(category),
+    region: toRegionCode(region),
     resultCount: Number.isFinite(Number(resultCount)) ? Number(resultCount) : null,
   });
 };

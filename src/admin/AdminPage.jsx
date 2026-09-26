@@ -19,7 +19,14 @@ import { toast } from 'react-toastify';
 const AdminPage = () => {
   const [activeMenu, setActiveMenu] = useState('post');
   const [processId, setProcessId] = useState(1);
+  const [processName, setProcessName] = useState(null);
   const navigate = useNavigate();
+
+  // 프로세스 목록에서 선택한 프로세스 (포맷/필터/중복제거 화면 제목에 이름 표시)
+  const handleSelectProcess = (process) => {
+    setProcessId(process.logProcessId);
+    setProcessName(process.name);
+  };
 
   // 렌더링할 컴포넌트 결정
   const renderContent = () => {
@@ -27,17 +34,17 @@ const AdminPage = () => {
       case 'member':
         return <MemberManagement />;
       case 'process':
-        return <ProcessManagement setPID={setProcessId} onMenuClick={setActiveMenu} />;
+        return <ProcessManagement onSelectProcess={handleSelectProcess} onMenuClick={setActiveMenu} />;
       case 'post':
         return <AdminPostManagement />;
       case 'format':
-        return <FormatManagement processId={processId} onMenuClick={setActiveMenu} />
+        return <FormatManagement processId={processId} processName={processName} onMenuClick={setActiveMenu} />
       case 'filter':
-        return <FilterManagement processId={processId} onMenuClick={setActiveMenu} />
+        return <FilterManagement processId={processId} processName={processName} onMenuClick={setActiveMenu} />
       case 'log':
         return <LogManagement onMenuClick={setActiveMenu} />
       case 'deduplication':
-        return <DeduplicationManagement processId={processId} onMenuClick={setActiveMenu} />
+        return <DeduplicationManagement processId={processId} processName={processName} onMenuClick={setActiveMenu} />
       case 'monitoring':
         return <Kibana/>
 

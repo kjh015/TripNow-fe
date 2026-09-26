@@ -6,7 +6,7 @@ import AdminPageHeader from '../../../admin/AdminPageHeader';
 import InputProcess from './InputProcess';
 import EditProcess from './EditProcess';
 
-const ProcessManagement = ({ setPID, onMenuClick }) => {
+const ProcessManagement = ({ onSelectProcess, onMenuClick }) => {
     const [processList, setProcessList] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [selectedProcessId, setSelectedProcessId] = useState(null);
@@ -65,7 +65,7 @@ const ProcessManagement = ({ setPID, onMenuClick }) => {
                                             className="process-name-hover fw-bold"
                                             role="button"
                                             onClick={() => {
-                                                setPID(process.logProcessId);
+                                                onSelectProcess(process);
                                                 onMenuClick('format');
                                             }}
                                             title="포맷 관리로 이동"

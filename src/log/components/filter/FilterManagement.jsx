@@ -7,7 +7,7 @@ import AdminPipelineNav from '../../../admin/AdminPipelineNav';
 import DetailFilter from './DetailFilter';
 import ConditionBuilder from './ConditionBuilder';
 
-const FilterManagement = ({ processId, onMenuClick }) => {
+const FilterManagement = ({ processId, processName, onMenuClick }) => {
     const [filterList, setFilterList] = useState([]);
     const [detailComp, setDetailComp] = useState(0);
     const [builderComp, setBuilderComp] = useState(false);
@@ -25,7 +25,7 @@ const FilterManagement = ({ processId, onMenuClick }) => {
 
     return (
         <div className="log-page-spacer">
-            <AdminPageHeader title="필터링 관리">
+            <AdminPageHeader title="필터링 관리" badge={processName}>
                 <button className="btn admin-btn admin-btn-primary" onClick={() => setBuilderComp(true)}>+ 필터 추가</button>
             </AdminPageHeader>
 
