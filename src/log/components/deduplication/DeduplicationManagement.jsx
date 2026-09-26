@@ -7,7 +7,7 @@ import AdminPageHeader from '../../../admin/AdminPageHeader';
 import AdminPipelineNav from '../../../admin/AdminPipelineNav';
 import DetailDeduplication from './DetailDeduplication';
 
-const DeduplicationManagement = ({ processId, onMenuClick }) => {
+const DeduplicationManagement = ({ processId, processName, onMenuClick }) => {
   const [ddpList, setDdpList] = useState([]);
   const [showInput, setShowInput] = useState(false);
   const [showDetail, setShowDetail] = useState(0);
@@ -47,7 +47,7 @@ const DeduplicationManagement = ({ processId, onMenuClick }) => {
 
   return (
     <div className="log-page-spacer">
-      <AdminPageHeader title="중복 제거 관리">
+      <AdminPageHeader title="중복 제거 관리" badge={processName}>
         <button className="btn admin-btn admin-btn-primary" onClick={() => setShowInput(true)}>+ 중복 제거 추가</button>
       </AdminPageHeader>
 

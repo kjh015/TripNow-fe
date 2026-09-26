@@ -78,11 +78,11 @@ src/analytics/
 | 이벤트 | 발화 시점 | 트래커 함수 (`src/analytics/events.js`) / 호출 위치 | 페이로드 | 남은 문제 |
 |---|---|---|---|---|
 | `travel_main_view` | 메인 페이지 진입 | `trackMainView` / `src/main/pages/MainPage.jsx` | (공통 필드만) | — |
-| `travel_search_click` | 검색 버튼 클릭 | `trackSearchClick` / `src/post/components/PostSearch.jsx` | category, region, keyword (빈 값 null) | — (M4에서 keyword 추가) |
-| `travel_detail_pageview` | 상세 데이터 로드 후 (postId당 1회 가드) | `trackDetailPageview` / `src/post/pages/PostDetailPage.jsx` | postId(number), category, region, title | — (M2에서 중복 발화 수정) |
+| `travel_search_click` | 검색 버튼 클릭 | `trackSearchClick` / `src/post/components/PostSearch.jsx` | category, region (코드값 — 검색 화면의 한글 라벨을 트래커가 변환), keyword (빈 값 null) | — (M4에서 keyword 추가, WP-D에서 코드값 통일) |
+| `travel_detail_pageview` | 상세 데이터 로드 후 (postId당 1회 가드) | `trackDetailPageview` / `src/post/pages/PostDetailPage.jsx` | postId(number), category, region (코드값), title | — (M2에서 중복 발화 수정) |
 | `travel_detail_exit` | 상세 이탈 (effect cleanup + `pagehide` 보완) | `trackDetailExit` / `src/post/pages/PostDetailPage.jsx` | postId(number), staySeconds, title | — (M2에서 과다 발화·staySeconds 왜곡 수정) |
-| `travel_favorite_add` / `_remove` | 찜 토글 | `trackFavoriteAdd` / `trackFavoriteRemove` / `src/post/pages/PostDetailPage.jsx` | postId(number), category, region, title | — |
-| `travel_comment_add` / `_remove` | 댓글 등록/삭제 | `trackCommentAdd` / `trackCommentRemove` / `src/comment/components/CommentPage.jsx` | postId(number), category, region, title, star(add만, number) | — (M4에서 star 추가) |
+| `travel_favorite_add` / `_remove` | 찜 토글 | `trackFavoriteAdd` / `trackFavoriteRemove` / `src/post/pages/PostDetailPage.jsx` | postId(number), category, region (코드값), title | — |
+| `travel_comment_add` / `_remove` | 댓글 등록/삭제 | `trackCommentAdd` / `trackCommentRemove` / `src/comment/components/CommentPage.jsx` | postId(number), category, region (코드값), title, star(add만, number) | — (M4에서 star 추가) |
 
 ### 신규 이벤트 (M4에서 추가 완료, 이슈 #81)
 
@@ -92,13 +92,14 @@ src/analytics/
 | `travel_login` / `travel_login_fail` | 로그인 성공/실패 (일반·카카오 소셜 공통) | `trackLogin` / `trackLoginFail` / 성공: `src/hooks/useLoginSuccess.js`, 실패: `src/sign/components/SignInPage.jsx`·`OAuth2RedirectPage.jsx` | 성공 시 role("admin"\|"user"), 실패 시 공통 필드만 | 로그인 퍼널 |
 | `travel_post_add` | 게시글 작성 성공 | `trackPostAdd` / `src/post/pages/PostWritePage.jsx` | postId(생성 응답에서 확보, 없으면 null), category, region (코드값) | 콘텐츠 생산 지표 |
 | `travel_post_update` / `_remove` | 게시글 수정/삭제 성공 | `trackPostUpdate` / `trackPostRemove` / `src/post/pages/PostEditPage.jsx` | postId, category, region (코드값) | 콘텐츠 생산 지표 |
-| `travel_search_result` | 검색 결과 로드 성공 (정렬/페이지 이동 포함 매 로드) | `trackSearchResult` / `src/post/pages/PostListPage.jsx` | keyword, category, region, resultCount(totalElements, 없으면 페이지 건수) | **0건 검색 = 콘텐츠 갭** |
+| `travel_search_result` | 검색 결과 로드 성공 (정렬/페이지 이동 포함 매 로드) | `trackSearchResult` / `src/post/pages/PostListPage.jsx` | keyword, category, region (코드값 — URL 파라미터가 라벨/코드 혼재라 트래커가 변환), resultCount(totalElements, 없으면 페이지 건수) | **0건 검색 = 콘텐츠 갭** |
 | `travel_list_item_click` | 검색 결과 카드 → 상세 클릭 | `trackListItemClick` / `src/post/pages/PostListPage.jsx` (`PostListCard`의 `onCardClick` prop 경유) | postId, position(페이지 내 순번 1~), keyword | 검색 CTR |
 | `travel_ranking_click` | 메인 랭킹 카드 클릭 | `trackRankingClick` / `src/main/components/MainPageCard/MainPageCard.jsx` | rankType("post"\|"region"\|"category"), rank(1~5), label(post는 제목, 그 외 코드값), postId(post일 때만) | 랭킹 기능 효용 검증 |
 | `travel_error` | 렌더 크래시 / 목록 로드 실패(에러 화면 노출) | `trackError` / `src/components/ErrorBoundary.jsx`(render) · `src/post/pages/PostListPage.jsx`(api) | errorType("render"\|"api"), message, path | 사용자 체감 장애 |
 
 > 공통 필드(`isLoggedIn`, `userId`)는 `pushEvent`가 모든 이벤트에 자동 주입하므로 표에서 생략.
-> `processId`(로그 파이프라인 프로세스 id)도 표에서 생략 — `events.js`의 `EVENT_PROCESS_IDS` 매핑(조회/체류 5 `travel-view`, 검색 6 `travel-search`, 전환/액션 7 `travel-action`, 에러 8 `travel-error`, 검색 결과 카드 클릭 9 `travel-list-click`, 랭킹 클릭 10 `travel-ranking`)으로 `pushCatalogEvent`가 자동 주입한다. 백엔드 로그 프로세스 id가 바뀌면 `events.js`의 `LOG_PROCESS_IDS` 상수만 갱신.
+> `category`·`region`은 모든 이벤트에서 **대문자 코드값**(`FESTIVAL`, `BUSAN` 등)이다. 화면이 한글 라벨을 들고 있어도 `events.js`의 `toCategoryCode`/`toRegionCode`가 `src/constants/categoryRegion.js` 매핑으로 변환하므로 호출부는 신경 쓰지 않는다 (WP-D, 개선사항 #49 — 라벨/코드 혼재로 Kibana 버킷이 갈리던 문제).
+> `processCode`(로그 파이프라인 프로세스 코드)도 표에서 생략 — `events.js`의 `EVENT_PROCESS_CODES` 매핑(조회/체류 `View`, 검색 `Search`, 전환/액션 `Action`, 에러 `Error`, 검색 결과 카드 클릭 `ListClick`, 랭킹 클릭 `Ranking`)으로 `pushCatalogEvent`가 자동 주입한다. 값은 백엔드 `log_process.name`(유니크)과 1:1 대응 — DB가 발급하는 id는 환경마다 달라서 이름으로 전환함(MTM `dimension10` → Fluentd `X-Log-Process-Code` 헤더). 프로세스 이름이 바뀌면 `events.js`의 `LOG_PROCESS_CODES` 상수만 갱신. 이름 형식(영문자 시작 영숫자)은 `src/constants/logProcess.js`로 관리자 입력에서 검증.
 > 프로세스 분리 기준: Matomo `e_n`/`e_v` 슬롯 의미가 프로세스 내에서 동일해야 Format 규칙이 성립한다 — `list_item_click`(e_v=position)과 `ranking_click`(e_n=label, e_v=rank)은 이 이유로 `travel-search`(e_n=keyword, e_v=resultCount)에서 분리됨.
 
 ---
