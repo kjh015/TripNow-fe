@@ -7,7 +7,7 @@ import AdminPipelineNav from '../../../admin/AdminPipelineNav';
 import InputFormat from './InputFormat';
 import DetailFormat from './DetailFormat';
 
-const FormatManagement = ({ processId, onMenuClick }) => {
+const FormatManagement = ({ processId, processName, onMenuClick }) => {
     const [formatList, setFormatList] = useState([]);
     const [inputComp, setInputComp] = useState(false);
     const [detailComp, setDetailComp] = useState(0);
@@ -25,7 +25,7 @@ const FormatManagement = ({ processId, onMenuClick }) => {
 
     return (
         <div className="log-page-spacer">
-            <AdminPageHeader title="포맷 관리">
+            <AdminPageHeader title="포맷 관리" badge={processName}>
                 <button className="btn admin-btn admin-btn-primary" onClick={() => setInputComp(true)}>+ 포맷 추가</button>
             </AdminPageHeader>
 
