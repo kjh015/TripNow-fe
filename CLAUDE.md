@@ -92,10 +92,10 @@ src/analytics/
 | `travel_login` / `travel_login_fail` | 로그인 성공/실패 (일반·카카오 소셜 공통) | `trackLogin` / `trackLoginFail` / 성공: `src/hooks/useLoginSuccess.js`, 실패: `src/sign/components/SignInPage.jsx`·`OAuth2RedirectPage.jsx` | 성공 시 role("admin"\|"user"), 실패 시 공통 필드만 | 로그인 퍼널 |
 | `travel_post_add` | 게시글 작성 성공 | `trackPostAdd` / `src/post/pages/PostWritePage.jsx` | postId(생성 응답에서 확보, 없으면 null), category, region (코드값) | 콘텐츠 생산 지표 |
 | `travel_post_update` / `_remove` | 게시글 수정/삭제 성공 | `trackPostUpdate` / `trackPostRemove` / `src/post/pages/PostEditPage.jsx` | postId, category, region (코드값) | 콘텐츠 생산 지표 |
-| `travel_search_result` | 검색 결과 로드 성공 (정렬/페이지 이동 포함 매 로드) | `trackSearchResult` / `src/post/pages/PostListPage.jsx` | keyword, category, region (코드값 — URL 파라미터가 라벨/코드 혼재라 트래커가 변환), resultCount(totalElements, 없으면 페이지 건수) | **0건 검색 = 콘텐츠 갭** |
-| `travel_list_item_click` | 검색 결과 카드 → 상세 클릭 | `trackListItemClick` / `src/post/pages/PostListPage.jsx` (`PostListCard`의 `onCardClick` prop 경유) | postId, position(페이지 내 순번 1~), keyword | 검색 CTR |
+| `travel_search_result` | 검색 결과 로드 성공 (정렬 변경·무한스크롤 추가 로드 포함 매 로드) | `trackSearchResult` / `src/hooks/usePostFeed.js` | keyword, category, region (코드값 — URL 파라미터가 라벨/코드 혼재라 트래커가 변환), resultCount(이번에 읽은 건수 — 피드는 전체 건수를 세지 않음) | **0건 검색 = 콘텐츠 갭** |
+| `travel_list_item_click` | 검색 결과 카드 → 상세 클릭 | `trackListItemClick` / `src/post/pages/PostListPage.jsx` (`PostListCard`의 `onCardClick` prop 경유) | postId, position(목록 내 순번 1~), keyword | 검색 CTR |
 | `travel_ranking_click` | 메인 랭킹 카드 클릭 | `trackRankingClick` / `src/main/components/MainPageCard/MainPageCard.jsx` | rankType("post"\|"region"\|"category"), rank(1~5), label(post는 제목, 그 외 코드값), postId(post일 때만) | 랭킹 기능 효용 검증 |
-| `travel_error` | 렌더 크래시 / 목록 로드 실패(에러 화면 노출) | `trackError` / `src/components/ErrorBoundary.jsx`(render) · `src/post/pages/PostListPage.jsx`(api) | errorType("render"\|"api"), message, path | 사용자 체감 장애 |
+| `travel_error` | 렌더 크래시 / 목록 로드 실패(에러 화면 노출) | `trackError` / `src/components/ErrorBoundary.jsx`(render) · `src/hooks/usePostFeed.js`(api) | errorType("render"\|"api"), message, path | 사용자 체감 장애 |
 
 > 공통 필드(`isLoggedIn`, `userId`)는 `pushEvent`가 모든 이벤트에 자동 주입하므로 표에서 생략.
 > `category`·`region`은 모든 이벤트에서 **대문자 코드값**(`FESTIVAL`, `BUSAN` 등)이다. 화면이 한글 라벨을 들고 있어도 `events.js`의 `toCategoryCode`/`toRegionCode`가 `src/constants/categoryRegion.js` 매핑으로 변환하므로 호출부는 신경 쓰지 않는다 (WP-D, 개선사항 #49 — 라벨/코드 혼재로 Kibana 버킷이 갈리던 문제).

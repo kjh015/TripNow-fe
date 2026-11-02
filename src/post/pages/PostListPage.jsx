@@ -1,18 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getPostListBySearch } from "../../api/postSearchApi";
 import PostSearch from "../components/PostSearch";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import PostListCard from "../components/PostListCard";
 import useAlert from "../../hooks/useAlert";
-import { trackSearchResult, trackListItemClick, trackError } from "../../analytics/events";
+import usePostFeed from "../../hooks/usePostFeed";
+import { trackListItemClick } from "../../analytics/events";
+import { POST_FEED_PRELOAD_MARGIN, POST_LIST_MAX_RETRY } from "../../constants/post";
 
 const PostListPage = () => {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [searched, setSearched] = useState(false);
-  const [pagination, setPagination] = useState({ totalPages: 0, isFirst: true, isLast: true });
   const { alert, showAlert } = useAlert(500);
   const SORT_NAME_MAP = {
     "popular-desc": "인기 순",
@@ -30,15 +26,27 @@ const PostListPage = () => {
   const keyword = params.get("keyword") || "";
   const sort = params.get("sort") || "popular";
   const direction = params.get("direction") || "desc";
-  const page = parseInt(params.get("page") || "0", 10);
   const sortName = SORT_NAME_MAP[`${sort}-${direction}`] || "정렬";
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem('accessToken');
 
+  const { posts, loading, error, hasNext, retryCount, loadMore, retry } =
+    usePostFeed({ category, region, keyword, sort, direction });
+  const sentinelRef = useRef(null);
+
+  // 목록 끝의 표식이 화면 가까이 오면 다음 건을 읽는다
   useEffect(() => {
-    setSearched(true);
-    getPostList();
-  }, [location.search]);
+    const sentinel = sentinelRef.current;
+    if (!sentinel || !hasNext || loading || error) return undefined;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some(entry => entry.isIntersecting)) loadMore();
+      },
+      { rootMargin: POST_FEED_PRELOAD_MARGIN }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNext, loading, error, loadMore]);
 
   const goToWrite = () => {
     if (isLoggedIn) {
@@ -48,60 +56,23 @@ const PostListPage = () => {
     }
   };
 
-  const [retryCount, setRetryCount] = useState(0);
-
-  const getPostList = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data } = await getPostListBySearch({ category, region, keyword, sort, direction, page });
-      const result = data.result;
-      setPosts(result.content ?? []);
-      setPagination({ totalPages: result.totalPages ?? 0, isFirst: result.isFirst ?? true, isLast: result.isLast ?? true });
-      setRetryCount(0);
-      trackSearchResult({
-        keyword, category, region,
-        resultCount: result.totalElements ?? (result.content?.length ?? 0),
-      });
-    } catch (e) {
-      setError(e);
-      trackError({ errorType: "api", message: e.message, path: window.location.pathname });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (error && retryCount < 2) {
-      const timer = setTimeout(() => {
-        setRetryCount(c => c + 1);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [error, retryCount]);
-
-  useEffect(() => {
-    if (retryCount > 0 && retryCount <= 2) {
-      getPostList();
-    }
-  }, [retryCount]);
-
-  const handleRetry = () => {
-    setRetryCount(0);
-    getPostList();
-  };
-
   const handleSort = ({ sort, direction }) => {
     params.set("sort", sort);
     params.set("direction", direction);
-    params.set("page", 0);
+    params.delete("page");
     navigate(`/post/list?${params.toString()}`);
   };
 
-  const handlePage = (pageNum) => {
-    params.set("page", pageNum);
-    navigate(`/post/list?${params.toString()}`);
-  };
+  const errorNotice = error && (
+    <div className="text-danger text-center py-5">
+      에러 발생: {error.message}<br />
+      {retryCount < POST_LIST_MAX_RETRY ? (
+        <span>잠시 후 자동으로 다시 시도합니다... ({retryCount + 1}/{POST_LIST_MAX_RETRY + 1})</span>
+      ) : (
+        <button className="btn btn-outline-danger mt-3" onClick={retry}>다시 시도</button>
+      )}
+    </div>
+  );
 
   return (
     <div className="min-vh-100 py-4 post-list-page">
@@ -142,22 +113,7 @@ const PostListPage = () => {
           </div>
         </div>
 
-        {loading ? (
-          <LoadingSpinner minHeight={140} />
-        ) : error ? (
-          <div className="text-danger text-center py-5">
-            에러 발생: {error.message}<br />
-            {retryCount < 2 ? (
-              <span>잠시 후 자동으로 다시 시도합니다... ({retryCount + 1}/3)</span>
-            ) : (
-              <button className="btn btn-outline-danger mt-3" onClick={handleRetry}>다시 시도</button>
-            )}
-          </div>
-        ) : posts.length === 0 ? (
-          <div className="text-center text-secondary py-5 fs-5">
-            게시글이 없습니다. 검색해주세요.
-          </div>
-        ) : (
+        {posts.length > 0 ? (
           <div className="d-flex flex-column gap-4">
             {posts.map((post, idx) => (
               <PostListCard
@@ -169,35 +125,15 @@ const PostListPage = () => {
               />
             ))}
           </div>
-        )}
+        ) : !loading && !error ? (
+          <div className="text-center text-secondary py-5 fs-5">
+            게시글이 없습니다. 검색해주세요.
+          </div>
+        ) : null}
 
-        <div className="mt-4 mb-3 text-center">
-          <button
-            type="button"
-            className="btn btn-outline-primary me-2 px-4"
-            onClick={() => handlePage(page - 1)}
-            disabled={pagination.isFirst}
-          >
-            이전
-          </button>
-          {Array.from({ length: pagination.totalPages }, (_, i) => i).map(num => (
-            <button
-              key={num}
-              className={`btn mx-1 px-3 ${page === num ? 'btn-primary fw-bold' : 'btn-outline-primary'}`}
-              onClick={() => handlePage(num)}
-            >
-              {num + 1}
-            </button>
-          ))}
-          <button
-            type="button"
-            className="btn btn-outline-primary px-4"
-            onClick={() => handlePage(page + 1)}
-            disabled={pagination.isLast}
-          >
-            다음
-          </button>
-        </div>
+        {errorNotice}
+        {loading && <LoadingSpinner minHeight={140} />}
+        <div ref={sentinelRef} aria-hidden="true" />
       </div>
     </div>
   );
