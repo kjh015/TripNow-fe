@@ -11,6 +11,7 @@ import { CATEGORY_CODE_TO_LABEL, REGION_CODE_TO_LABEL } from "../constants/categ
 import { categoryColors, regionColors } from "../constants/colorMaps";
 import { formatDate } from "../utils/dateUtils";
 import AdminPageHeader from "./AdminPageHeader";
+import AdminPagination from "./AdminPagination";
 
 const PAGE_SIZE = 10;
 const IMAGE_BASE_URL = process.env.REACT_APP_IMAGE_BASE_URL || "";
@@ -20,36 +21,6 @@ const DELETED_FILTERS = [
     { key: "active", label: "활성", deleted: false },
     { key: "deleted", label: "삭제됨", deleted: true },
 ];
-
-const Pagination = ({ total, page, onChange, pageSize = PAGE_SIZE }) => {
-    const pageCount = Math.ceil(total / pageSize);
-    if (pageCount <= 1) return null;
-    const pages = Array.from({ length: pageCount }, (_, idx) => idx);
-    return (
-        <nav className="d-flex justify-content-center my-3">
-            <ul className="pagination mb-0">
-                <li className={`page-item${page === 0 ? ' disabled' : ''}`}>
-                    <button className="page-link" onClick={() => onChange(page - 1)} disabled={page === 0}>이전</button>
-                </li>
-                {pages.map((p) => (
-                    <li key={p} className={`page-item${page === p ? ' active' : ''}`}>
-                        <button className="page-link" onClick={() => onChange(p)}>{p + 1}</button>
-                    </li>
-                ))}
-                <li className={`page-item${page === pageCount - 1 ? ' disabled' : ''}`}>
-                    <button className="page-link" onClick={() => onChange(page + 1)} disabled={page === pageCount - 1}>다음</button>
-                </li>
-            </ul>
-        </nav>
-    );
-};
-
-Pagination.propTypes = {
-    total: PropTypes.number.isRequired,
-    page: PropTypes.number.isRequired,
-    onChange: PropTypes.func.isRequired,
-    pageSize: PropTypes.number,
-};
 
 const StatusBadge = ({ isDeleted }) => (
     isDeleted ? <Badge bg="danger">삭제됨</Badge> : <Badge bg="success">활성</Badge>
@@ -357,7 +328,7 @@ const AdminPostManagement = () => {
                                 </table>
                             </div>
                         )}
-                        <Pagination total={comments.totalElements} page={comments.page}
+                        <AdminPagination total={comments.totalElements} page={comments.page}
                             onChange={(p) => loadComments(comments.post, p)} />
                     </div>
                 </div>
@@ -470,7 +441,7 @@ const AdminPostManagement = () => {
                         </table>
                     </div>
                 </div>
-                <Pagination total={totalElements} page={page} onChange={setPage} />
+                <AdminPagination total={totalElements} page={page} onChange={setPage} />
             </div>
         </div>
     );
