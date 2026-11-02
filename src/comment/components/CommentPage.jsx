@@ -24,7 +24,7 @@ function ConfirmModal({ show, type = "danger", message, onConfirm, onCancel }) {
     );
 }
 
-const CommentPage = ({ postId, isLoggedIn, ratingAvg, setCommentFlag, category, region, title }) => {
+const CommentPage = ({ postId, isLoggedIn, ratingAvg, onStatsChange, category, region, title }) => {
     const [commentList, setCommentList] = useState([]);
     const [modal, setModal] = useState({ show: false, type: 'danger', message: '', onConfirm: null });
     const [alert, setAlert] = useState({ show: false, message: '', type: '' });
@@ -44,12 +44,13 @@ const CommentPage = ({ postId, isLoggedIn, ratingAvg, setCommentFlag, category, 
             onConfirm: async () => {
                 setModal(prev => ({ ...prev, show: false }));
                 try {
-                    await commentApi.deleteComment(commentId);
+                    const { data } = await commentApi.deleteComment(commentId);
                     setCommentList(prev => prev.filter((c) => c.commentId !== commentId));
                     const message = "댓글이 삭제되었습니다.";
                     setAlert({ show: true, message, type: "success" });
                     trackCommentRemove({ postId, category, region, title });
-                    setCommentFlag?.(prev => !prev);
+                    // 댓글 수·평균 별점은 응답 값으로 바로 반영 (검색엔진 반영을 기다리지 않음)
+                    onStatsChange?.({ commentCount: data.result.commentCount, starAvg: data.result.starAvg });
                 } catch (err) {
                     const message = err.response?.data?.message || "오류가 발생했습니다.";
                     setAlert({ show: true, message, type: "danger" });
@@ -74,7 +75,7 @@ const CommentPage = ({ postId, isLoggedIn, ratingAvg, setCommentFlag, category, 
             };
             setCommentList(prev => [newComment, ...prev]);
             setAlert({ show: true, message: "댓글이 등록되었습니다.", type: "success" });
-            setCommentFlag?.(prev => !prev);
+            onStatsChange?.({ commentCount: data.result.commentCount, starAvg: data.result.starAvg });
         } catch (err) {
             const message = err.response?.data?.message || "오류가 발생했습니다.";
             setAlert({ show: true, message, type: "danger" });
