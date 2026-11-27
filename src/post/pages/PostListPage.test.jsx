@@ -3,12 +3,16 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import PostListPage from './PostListPage';
 import { getPostFeed } from '../../api/postSearchApi';
+import { recordPostWrite } from '../../utils/pendingWrites';
+
+const DEFAULT_SEARCH = '?sort=modifiedDate&direction=desc';
+let mockSearch = DEFAULT_SEARCH;
 
 // CRA의 jest는 react-router 7의 exports 경로를 찾지 못해 필요한 훅만 대체한다
 jest.mock(
   'react-router-dom',
   () => ({
-    useLocation: () => ({ search: '?sort=modifiedDate&direction=desc' }),
+    useLocation: () => ({ search: mockSearch }),
     useNavigate: () => jest.fn(),
   }),
   { virtual: true }
@@ -45,6 +49,8 @@ const renderPage = () => render(<PostListPage />);
 describe('PostListPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockSearch = DEFAULT_SEARCH;
+    window.sessionStorage.clear();
     observers = [];
     window.IntersectionObserver = class {
       constructor(callback) {
@@ -121,5 +127,54 @@ describe('PostListPage', () => {
     renderPage();
 
     await waitFor(() => expect(screen.getByText(/게시글이 없습니다/)).toBeInTheDocument());
+  });
+
+  describe('검색에 반영되기 전인 방금 쓴 글', () => {
+    const recordCreated = () =>
+      recordPostWrite(
+        { postId: 'new', title: '방금 쓴 글', category: 'FOOD', region: 'SEOUL', createdAt: '2026-11-19T00:00:00Z', version: 0 },
+        { created: true }
+      );
+
+    it('최신순·검색어 없음·필터 일치면 첫 페이지 맨 앞에 넣는다', async () => {
+      mockSearch = '?sort=modifiedDate&direction=desc&category=음식';
+      recordCreated();
+      getPostFeed.mockResolvedValue(feed(['첫 글']));
+
+      renderPage();
+
+      await screen.findByText('첫 글');
+      const titles = screen.getAllByText(/글$/).map((el) => el.textContent);
+      expect(titles).toEqual(['방금 쓴 글', '첫 글']);
+    });
+
+    it.each([
+      ['인기순', '?sort=popular&direction=desc'],
+      ['오래된 순', '?sort=modifiedDate&direction=asc'],
+      ['검색어 있음', '?sort=modifiedDate&direction=desc&keyword=경주'],
+      ['카테고리 불일치', '?sort=modifiedDate&direction=desc&category=NATURE'],
+      ['지역 불일치', '?sort=modifiedDate&direction=desc&region=부산'],
+    ])('%s이면 넣지 않는다', async (_, search) => {
+      mockSearch = search;
+      recordCreated();
+      getPostFeed.mockResolvedValue(feed(['첫 글']));
+
+      renderPage();
+
+      await screen.findByText('첫 글');
+      expect(screen.queryByText('방금 쓴 글')).not.toBeInTheDocument();
+    });
+
+    it('다음 페이지에는 넣지 않는다', async () => {
+      getPostFeed.mockResolvedValueOnce(feed(['첫 글'], 'c1')).mockResolvedValueOnce(feed(['둘째 글']));
+
+      renderPage();
+      await screen.findByText('첫 글');
+      recordCreated();
+      await scrollToEnd();
+
+      expect(await screen.findByText('둘째 글')).toBeInTheDocument();
+      expect(screen.queryByText('방금 쓴 글')).not.toBeInTheDocument();
+    });
   });
 });

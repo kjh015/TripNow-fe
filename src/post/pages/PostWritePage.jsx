@@ -5,6 +5,7 @@ import useAlert from '../../hooks/useAlert';
 import PostForm from '../components/PostForm';
 import { CATEGORY_LABEL_TO_CODE, REGION_LABEL_TO_CODE } from '../../constants/categoryRegion';
 import { trackPostAdd } from '../../analytics/events';
+import { recordPostWrite } from '../../utils/pendingWrites';
 
 const buildSafeFileName = (originalName) => {
     const ext = originalName.includes('.') ? originalName.split('.').pop().toLowerCase() : 'jpg';
@@ -93,8 +94,10 @@ const PostWritePage = () => {
             // 생성 응답 result가 { postId } 객체든 id 원시값이든 모두 수용 (없으면 null 전송)
             const result = data?.result;
             trackPostAdd({ postId: typeof result === 'object' ? result?.postId : result, category, region });
+            // 검색에 반영되기 전에도 방금 쓴 글이 보이도록 응답(저장된 게시글 전체)을 기록하고 그 글의 상세로 이동한다
+            recordPostWrite(result, { created: true });
             showAlert("글 작성이 완료되었습니다.", "success");
-            setTimeout(() => navigate('/post/list'), 500);
+            setTimeout(() => navigate(`/post/detail?postId=${result.postId}`, { replace: true }), 500);
         } catch {
             showAlert("글 작성에 실패하였습니다.", "danger");
         } finally {

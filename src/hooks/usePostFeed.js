@@ -2,12 +2,25 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getPostFeed } from '../api/postSearchApi';
 import { trackSearchResult, trackError } from '../analytics/events';
 import { POST_FEED_SIZE, POST_LIST_MAX_RETRY, POST_LIST_RETRY_DELAY_MS } from '../constants/post';
+import { CATEGORY_LABEL_TO_CODE, REGION_LABEL_TO_CODE } from '../constants/categoryRegion';
+import { mergePostList } from '../utils/pendingWrites';
 
 // 조회수·평점 같은 정렬 값은 읽는 사이에 바뀔 수 있어, 이미 받은 글이 다음 응답에 다시 올 수 있다
 const appendNewPosts = (posts, content) => {
   const postIds = new Set(posts.map(post => post.postId));
   return [...posts, ...content.filter(post => !postIds.has(post.postId))];
 };
+
+// URL의 카테고리·지역은 한글 라벨과 코드값이 섞여 있어 코드값으로 맞춰 비교한다
+const toCategoryCode = (value) => (value ? (CATEGORY_LABEL_TO_CODE[value] ?? value) : '');
+const toRegionCode = (value) => (value ? (REGION_LABEL_TO_CODE[value] ?? value) : '');
+
+/**
+ * 검색에 반영되기 전인 방금 쓴 글을 끼워 넣어도 되는 목록인지.
+ * 최신순이고 검색어가 없을 때만 새 글이 맨 앞에 온다고 확신할 수 있다. 다른 정렬에서는 위치를 알 수 없어 넣지 않는다
+ */
+const canInsertCreated = ({ keyword, sort, direction }) =>
+  sort === 'modifiedDate' && direction === 'desc' && !keyword;
 
 /**
  * 게시글 목록을 cursor 방식으로 이어서 읽는다.
@@ -35,7 +48,15 @@ const usePostFeed = ({ category, region, keyword, sort, direction }) => {
       if (requestId !== requestIdRef.current) return;
       const result = data.result;
       const content = result.content ?? [];
-      setPosts(prev => (cursor ? appendNewPosts(prev, content) : content));
+      // 방금 수정·삭제한 글은 기록으로 덮어쓰거나 숨기고, 조건이 맞는 첫 페이지에는 방금 쓴 글을 맨 앞에 넣는다
+      const categoryCode = toCategoryCode(category);
+      const regionCode = toRegionCode(region);
+      const merged = mergePostList(content, {
+        insertCreated: !cursor && canInsertCreated({ keyword, sort, direction }),
+        filter: (post) =>
+          (!categoryCode || post.category === categoryCode) && (!regionCode || post.region === regionCode),
+      });
+      setPosts(prev => (cursor ? appendNewPosts(prev, merged) : merged));
       setHasNext(result.hasNext ?? false);
       cursorRef.current = result.nextCursor ?? null;
       setRetryCount(0);

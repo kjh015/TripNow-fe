@@ -9,6 +9,7 @@ import {
     REGION_LABEL_TO_CODE, REGION_CODE_TO_LABEL,
 } from '../../constants/categoryRegion';
 import { trackPostUpdate, trackPostRemove } from '../../analytics/events';
+import { mergePost, getPendingPost, recordPostWrite, recordPostDelete } from '../../utils/pendingWrites';
 
 const IMAGE_BASE_URL = process.env.REACT_APP_IMAGE_BASE_URL || '';
 
@@ -50,27 +51,43 @@ const PostEditPage = () => {
     const [uploading, setUploading] = useState(false);
     const { alert, showAlert } = useAlert(500);
 
+    const applyPost = (postData) => {
+        setPost({
+            title: postData.title,
+            content: postData.content,
+            travelPlace: postData.travelPlace,
+            address: postData.address,
+            category: CATEGORY_CODE_TO_LABEL[postData.category] ?? postData.category,
+            region: REGION_CODE_TO_LABEL[postData.region] ?? postData.region,
+        });
+        setExistingImages(postData.images || []);
+    };
+
     const loadPost = async () => {
         try {
             const { data } = await getPost(postId);
-            const postData = data.result;
-            setPost({
-                title: postData.title,
-                content: postData.content,
-                travelPlace: postData.travelPlace,
-                address: postData.address,
-                category: CATEGORY_CODE_TO_LABEL[postData.category] ?? postData.category,
-                region: REGION_CODE_TO_LABEL[postData.region] ?? postData.region,
-            });
-            setExistingImages(postData.images || []);
-        } catch {
+            // 방금 수정·삭제한 내용이 검색에 반영되기 전이면 기록으로 보여 준다. 삭제 기록이 이기면 없는 글로 본다
+            const postData = mergePost(data.result);
+            if (!postData) {
+                showAlert("게시글을 불러오지 못했습니다.", "danger");
+                return;
+            }
+            applyPost(postData);
+        } catch (err) {
+            // 방금 작성한 글은 검색에 반영되기 전까지 404다. 작성 기록이 있으면 그 값으로 채운다
+            const pending = err.response?.status === 404 ? getPendingPost(postId) : null;
+            if (pending) {
+                applyPost(pending);
+                return;
+            }
             showAlert("게시글을 불러오지 못했습니다.", "danger");
         }
     };
 
     const removePost = async () => {
         try {
-            await deletePost(postId);
+            const { data } = await deletePost(postId);
+            recordPostDelete(data.result);
             trackPostRemove({
                 postId,
                 category: CATEGORY_LABEL_TO_CODE[post.category] ?? post.category,
@@ -132,15 +149,17 @@ const PostEditPage = () => {
             const images = [...existingImages.map((img) => img.imageKey), ...uploadedImageKeys];
             const category = CATEGORY_LABEL_TO_CODE[post.category] ?? post.category;
             const region = REGION_LABEL_TO_CODE[post.region] ?? post.region;
-            await updatePost(postId, {
+            const { data } = await updatePost(postId, {
                 ...post,
                 category,
                 region,
                 images,
             });
+            // 검색에 반영되기 전에도 수정한 내용이 보이도록 응답(저장된 게시글 전체)을 기록하고 그 글의 상세로 이동한다
+            recordPostWrite(data.result);
             trackPostUpdate({ postId, category, region });
             showAlert("글 수정이 완료되었습니다.", "success");
-            setTimeout(() => navigate('/post/list'), 500);
+            setTimeout(() => navigate(`/post/detail?postId=${postId}`, { replace: true }), 500);
         } catch {
             showAlert("글 수정에 실패하였습니다.", "danger");
         } finally {
