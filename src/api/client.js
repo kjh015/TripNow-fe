@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { clearPendingWrites } from "../utils/pendingWrites";
 
 export const BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
 
@@ -71,6 +72,7 @@ apiClient.interceptors.response.use(
         }
         localStorage.removeItem("accessToken");
         localStorage.removeItem("nickname");
+        clearPendingWrites();
         toast.error("로그인이 만료되었습니다. 다시 로그인해주세요.");
         if (window._navigate) window._navigate("/");
         return Promise.reject(refreshError);
