@@ -7,6 +7,7 @@ import UserAuthentication from '../sign/service/UserAuthentication';
 import { toast } from 'react-toastify';
 import useAlert from '../hooks/useAlert';
 import NavMenu from './NavMenu';
+import { clearPendingWrites } from "../utils/pendingWrites";
 
 const Navbar = () => {
   const [curUser, setCurUser] = useState('');
@@ -22,6 +23,7 @@ const Navbar = () => {
       await logout();
       localStorage.removeItem('accessToken');
       localStorage.removeItem('nickname');
+      clearPendingWrites();
       resetUser();
       toast.info("로그아웃 되었습니다.");
       handleClose();

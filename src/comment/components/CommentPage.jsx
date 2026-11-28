@@ -3,6 +3,7 @@ import WriteComment from "./WriteComment";
 import * as commentApi from "../../api/commentApi";
 import { useEffect, useState } from "react";
 import { trackCommentAdd, trackCommentRemove } from "../../analytics/events";
+import { mergeComments, recordCommentAdd, recordCommentRemove } from "../../utils/pendingWrites";
 
 function ConfirmModal({ show, type = "danger", message, onConfirm, onCancel }) {
     if (!show) return null;
@@ -24,7 +25,7 @@ function ConfirmModal({ show, type = "danger", message, onConfirm, onCancel }) {
     );
 }
 
-const CommentPage = ({ postId, isLoggedIn, ratingAvg, setCommentFlag, category, region, title }) => {
+const CommentPage = ({ postId, isLoggedIn, ratingAvg, onStatsChange, category, region, title }) => {
     const [commentList, setCommentList] = useState([]);
     const [modal, setModal] = useState({ show: false, type: 'danger', message: '', onConfirm: null });
     const [alert, setAlert] = useState({ show: false, message: '', type: '' });
@@ -32,7 +33,8 @@ const CommentPage = ({ postId, isLoggedIn, ratingAvg, setCommentFlag, category, 
     const getCommentList = async () => {
         try {
             const { data } = await commentApi.getCommentList(postId);
-            setCommentList(data.result.content);
+            // 방금 쓰거나 지운 댓글이 검색에 반영되기 전이면 기록으로 보여 준다
+            setCommentList(mergeComments(postId, data.result.content));
         } catch {}
     };
 
@@ -44,12 +46,14 @@ const CommentPage = ({ postId, isLoggedIn, ratingAvg, setCommentFlag, category, 
             onConfirm: async () => {
                 setModal(prev => ({ ...prev, show: false }));
                 try {
-                    await commentApi.deleteComment(commentId);
+                    const { data } = await commentApi.deleteComment(commentId);
                     setCommentList(prev => prev.filter((c) => c.commentId !== commentId));
+                    recordCommentRemove(postId, commentId);
                     const message = "댓글이 삭제되었습니다.";
                     setAlert({ show: true, message, type: "success" });
                     trackCommentRemove({ postId, category, region, title });
-                    setCommentFlag?.(prev => !prev);
+                    // 댓글 수·평균 별점은 응답 값으로 바로 반영 (검색엔진 반영을 기다리지 않음)
+                    onStatsChange?.({ commentCount: data.result.commentCount, starAvg: data.result.starAvg });
                 } catch (err) {
                     const message = err.response?.data?.message || "오류가 발생했습니다.";
                     setAlert({ show: true, message, type: "danger" });
@@ -71,10 +75,13 @@ const CommentPage = ({ postId, isLoggedIn, ratingAvg, setCommentFlag, category, 
                 memberNickname: localStorage.getItem("nickname") || "",
                 content: payload.content,
                 star: payload.star,
+                ...(data.result.createdAt ? { createdAt: data.result.createdAt } : {}),
             };
             setCommentList(prev => [newComment, ...prev]);
+            // 새로고침·재진입해도 검색에 반영되기 전까지 보이도록 기록한다
+            recordCommentAdd(postId, newComment);
             setAlert({ show: true, message: "댓글이 등록되었습니다.", type: "success" });
-            setCommentFlag?.(prev => !prev);
+            onStatsChange?.({ commentCount: data.result.commentCount, starAvg: data.result.starAvg });
         } catch (err) {
             const message = err.response?.data?.message || "오류가 발생했습니다.";
             setAlert({ show: true, message, type: "danger" });

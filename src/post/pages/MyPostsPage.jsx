@@ -5,6 +5,7 @@ import { getMyPosts } from '../../api/postSearchApi';
 import LoadingSpinner from "../../components/LoadingSpinner";
 import useAlert from "../../hooks/useAlert";
 import PostListCard from "../components/PostListCard";
+import { mergePostList } from "../../utils/pendingWrites";
 
 const MyPostsPage = () => {
     const [posts, setPosts] = useState([]);
@@ -19,7 +20,8 @@ const MyPostsPage = () => {
         setError(null);
         try {
             const { data } = await getMyPosts();
-            setPosts(data.result.content);
+            // 서버 정렬이 작성일 내림차순이라, 검색에 반영되기 전인 방금 쓴 글을 맨 앞에 넣는다
+            setPosts(mergePostList(data.result.content, { insertCreated: true }));
         } catch (e) {
             setError(e);
         } finally {

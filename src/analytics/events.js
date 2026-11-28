@@ -265,10 +265,10 @@ export const trackPostRemove = ({ postId, category, region }) => {
 
 /**
  * 검색 결과 로드 성공 시 발화. resultCount 0 = 콘텐츠 갭 신호.
- * 정렬/페이지 이동도 결과 로드이므로 매 로드마다 발화된다.
- * 호출 위치: src/post/pages/PostListPage.jsx
+ * 정렬 변경·무한스크롤 추가 로드도 결과 로드이므로 매 로드마다 발화된다.
+ * 호출 위치: src/hooks/usePostFeed.js
  * 페이로드: keyword, category(코드값), region(코드값),
- *           resultCount(number — 전체 건수, 서버가 안 주면 현재 페이지 건수)
+ *           resultCount(number — 이번에 읽은 건수, 피드는 전체 건수를 세지 않는다)
  *   — URL 파라미터는 검색 화면에서 오면 한글 라벨, 메인 랭킹에서 오면 코드값이라 여기서 코드값으로 통일한다.
  */
 export const trackSearchResult = ({ keyword, category, region, resultCount }) => {
@@ -283,7 +283,7 @@ export const trackSearchResult = ({ keyword, category, region, resultCount }) =>
 /**
  * 검색 결과 리스트에서 게시글 카드 클릭 시 발화. (검색 CTR)
  * 호출 위치: src/post/pages/PostListPage.jsx
- * 페이로드: postId(number|null), position(number — 현재 페이지 내 순번, 1부터), keyword
+ * 페이로드: postId(number|null), position(number — 목록 내 순번, 1부터), keyword
  */
 export const trackListItemClick = ({ postId, position, keyword }) => {
   pushCatalogEvent(EVENT_NAMES.LIST_ITEM_CLICK, {
@@ -311,7 +311,7 @@ export const trackRankingClick = ({ rankType, rank, label, postId }) => {
 /**
  * 사용자 체감 장애 발생 시 발화.
  * - 렌더 크래시: src/components/ErrorBoundary.jsx (errorType "render")
- * - 목록 로드 실패(에러 화면 노출): src/post/pages/PostListPage.jsx (errorType "api")
+ * - 목록 로드 실패(에러 화면 노출): src/hooks/usePostFeed.js (errorType "api")
  * 페이로드: errorType("render"|"api"), message(string|null), path(string — window.location.pathname)
  */
 export const trackError = ({ errorType, message, path }) => {

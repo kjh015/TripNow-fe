@@ -8,6 +8,7 @@ import CommentPage from "../../comment/components/CommentPage";
 import useAlert from "../../hooks/useAlert";
 import PostContent from "../components/PostContent";
 import { trackFavoriteAdd, trackFavoriteRemove, trackDetailPageview, trackDetailExit } from "../../analytics/events";
+import { mergePost, getPendingPost } from "../../utils/pendingWrites";
 
 const PostDetailPage = () => {
   const enterTime = useRef(Date.now());
@@ -22,7 +23,6 @@ const PostDetailPage = () => {
     travelPlace: '', address: '', category: '', region: '', images: [],
     updatedAt: '', starAvg: '', viewCount: '', likeCount: '', commentCount: ''
   });
-  const [commentFlag, setCommentFlag] = useState(false);
   const [liked, setLiked] = useState(false);
   const { alert, showAlert } = useAlert(2500);
 
@@ -36,19 +36,22 @@ const PostDetailPage = () => {
 
   const handleLike = async () => {
     try {
+      // 좋아요 수는 응답 값으로 바로 바꾼다. 상세 조회는 검색엔진 반영을 거쳐 늦게 바뀐다
       if (liked) {
-        await deleteLike(Number(postId));
+        const { data } = await deleteLike(Number(postId));
+        setPost(prev => ({ ...prev, likeCount: data.result.likeCount }));
         setLiked(false);
         trackFavoriteRemove(post);
         showAlert("찜 목록에서 삭제되었습니다.", "danger");
       } else {
-        await addLike(Number(postId));
+        const { data } = await addLike(Number(postId));
+        setPost(prev => ({ ...prev, likeCount: data.result.likeCount }));
         setLiked(true);
         trackFavoriteAdd(post);
         showAlert("찜 목록에 추가되었습니다.", "success");
       }
-    } catch {
-      showAlert("오류가 발생했습니다.", "danger");
+    } catch (err) {
+      showAlert(err.response?.data?.message || "오류가 발생했습니다.", "danger");
     }
   };
 
@@ -63,21 +66,42 @@ const PostDetailPage = () => {
     }
   };
 
+  const showPost = (loaded) => {
+    titleRef.current = loaded.title;
+    setPost({ ...loaded, images: loaded.images || [] });
+  };
+
   const loadPost = async () => {
     try {
       const { data } = await getPost(postId);
-      const post = data.result;
-      titleRef.current = post.title;
-      setPost({ ...post, images: post.images || [] });
-    } catch {
+      // 방금 수정·삭제한 내용이 검색에 반영되기 전이면 기록으로 보여 준다. 삭제 기록이 이기면 없는 글로 본다
+      const merged = mergePost(data.result);
+      if (!merged) {
+        showAlert("게시글을 불러오지 못했습니다.", "danger");
+        return;
+      }
+      showPost(merged);
+    } catch (err) {
+      // 방금 작성한 글은 검색에 반영되기 전까지 404다. 작성 기록이 있으면 그 값(통계 0)으로 그린다
+      const pending = err.response?.status === 404 ? getPendingPost(postId) : null;
+      if (pending) {
+        showPost(pending);
+        return;
+      }
       showAlert("게시글을 불러오지 못했습니다.", "danger");
     }
   };
 
+  // 댓글 작성·삭제 응답의 게시글 통계(댓글 수·평균 별점)를 화면에 바로 반영한다
+  const handleCommentStatsChange = ({ commentCount, starAvg }) => {
+    setPost(prev => ({ ...prev, commentCount, starAvg }));
+  };
+
+  // 찜·댓글 뒤에는 다시 조회하지 않는다. 검색엔진 반영 전 값으로 응답 값을 덮어쓰기 때문
   useEffect(() => {
     loadPost();
     getLike();
-  }, [postId, liked, commentFlag]);
+  }, [postId]);
 
   // 이탈 추적: no에만 의존해 실제 상세 진입/이탈 시에만 발화 (찜/댓글 상호작용에는 반응하지 않음)
   useEffect(() => {
@@ -126,7 +150,7 @@ const PostDetailPage = () => {
                     postId={post.postId}
                     isLoggedIn={isLoggedIn}
                     ratingAvg={post.starAvg}
-                    setCommentFlag={setCommentFlag}
+                    onStatsChange={handleCommentStatsChange}
                     category={post.category}
                     region={post.region}
                     title={post.title}
