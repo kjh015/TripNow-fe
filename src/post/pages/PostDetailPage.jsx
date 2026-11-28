@@ -8,6 +8,7 @@ import CommentPage from "../../comment/components/CommentPage";
 import useAlert from "../../hooks/useAlert";
 import PostContent from "../components/PostContent";
 import { trackFavoriteAdd, trackFavoriteRemove, trackDetailPageview, trackDetailExit } from "../../analytics/events";
+import { mergePost, getPendingPost } from "../../utils/pendingWrites";
 
 const PostDetailPage = () => {
   const enterTime = useRef(Date.now());
@@ -65,13 +66,28 @@ const PostDetailPage = () => {
     }
   };
 
+  const showPost = (loaded) => {
+    titleRef.current = loaded.title;
+    setPost({ ...loaded, images: loaded.images || [] });
+  };
+
   const loadPost = async () => {
     try {
       const { data } = await getPost(postId);
-      const post = data.result;
-      titleRef.current = post.title;
-      setPost({ ...post, images: post.images || [] });
-    } catch {
+      // 방금 수정·삭제한 내용이 검색에 반영되기 전이면 기록으로 보여 준다. 삭제 기록이 이기면 없는 글로 본다
+      const merged = mergePost(data.result);
+      if (!merged) {
+        showAlert("게시글을 불러오지 못했습니다.", "danger");
+        return;
+      }
+      showPost(merged);
+    } catch (err) {
+      // 방금 작성한 글은 검색에 반영되기 전까지 404다. 작성 기록이 있으면 그 값(통계 0)으로 그린다
+      const pending = err.response?.status === 404 ? getPendingPost(postId) : null;
+      if (pending) {
+        showPost(pending);
+        return;
+      }
       showAlert("게시글을 불러오지 못했습니다.", "danger");
     }
   };
