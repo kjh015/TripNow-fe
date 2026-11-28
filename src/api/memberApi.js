@@ -34,9 +34,11 @@ export const checkEmail = (email) =>
 
 // === Admin ===
 
-// 전체 회원 목록
-export const getAdminMembers = () =>
-  apiClient.get('/api/v1/admin/members');
+// 회원 목록 검색 (값이 없는 조건은 적용되지 않음)
+export const getAdminMembers = ({ keyword, provider, role, deleted, joinedFrom, joinedTo, page, size, sort } = {}) =>
+  apiClient.get('/api/v1/admin/members', {
+    params: { keyword, provider, role, deleted, joinedFrom, joinedTo, page, size, sort },
+  });
 
 // 회원 상세
 export const getAdminMember = (memberId) =>

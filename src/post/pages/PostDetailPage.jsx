@@ -22,7 +22,6 @@ const PostDetailPage = () => {
     travelPlace: '', address: '', category: '', region: '', images: [],
     updatedAt: '', starAvg: '', viewCount: '', likeCount: '', commentCount: ''
   });
-  const [commentFlag, setCommentFlag] = useState(false);
   const [liked, setLiked] = useState(false);
   const { alert, showAlert } = useAlert(2500);
 
@@ -36,19 +35,22 @@ const PostDetailPage = () => {
 
   const handleLike = async () => {
     try {
+      // 좋아요 수는 응답 값으로 바로 바꾼다. 상세 조회는 검색엔진 반영을 거쳐 늦게 바뀐다
       if (liked) {
-        await deleteLike(Number(postId));
+        const { data } = await deleteLike(Number(postId));
+        setPost(prev => ({ ...prev, likeCount: data.result.likeCount }));
         setLiked(false);
         trackFavoriteRemove(post);
         showAlert("찜 목록에서 삭제되었습니다.", "danger");
       } else {
-        await addLike(Number(postId));
+        const { data } = await addLike(Number(postId));
+        setPost(prev => ({ ...prev, likeCount: data.result.likeCount }));
         setLiked(true);
         trackFavoriteAdd(post);
         showAlert("찜 목록에 추가되었습니다.", "success");
       }
-    } catch {
-      showAlert("오류가 발생했습니다.", "danger");
+    } catch (err) {
+      showAlert(err.response?.data?.message || "오류가 발생했습니다.", "danger");
     }
   };
 
@@ -74,10 +76,16 @@ const PostDetailPage = () => {
     }
   };
 
+  // 댓글 작성·삭제 응답의 게시글 통계(댓글 수·평균 별점)를 화면에 바로 반영한다
+  const handleCommentStatsChange = ({ commentCount, starAvg }) => {
+    setPost(prev => ({ ...prev, commentCount, starAvg }));
+  };
+
+  // 찜·댓글 뒤에는 다시 조회하지 않는다. 검색엔진 반영 전 값으로 응답 값을 덮어쓰기 때문
   useEffect(() => {
     loadPost();
     getLike();
-  }, [postId, liked, commentFlag]);
+  }, [postId]);
 
   // 이탈 추적: no에만 의존해 실제 상세 진입/이탈 시에만 발화 (찜/댓글 상호작용에는 반응하지 않음)
   useEffect(() => {
@@ -126,7 +134,7 @@ const PostDetailPage = () => {
                     postId={post.postId}
                     isLoggedIn={isLoggedIn}
                     ratingAvg={post.starAvg}
-                    setCommentFlag={setCommentFlag}
+                    onStatsChange={handleCommentStatsChange}
                     category={post.category}
                     region={post.region}
                     title={post.title}

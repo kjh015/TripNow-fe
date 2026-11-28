@@ -9,19 +9,22 @@ const SORT_TYPE_MAP = {
   viewCount: 'VIEW_COUNT',
 };
 
+// 검색 조건을 API 파라미터 값으로 변환
+const toSearchParams = ({ keyword, category, region, sort, direction }) => ({
+  keyword,
+  category: category ? (CATEGORY_LABEL_TO_CODE[category] ?? category) : undefined,
+  region: region ? (REGION_LABEL_TO_CODE[region] ?? region) : undefined,
+  sort: sort ? (SORT_TYPE_MAP[sort] ?? sort.toUpperCase()) : undefined,
+  direction: direction ? direction.toUpperCase() : undefined,
+});
+
 // 게시글 통합 검색
-export const getPostListBySearch = ({ keyword, category, region, sort, direction, page, size } = {}) =>
-  apiClient.get('/api/v1/search/posts', {
-    params: {
-      keyword,
-      category: category ? (CATEGORY_LABEL_TO_CODE[category] ?? category) : undefined,
-      region: region ? (REGION_LABEL_TO_CODE[region] ?? region) : undefined,
-      sort: sort ? (SORT_TYPE_MAP[sort] ?? sort.toUpperCase()) : undefined,
-      direction: direction ? direction.toUpperCase() : undefined,
-      page,
-      size,
-    },
-  });
+export const getPostListBySearch = ({ page, size, ...search } = {}) =>
+  apiClient.get('/api/v1/search/posts', { params: { ...toSearchParams(search), page, size } });
+
+// 게시글 피드 조회 (무한스크롤)
+export const getPostFeed = ({ cursor, size, ...search } = {}) =>
+  apiClient.get('/api/v1/search/posts/feed', { params: { ...toSearchParams(search), cursor, size } });
 
 // 게시글 상세 조회
 export const getPost = (postId) =>
